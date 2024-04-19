@@ -8,6 +8,7 @@ import (
 	"github.com/eklairs/tlock/internal/modelmanager"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"golang.org/x/term"
+    "github.com/pquerna/otp"
 )
 
 type dashboardStyles struct {
@@ -22,6 +23,7 @@ type dashboardStyles struct {
 type DashboardModel struct {
     styles dashboardStyles
     vault tlockvault.TLockVault
+    current_index int
 }
 
 // Initialize root model
@@ -37,6 +39,7 @@ func InitializeDashboardModel(vault tlockvault.TLockVault) DashboardModel {
             dimmedCenter: dimmed.Width(30).Copy().Align(lipgloss.Center),
         },
         vault: vault,
+        current_index: 0,
     }
 }
 
@@ -59,7 +62,7 @@ func (m DashboardModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 
 // View
 func (m DashboardModel) View() string {
-    _, height, _ := term.GetSize(0)
+    width, height, _ := term.GetSize(0)
 
     style := lipgloss.NewStyle().Width(30).Height(height)
 
@@ -76,9 +79,30 @@ func (m DashboardModel) View() string {
         folders = append(folders, lipgloss.NewStyle().MarginTop(1).Render(ui))
     }
 
+    // Tokens
+    tokens := make([]string, 0)
+
+    for _, uri := range m.vault.Data.Folders[m.current_index].Uris {
+        style := lipgloss.NewStyle().
+            Width(width - 30 - 2).
+            Padding(1, 3).
+            MarginBottom(1).
+            Background(lipgloss.Color("#1E1E2E"))
+
+        totp, _ := otp.NewKeyFromURL(uri)
+
+        tokens = append(tokens, style.Render(fmt.Sprintf("%s • %s", totp.AccountName(), totp.Issuer())))
+    }
+
+    ui := []string {
+        style.Render(lipgloss.JoinVertical(lipgloss.Left, folders...)),
+    }
+
+    ui = append(ui, lipgloss.JoinVertical(lipgloss.Left, tokens...))
+
     return lipgloss.JoinHorizontal(
         lipgloss.Left,
-        style.Render(lipgloss.JoinVertical(lipgloss.Left, folders...)),
+        ui...
     )
 }
 

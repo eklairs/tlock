@@ -17,7 +17,7 @@ func InitializeRootModel() RootModel {
     temp_vault, _ := tlockvault.Load("/home/kyeboard/.local/share/tlock/root/6153db12-9995-4c50-abb4-584be0216550/vault.dat", "")
 
     return RootModel {
-        modelmanager: modelmanager.New(InitializeNewFolderModel(*temp_vault)),
+        modelmanager: modelmanager.New(InitializeDashboardModel(*temp_vault)),
     }
 }
 
