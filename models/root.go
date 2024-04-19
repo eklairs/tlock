@@ -17,7 +17,7 @@ func InitializeRootModel() RootModel {
     core := tlockcore.New()
 
     return RootModel {
-        modelmanager: modelmanager.New(InitializeSelectUserModel(core)),
+        modelmanager: modelmanager.New(InitializeEnterPassModel(core)),
     }
 }
 
