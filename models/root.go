@@ -4,7 +4,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/eklairs/tlock/internal/modelmanager"
-	tlockcore "github.com/eklairs/tlock/tlock-core"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
 
@@ -15,11 +14,10 @@ type RootModel struct {
 
 // Initialize root model
 func InitializeRootModel() RootModel {
-    core := tlockcore.New()
-    temp_vault = tlockvault.Load("~/.local/share/tlock/root/6153db12-9995-4c50-abb4-584be0216550/vault.dat", "")
+    temp_vault, _ := tlockvault.Load("/home/kyeboard/.local/share/tlock/root/6153db12-9995-4c50-abb4-584be0216550/vault.dat", "")
 
     return RootModel {
-        modelmanager: modelmanager.New(InitializeSelectUserModel(core)),
+        modelmanager: modelmanager.New(InitializeDashboardModel(*temp_vault)),
     }
 }
 

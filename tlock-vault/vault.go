@@ -55,7 +55,7 @@ func Load(path, password string) (*TLockVault, error) {
 func Decrypt(data []byte) (*TLockVaultData, error) {
     out := TLockVaultData{}
 
-    if err := yaml.Unmarshal(data, out); err != nil {
+    if err := yaml.Unmarshal(data, &out); err != nil {
         return nil, err
     }
 
