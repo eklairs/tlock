@@ -61,3 +61,20 @@ func Decrypt(data []byte) (*TLockVaultData, error) {
 
     return &out, nil
 }
+
+func (vault TLockVault) write() {
+    f, _ := os.Create(vault.Vault_path)
+
+    b, _ := yaml.Marshal(vault.Data)
+
+    if _, err := f.Write(b); err != nil {
+
+    }
+}
+
+func (vault *TLockVault) AddFolder(name string) {
+    vault.Data.Folders = append(vault.Data.Folders, struct{Name string; Uris []string}{ Name: name, Uris: []string {} })
+
+    vault.write()
+}
+
