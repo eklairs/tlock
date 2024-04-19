@@ -5,6 +5,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/internal/modelmanager"
+	tlockcore "github.com/eklairs/tlock/tlock-core"
 )
 
 var ascii = `
@@ -24,12 +25,13 @@ type newUserStyles struct {
 // Root Model
 type NewUserModel struct {
     styles newUserStyles
+    core tlockcore.TLockCore
     usernameInput textinput.Model
     passwordInput textinput.Model
 }
 
 // Initialize root model
-func InitializeNewUserModel() NewUserModel {
+func InitializeNewUserModel(core tlockcore.TLockCore) NewUserModel {
     dimmed := lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
 
     usernameInput := textinput.New();
@@ -54,6 +56,7 @@ func InitializeNewUserModel() NewUserModel {
         },
         usernameInput: usernameInput,
         passwordInput: passwordInput,
+        core: core,
     }
 }
 
@@ -75,6 +78,8 @@ func (m NewUserModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) (m
                 m.usernameInput.Focus()
                 m.passwordInput.Blur()
             }
+        case "enter":
+            m.core.Users.AddNewUser(m.usernameInput.Value(), m.passwordInput.Value())
         }
     }
 

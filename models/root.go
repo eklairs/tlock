@@ -4,6 +4,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/eklairs/tlock/internal/modelmanager"
+	tlockcore "github.com/eklairs/tlock/tlock-core"
 )
 
 // Root Model
@@ -13,8 +14,10 @@ type RootModel struct {
 
 // Initialize root model
 func InitializeRootModel() RootModel {
+    core := tlockcore.New()
+
     return RootModel {
-        modelmanager: modelmanager.New(InitializeNewUserModel()),
+        modelmanager: modelmanager.New(InitializeNewUserModel(core)),
     }
 }
 

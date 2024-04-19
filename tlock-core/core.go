@@ -13,8 +13,3 @@ func New() TLockCore {
     }
 }
 
-// Returns a list of all the available users
-func (core TLockCore) GetUsers() []string {
-    return []string {}
-}
-
