@@ -13,13 +13,13 @@ var USERS_PATH = path.Join(xdg.DataHome, "tlock", "users.yaml")
 
 // Represents a user
 type UserSpec struct {
-    Username string
-    Vault string
+    Username string `yaml:"username"`
+    Vault string `yaml:"vault"`
 }
 
 // Users API for tlock
 type TLockUsers struct {
-    Users []UserSpec
+    Users []UserSpec `yaml:"users"`
 }
 
 // Loads the list of users
@@ -30,18 +30,18 @@ func LoadTLockUsers() TLockUsers {
         return TLockUsers{}
     }
 
-    users := []UserSpec{}
+    users := TLockUsers{}
 
-    if err = yaml.Unmarshal(raw, users); err != nil {
+    if err = yaml.Unmarshal(raw, &users); err != nil {
         return TLockUsers{}
     }
 
-    return TLockUsers{ Users: users }
+    return users
 }
 
 // Writes the current users value to the file
 func (users TLockUsers) write() {
-    data, _ := yaml.Marshal(users.Users)
+    data, _ := yaml.Marshal(users)
 
     file, err := os.Create(path.Join(xdg.DataHome, "tlock", "users.yaml"))
 
