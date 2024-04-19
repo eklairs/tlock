@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/adrg/xdg"
+	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"gopkg.in/yaml.v2"
 )
 
@@ -54,7 +55,8 @@ func (users TLockUsers) write() {
 
 // Adds a new user
 func (users *TLockUsers) AddNewUser(username, password string) {
-    users.Users = append(users.Users, UserSpec{ Username: username })
+    vault_path := tlockvault.Initialize(password)
+    users.Users = append(users.Users, UserSpec{ Username: username, Vault: vault_path })
 
     users.write()
 }

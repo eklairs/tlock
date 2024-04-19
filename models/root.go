@@ -5,6 +5,7 @@ import (
 
 	"github.com/eklairs/tlock/internal/modelmanager"
 	tlockcore "github.com/eklairs/tlock/tlock-core"
+	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
 
 // Root Model
@@ -15,9 +16,10 @@ type RootModel struct {
 // Initialize root model
 func InitializeRootModel() RootModel {
     core := tlockcore.New()
+    temp_vault = tlockvault.Load("~/.local/share/tlock/root/6153db12-9995-4c50-abb4-584be0216550/vault.dat", "")
 
     return RootModel {
-        modelmanager: modelmanager.New(InitializeEnterPassModel(core)),
+        modelmanager: modelmanager.New(InitializeSelectUserModel(core)),
     }
 }
 
