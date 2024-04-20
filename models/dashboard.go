@@ -116,14 +116,18 @@ func (m DashboardModel) View() string {
             Width(width - 30 - 2).
             Padding(1, 3).
             MarginBottom(1)
+        title := lipgloss.NewStyle().Foreground(lipgloss.Color("4"))
+        issuer := lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
 
         if index == m.token_current_index {
             style = style.Background(lipgloss.Color("#1E1E2E"))
+            title = title.Background(lipgloss.Color("#1E1E2E")).Bold(true)
+            issuer = issuer.Background(lipgloss.Color("#1E1E2E")).Bold(true)
         }
 
         totp, _ := otp.NewKeyFromURL(uri)
 
-        tokens = append(tokens, style.Render(fmt.Sprintf("%s • %s", totp.AccountName(), totp.Issuer())))
+        tokens = append(tokens, style.Render(fmt.Sprintf("%s • %s", title.Render(totp.AccountName()), issuer.Render(totp.Issuer()))))
     }
 
     ui := []string {
