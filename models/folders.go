@@ -6,6 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/internal/boundedinteger"
+	"github.com/eklairs/tlock/internal/modelmanager"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"golang.org/x/term"
 )
@@ -34,7 +35,18 @@ func InitializeFolders(vault tlockvault.TLockVault) Folders {
 }
 
 // Handles update messages
-func (folders *Folders) Update(msg tea.Msg) tea.Cmd {
+func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) tea.Cmd {
+    switch msgType := msg.(type) {
+    case tea.KeyMsg:
+        switch msgType.String() {
+        case "J":
+            folders.focused_index.Increase()
+        case "K":
+            folders.focused_index.Decrease()
+        case "X":
+            manager.PushScreen(InitializeDeleteFolderModel(&folders.vault, folders.vault.Data.Folders[folders.focused_index.Value].Name))
+        }
+    }
     return nil
 }
 
@@ -61,7 +73,7 @@ func (folders Folders) View() string {
             folders.styles.dimmed.Render(fmt.Sprintf("%d tokens", len(folder.Uris))),
         )
 
-        items = append(items, render_fn(ui))
+        items[index] = render_fn(ui)
     }
 
     return style.Render(lipgloss.JoinVertical(lipgloss.Left, items...))

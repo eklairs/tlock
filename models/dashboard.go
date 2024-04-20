@@ -56,6 +56,9 @@ func (m DashboardModel) Update(msg tea.Msg, manager *ModelManager) (Screen, tea.
         }
     }
 
+    m.folders.Update(msg, manager)
+    m.tokens.Update(msg)
+
     return m, nil
 }
 
