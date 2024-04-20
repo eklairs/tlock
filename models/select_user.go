@@ -3,12 +3,47 @@ package models
 import (
 	"strings"
 
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/internal/boundedinteger"
 	"github.com/eklairs/tlock/internal/modelmanager"
 	tlockcore "github.com/eklairs/tlock/tlock-core"
 )
+
+type selectUserKeyMap struct {
+    Up key.Binding
+    Down key.Binding
+    New key.Binding
+}
+
+func (k selectUserKeyMap) ShortHelp() []key.Binding {
+	return []key.Binding{k.Up, k.Down, k.New}
+}
+
+func (k selectUserKeyMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{
+        {k.Up},
+        {k.Down},
+        {k.New},
+	}
+}
+
+var keys = selectUserKeyMap{
+	Up: key.NewBinding(
+		key.WithKeys("up", "k"),
+		key.WithHelp("↑/k", "move up"),
+	),
+	Down: key.NewBinding(
+		key.WithKeys("down", "j"),
+		key.WithHelp("↓/j", "move down"),
+	),
+	New: key.NewBinding(
+		key.WithKeys("c"),
+		key.WithHelp("c", "new user"),
+	),
+}
 
 var _ascii = `
  _____     _         _      _____             
@@ -20,6 +55,7 @@ var _ascii = `
 type selectUserStyles struct {
     title lipgloss.Style
     titleCenter lipgloss.Style
+    center lipgloss.Style
     dimmed lipgloss.Style
     dimmedCenter lipgloss.Style
     input lipgloss.Style
@@ -30,6 +66,7 @@ type selectUserStyles struct {
 // Root Model
 type SelectUserModel struct {
     styles selectUserStyles
+    help help.Model
     focused_index boundedinteger.BoundedInteger
     core tlockcore.TLockCore
 }
@@ -47,9 +84,11 @@ func InitializeSelectUserModel(core tlockcore.TLockCore) SelectUserModel {
             dimmedCenter: dimmed.Width(65).Copy().Align(lipgloss.Center),
             userItem: lipgloss.NewStyle().Padding(1, 3).Width(65).Foreground(lipgloss.Color("8")),
             userItemFocused: lipgloss.NewStyle().Padding(1, 3).Width(65).Background(lipgloss.Color("#1E1E2E")).Foreground(lipgloss.Color("12")),
+            center: lipgloss.NewStyle().Align(lipgloss.Center).Width(65),
         },
         core: core,
         focused_index: boundedinteger.New(0, len(core.Users.Users)),
+        help: help.New(),
     }
 }
 
@@ -71,6 +110,9 @@ func (m SelectUserModel) Update(msg tea.Msg, manager *modelmanager.ModelManager)
 
         case "enter":
             manager.PushScreen(InitializeEnterPassModel(m.core, m.focused_index.Value))
+
+        case "c":
+            manager.PushScreen(InitializeNewUserModel(m.core))
         }
     }
 
@@ -81,7 +123,7 @@ func (m SelectUserModel) Update(msg tea.Msg, manager *modelmanager.ModelManager)
 func (m SelectUserModel) View() string {
     user_items := []string {
         m.styles.titleCenter.Render(_ascii), // Title
-        m.styles.dimmedCenter.Render("Select a user to continue as"), "", "",
+        m.styles.dimmedCenter.Render("Select a user to continue as"), "",
     }
 
     for index, user := range m.core.Users.Users {
@@ -102,6 +144,8 @@ func (m SelectUserModel) View() string {
 
         user_items = append(user_items, renderable)
     }
+
+    user_items = append(user_items, "", m.styles.center.Render(m.help.View(keys)))
 
     return lipgloss.JoinVertical(
         lipgloss.Left,

@@ -3,12 +3,42 @@ package models
 import (
 	"fmt"
 
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/internal/modelmanager"
 	tlockcore "github.com/eklairs/tlock/tlock-core"
+	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
+
+type enterPassKeys struct {
+    Login key.Binding
+    Back key.Binding
+}
+
+func (k enterPassKeys) ShortHelp() []key.Binding {
+	return []key.Binding{k.Login, k.Back}
+}
+
+func (k enterPassKeys) FullHelp() [][]key.Binding {
+	return [][]key.Binding{
+        {k.Login},
+        {k.Back},
+	}
+}
+
+var enter_pass_keys = enterPassKeys{
+	Login: key.NewBinding(
+		key.WithKeys("enter"),
+		key.WithHelp("enter", "login"),
+	),
+	Back: key.NewBinding(
+		key.WithKeys("esc"),
+		key.WithHelp("esc", "go back"),
+	),
+}
 
 var __ascii = `
  _____     _              _____             
@@ -23,12 +53,14 @@ type enterPassStyles struct {
     dimmed lipgloss.Style
     dimmedCenter lipgloss.Style
     input lipgloss.Style
+    center lipgloss.Style
 }
 
 // Root Model
 type EnterPassModel struct {
     styles enterPassStyles
     passInput textinput.Model
+    help help.Model
     core tlockcore.TLockCore
     userSpec tlockcore.UserSpec
 }
@@ -51,7 +83,9 @@ func InitializeEnterPassModel(core tlockcore.TLockCore, userIndex int) EnterPass
             input: lipgloss.NewStyle().Padding(1, 3).Width(65).Background(lipgloss.Color("#1e1e2e")),
             dimmed: dimmed,
             dimmedCenter: dimmed.Width(65).Copy().Align(lipgloss.Center),
+            center: lipgloss.NewStyle().Align(lipgloss.Center).Width(65),
         },
+        help: help.New(),
         core: core,
         passInput: passwordInput,
         userSpec: core.Users.Users[userIndex],
@@ -68,7 +102,12 @@ func (m EnterPassModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
     switch msgType := msg.(type) {
     case tea.KeyMsg:
         switch msgType.String() {
+        case "esc":
+            manager.PopScreen()
+        case "enter":
+            vault, _ := tlockvault.Load(m.userSpec.Vault, m.passInput.Value())
 
+            manager.PushScreen(InitializeDashboardModel(*vault))
         }
     }
 
@@ -86,6 +125,7 @@ func (m EnterPassModel) View() string {
         m.styles.title.Render("Password"), // Username header
         m.styles.dimmed.Render("Enter the super secret password"), // Username description
         m.styles.input.Render(m.passInput.View()), "",
+        m.styles.center.Render(m.help.View(enter_pass_keys)),
     )
 }
 
