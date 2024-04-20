@@ -40,6 +40,12 @@ type Styles struct {
 
     // Error
     error lipgloss.Style
+
+    // Folder inactive
+    folderInactive lipgloss.Style
+
+    // Folder active
+    folderActive lipgloss.Style
 }
 
 // Initializes the styles
@@ -62,12 +68,14 @@ func InitializeStyles(width int) Styles {
         dimmed: dimmed,
         inactive: listItem,
         error: base.Copy().Foreground(COLOR_RED),
+        folderInactive: base.Copy().Padding(1, 3),
         dimmedBgOver: dimmed.Copy().Background(COLOR_BG_OVER),
         input: base.Copy().Padding(1, 3).Background(COLOR_BG_OVER),
         center: base.Copy().Align(lipgloss.Center, lipgloss.Center),
         titleCenter: title.Copy().Align(lipgloss.Center, lipgloss.Center),
         dimmedCenter: dimmed.Copy().Align(lipgloss.Center, lipgloss.Center),
         active: listItem.Copy().Background(COLOR_BG_OVER).Foreground(COLOR_ACCENT),
+        folderActive: base.Copy().Background(COLOR_BG_OVER).Padding(1, 2).BorderBackground(lipgloss.Color("#1E1E2E")).Border(lipgloss.ThickBorder(), false, false, false, true),
     }
 }
 
