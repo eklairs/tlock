@@ -6,21 +6,22 @@ import (
 	"path"
 
 	"github.com/adrg/xdg"
+	"github.com/kelindar/binary"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
-	"gopkg.in/yaml.v2"
 )
 
-var USERS_PATH = path.Join(xdg.DataHome, "tlock", "users.yaml")
+// Users
+var USERS_PATH = path.Join(xdg.DataHome, "tlock", "users")
 
 // Represents a user
 type UserSpec struct {
-    Username string `yaml:"username"`
-    Vault string `yaml:"vault"`
+    Username string
+    Vault string
 }
 
 // Users API for tlock
 type TLockUsers struct {
-    Users []UserSpec `yaml:"users"`
+    Users []UserSpec
 }
 
 // Loads the list of users
@@ -39,7 +40,7 @@ func LoadTLockUsers() TLockUsers {
     users := TLockUsers{}
 
     // Parse
-    if err = yaml.Unmarshal(raw, &users); err != nil {
+    if err = binary.Unmarshal(raw, &users); err != nil {
         log.Fatalf("[users] Failed to parse users map, syntax error possibly: %v", err)
     }
 
@@ -48,23 +49,33 @@ func LoadTLockUsers() TLockUsers {
 
 // Writes the current users value to the file
 func (users TLockUsers) write() {
-    data, _ := yaml.Marshal(users)
+    // Serialize
+    data, _ := binary.Marshal(users)
 
-    file, err := os.Create(path.Join(xdg.DataHome, "tlock", "users.yaml"))
+    // Create file
+    file, err := os.Create(USERS_PATH)
 
+    // Check for errors
     if err != nil {
         log.Fatalf("Failed to create users file")
     }
 
+    // Write
     file.Write(data)
 }
 
 // Adds a new user
 func (users *TLockUsers) AddNewUser(username, password string) tlockvault.TLockVault {
+    // Initialize new vault
     vault := tlockvault.Initialize(password)
-    users.Users = append(users.Users, UserSpec{ Username: username, Vault: vault.Vault_path })
 
+    // Add to users
+    users.Users = append(users.Users, UserSpec{ Username: username, Vault: vault.VaultPath })
+
+    // Write
     users.write()
 
+    // Return vault
     return vault
 }
+
