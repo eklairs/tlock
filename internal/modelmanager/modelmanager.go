@@ -46,10 +46,12 @@ func (manager ModelManager) Update(msg tea.Msg) (ModelManager, tea.Cmd) {
 	}
 
 	// Update current model
-	var cmd tea.Cmd
 	currentScreenIndex := len(manager.screens) - 1
+    updated_screen, cmd := manager.screens[currentScreenIndex].Update(msg, &manager)
 
-	manager.screens[currentScreenIndex], cmd = manager.screens[currentScreenIndex].Update(msg, &manager)
+    if currentScreenIndex == len(manager.screens) - 1 {
+        manager.screens[currentScreenIndex] = updated_screen
+    }
 
 	cmds = append(cmds, cmd)
 
