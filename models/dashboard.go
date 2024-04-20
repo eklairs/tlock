@@ -24,6 +24,7 @@ type DashboardModel struct {
     styles dashboardStyles
     vault tlockvault.TLockVault
     current_index int
+    token_current_index int
 }
 
 // Initialize root model
@@ -55,11 +56,21 @@ func (m DashboardModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
         switch msgType.String() {
         case "J":
             m.current_index = (m.current_index + 1) % len(m.vault.Data.Folders)
+            m.token_current_index = 0
         case "K":
             if m.current_index == 0 {
                 m.current_index = len(m.vault.Data.Folders) - 1
             } else {
                 m.current_index -= 1
+            }
+            m.token_current_index = 0
+        case "j":
+            m.token_current_index = (m.token_current_index + 1) % len(m.vault.Data.Folders[m.current_index].Uris)
+        case "k":
+            if m.token_current_index == 0 {
+                m.token_current_index = len(m.vault.Data.Folders[m.current_index].Uris) - 1
+            } else {
+                m.token_current_index -= 1
             }
         }
     }
@@ -89,12 +100,15 @@ func (m DashboardModel) View() string {
     // Tokens
     tokens := make([]string, 0)
 
-    for _, uri := range m.vault.Data.Folders[m.current_index].Uris {
+    for index, uri := range m.vault.Data.Folders[m.current_index].Uris {
         style := lipgloss.NewStyle().
             Width(width - 30 - 2).
             Padding(1, 3).
-            MarginBottom(1).
-            Background(lipgloss.Color("#1E1E2E"))
+            MarginBottom(1)
+
+        if index == m.token_current_index {
+            style = style.Background(lipgloss.Color("#1E1E2E"))
+        }
 
         totp, _ := otp.NewKeyFromURL(uri)
 
