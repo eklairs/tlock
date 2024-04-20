@@ -99,3 +99,30 @@ func (vault *TLockVault) DeleteURI(folder, uri int) {
     vault.write()
 }
 
+func (vault *TLockVault) MoveDown(folder, uri int) int {
+    if uri == len(vault.Data.Folders[folder].Uris) - 1 {
+        return 0
+    }
+
+    temp := vault.Data.Folders[folder].Uris[uri]
+    vault.Data.Folders[folder].Uris[uri] = vault.Data.Folders[folder].Uris[uri + 1]
+    vault.Data.Folders[folder].Uris[uri + 1] = temp
+
+    vault.write()
+
+    return 1
+}
+
+func (vault *TLockVault) MoveUp(folder, uri int) int {
+    if uri == 0 {
+        return 0
+    }
+
+    temp := vault.Data.Folders[folder].Uris[uri]
+    vault.Data.Folders[folder].Uris[uri] = vault.Data.Folders[folder].Uris[uri - 1]
+    vault.Data.Folders[folder].Uris[uri - 1] = temp
+
+    vault.write()
+
+    return 1
+}
