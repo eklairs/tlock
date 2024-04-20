@@ -3,10 +3,11 @@ package models
 import (
 	"strings"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"golang.org/x/term"
+	"github.com/charmbracelet/lipgloss"
+
+	tea "github.com/charmbracelet/bubbletea"
+	tlockvault "github.com/eklairs/tlock/tlock-vault"
 
 	. "github.com/eklairs/tlock/internal/modelmanager"
 )
@@ -47,6 +48,14 @@ func (m DashboardModel) Init() tea.Cmd {
 
 // Update
 func (m DashboardModel) Update(msg tea.Msg, manager *ModelManager) (Screen, tea.Cmd) {
+    switch msgType := msg.(type) {
+    case tea.KeyMsg:
+        switch msgType.String() {
+        case "A":
+            manager.PushScreen(InitializeAddFolderModel(&m.vault))
+        }
+    }
+
     return m, nil
 }
 
