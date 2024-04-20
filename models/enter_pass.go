@@ -97,13 +97,13 @@ func (m EnterPassModel) Update(msg tea.Msg, manager *ModelManager) (Screen, tea.
         case key.Matches(msgType, enterPassKeys.Back):
             manager.PopScreen()
         case key.Matches(msgType, enterPassKeys.Login):
-            _, err := tlockvault.Load(m.userSpec.Vault, m.passInput.Value())
+            vault, err := tlockvault.Load(m.userSpec.Vault, m.passInput.Value())
 
             if err != nil {
                 m.errorMessage = true
+            } else {
+                manager.PushScreen(InitializeDashboardModel(*vault))
             }
-
-            // manager.PushScreen(InitializeDashboardModel(*vault))
         }
     }
 

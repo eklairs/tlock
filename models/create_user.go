@@ -111,7 +111,9 @@ func (m NewUserModel) Update(msg tea.Msg, manager *ModelManager) (Screen, tea.Cm
             manager.PopScreen()
 
         case key.Matches(msgType, createUserKeys.Create):
-            m.core.Users.AddNewUser(m.usernameInput.Value(), m.passwordInput.Value())
+            vault := m.core.Users.AddNewUser(m.usernameInput.Value(), m.passwordInput.Value())
+
+            manager.PushScreen(InitializeDashboardModel(vault))
         }
     }
 

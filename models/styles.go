@@ -6,6 +6,7 @@ import "github.com/charmbracelet/lipgloss"
 var COLOR_ACCENT = lipgloss.Color("4")
 var COLOR_DIMMED = lipgloss.Color("8")
 var COLOR_RED = lipgloss.Color("1")
+var COLOR_YELLOW = lipgloss.Color("3")
 var COLOR_BG_OVER = lipgloss.Color("#1E1E2E")
 
 // Styles
