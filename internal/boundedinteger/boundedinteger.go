@@ -10,7 +10,7 @@ type BoundedInteger struct {
 }
 
 // New instance of BoundedInteger
-func New(max, value int) BoundedInteger {
+func New(value, max int) BoundedInteger {
     return BoundedInteger{
         Max: max,
         Value: value,
@@ -19,7 +19,7 @@ func New(max, value int) BoundedInteger {
 
 // Increases the value by 1
 func (integer *BoundedInteger) Increase() {
-    integer.Value = (integer.Value) % integer.Max
+    integer.Value = (integer.Value + 1) % integer.Max
 }
 
 // Decreases the value by 1

@@ -5,6 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/eklairs/tlock/internal/boundedinteger"
 	"github.com/eklairs/tlock/internal/modelmanager"
 	tlockcore "github.com/eklairs/tlock/tlock-core"
 )
@@ -29,7 +30,7 @@ type selectUserStyles struct {
 // Root Model
 type SelectUserModel struct {
     styles selectUserStyles
-    focused_index int
+    focused_index boundedinteger.BoundedInteger
     core tlockcore.TLockCore
 }
 
@@ -44,10 +45,11 @@ func InitializeSelectUserModel(core tlockcore.TLockCore) SelectUserModel {
             input: lipgloss.NewStyle().Padding(1, 3).Width(65).Background(lipgloss.Color("#1e1e2e")),
             dimmed: dimmed,
             dimmedCenter: dimmed.Width(65).Copy().Align(lipgloss.Center),
-            userItem: lipgloss.NewStyle().Padding(1, 3).Width(65),
-            userItemFocused: lipgloss.NewStyle().Padding(1, 3).Width(65).Background(lipgloss.Color("#1E1E2E")).Foreground(lipgloss.Color("12")).Bold(true),
+            userItem: lipgloss.NewStyle().Padding(1, 3).Width(65).Foreground(lipgloss.Color("8")),
+            userItemFocused: lipgloss.NewStyle().Padding(1, 3).Width(65).Background(lipgloss.Color("#1E1E2E")).Foreground(lipgloss.Color("12")),
         },
         core: core,
+        focused_index: boundedinteger.New(0, len(core.Users.Users)),
     }
 }
 
@@ -62,18 +64,10 @@ func (m SelectUserModel) Update(msg tea.Msg, manager *modelmanager.ModelManager)
     case tea.KeyMsg:
         switch msgType.String() {
         case tea.KeyDown.String(), "j":
-            total_users := len(m.core.Users.Users)
-
-            m.focused_index = (m.focused_index + 1) % total_users
+            m.focused_index.Increase()
         
         case tea.KeyUp.String(), "k":
-            total_users := len(m.core.Users.Users)
-
-            if m.focused_index == 0 {
-                m.focused_index = total_users - 1
-            } else {
-                m.focused_index -= 1
-            }
+            m.focused_index.Decrease()
         }
     }
 
@@ -84,13 +78,13 @@ func (m SelectUserModel) Update(msg tea.Msg, manager *modelmanager.ModelManager)
 func (m SelectUserModel) View() string {
     user_items := []string {
         m.styles.titleCenter.Render(_ascii), // Title
-        m.styles.dimmedCenter.Render("Select a user to continue as"), "",
+        m.styles.dimmedCenter.Render("Select a user to continue as"), "", "",
     }
 
     for index, user := range m.core.Users.Users {
         render_fn := m.styles.userItem.Render
 
-        if index == m.focused_index {
+        if index == m.focused_index.Value {
             render_fn = m.styles.userItemFocused.Render
         }
 
