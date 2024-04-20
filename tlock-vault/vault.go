@@ -133,5 +133,15 @@ func (vault *TLockVault) MoveURI(folder, uri, toFolder int) int {
     vault.Data.Folders[folder].Uris = remove(vault.Data.Folders[folder].Uris, uri)
     vault.Data.Folders[toFolder].Uris = append(vault.Data.Folders[toFolder].Uris, toMove)
 
+    vault.write()
+
+    return 1
+}
+
+func (vault *TLockVault) AddURI(folder int, uri string) int {
+    vault.Data.Folders[folder].Uris = append(vault.Data.Folders[folder].Uris, uri)
+
+    vault.write()
+
     return 1
 }

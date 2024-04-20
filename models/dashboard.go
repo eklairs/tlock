@@ -146,6 +146,8 @@ func (m DashboardModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
             m.token_current_index -= m.vault.MoveUp(m.current_index, m.token_current_index)
         case "r":
             manager.PushScreen(InitializeMoveTokenModel(&m.vault, m.current_index, m.token_current_index))
+        case "a":
+            manager.PushScreen(InitializeAddTokenModel(&m.vault, m.current_index))
         }
     }
 
@@ -233,7 +235,16 @@ func (m DashboardModel) View() string {
         style.Render(lipgloss.JoinVertical(lipgloss.Left, folders...)),
     }
 
-    ui = append(ui, lipgloss.JoinVertical(lipgloss.Left, tokens...))
+    if len(tokens) != 0 {
+        ui = append(ui, lipgloss.JoinVertical(lipgloss.Left, tokens...))
+    } else {
+        placeholder := lipgloss.NewStyle().
+            Width(width - 30 - 2).
+            Height(height).
+            Align(lipgloss.Center, lipgloss.Center)
+
+        ui = append(ui, placeholder.Render("Press a to add some tokens"))
+    }
 
     return lipgloss.JoinHorizontal(
         lipgloss.Left,
