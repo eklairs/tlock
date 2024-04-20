@@ -53,7 +53,14 @@ func (m DashboardModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
     switch msgType := msg.(type) {
     case tea.KeyMsg:
         switch msgType.String() {
-
+        case "J":
+            m.current_index = (m.current_index + 1) % len(m.vault.Data.Folders)
+        case "K":
+            if m.current_index == 0 {
+                m.current_index = len(m.vault.Data.Folders) - 1
+            } else {
+                m.current_index -= 1
+            }
         }
     }
 
