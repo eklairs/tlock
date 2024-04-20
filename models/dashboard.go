@@ -1,7 +1,9 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -14,6 +16,13 @@ import (
 	"github.com/pquerna/otp/totp"
 	"golang.org/x/term"
 )
+
+type TLockVendor struct {
+    Icons map[string]struct {
+        Unicode string
+        Hex string
+    }
+}
 
 type dashboardStyles struct {
     title lipgloss.Style
@@ -29,6 +38,7 @@ type DashboardModel struct {
     vault tlockvault.TLockVault
     current_index int
     token_current_index int
+    vendor TLockVendor
 }
 
 var DIGIT_LIST = []string {
@@ -77,6 +87,10 @@ var DIGIT_LIST = []string {
 // Initialize root model
 func InitializeDashboardModel(vault tlockvault.TLockVault) DashboardModel {
     dimmed := lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
+    raw, _ := os.ReadFile("tlock-vendor/icons.json")
+
+    vendor := TLockVendor{}
+    json.Unmarshal(raw, &vendor)
 
     return DashboardModel {
         styles: dashboardStyles{
@@ -88,6 +102,7 @@ func InitializeDashboardModel(vault tlockvault.TLockVault) DashboardModel {
         },
         vault: vault,
         current_index: 0,
+        vendor: vendor,
     }
 }
 
@@ -175,6 +190,19 @@ func (m DashboardModel) View() string {
         _totp, _ := otp.NewKeyFromURL(uri)
         code, _ := totp.GenerateCode(_totp.Secret(), time.Now())
 
+        icon := ""
+
+        icon_spec, exists := m.vendor.Icons[_totp.Issuer()]
+
+        if exists {
+            style := lipgloss.NewStyle().
+                Padding(1, 3).
+                Foreground(lipgloss.Color("#FFFFFF")).
+                Background(lipgloss.Color(fmt.Sprintf("#%s", icon_spec.Hex)));
+
+            icon = style.Render(icon_spec.Unicode)
+        }
+
         info := fmt.Sprintf("%s • %s", title.Render(_totp.AccountName()), issuer.Render(_totp.Issuer()))
         code_ui := make([]string, _totp.Digits())
 
@@ -184,9 +212,9 @@ func (m DashboardModel) View() string {
             code_ui = append(code_ui, strings.Trim(DIGIT_LIST[code_digit], "\n"))
         }
 
-        spacing := style.GetWidth() - lipgloss.Width(info) - lipgloss.Width(lipgloss.JoinHorizontal(lipgloss.Center, code_ui...)) - 10
+        spacing := style.GetWidth() - lipgloss.Width(info) - lipgloss.Width(lipgloss.JoinHorizontal(lipgloss.Center, code_ui...)) - 10 - lipgloss.Width(icon)
 
-        tokens = append(tokens, style.Render(lipgloss.JoinHorizontal(lipgloss.Center, info, strings.Repeat(" ", spacing), lipgloss.JoinHorizontal(lipgloss.Center, code_ui...))))
+        tokens = append(tokens, style.Render(lipgloss.JoinHorizontal(lipgloss.Center, icon, title.Render("    "), info, strings.Repeat(" ", spacing), lipgloss.JoinHorizontal(lipgloss.Center, code_ui...))))
     }
 
     ui := []string {
