@@ -18,6 +18,9 @@ type Styles struct {
     // Dimmed
     dimmed lipgloss.Style
 
+    // Same as dimmed, but with COLOR_BG_OVER as background color
+    dimmedBgOver lipgloss.Style
+
     // Same as dimmed, but with center alignment
     dimmedCenter lipgloss.Style
 
@@ -29,6 +32,9 @@ type Styles struct {
 
     // Center
     center lipgloss.Style
+
+    // Input
+    input lipgloss.Style
 }
 
 // Initializes the styles
@@ -50,10 +56,12 @@ func InitializeStyles(width int) Styles {
         title: title,
         dimmed: dimmed,
         inactive: listItem,
-        active: listItem.Copy().Background(COLOR_BG_OVER),
+        dimmedBgOver: dimmed.Copy().Background(COLOR_BG_OVER),
+        input: base.Copy().Padding(1, 3).Background(COLOR_BG_OVER),
         center: base.Copy().Align(lipgloss.Center, lipgloss.Center),
         titleCenter: title.Copy().Align(lipgloss.Center, lipgloss.Center),
         dimmedCenter: dimmed.Copy().Align(lipgloss.Center, lipgloss.Center),
+        active: listItem.Copy().Background(COLOR_BG_OVER).Foreground(COLOR_ACCENT),
     }
 }
 

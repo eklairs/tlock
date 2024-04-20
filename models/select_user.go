@@ -102,6 +102,9 @@ func (m SelectUserModel) Update(msg tea.Msg, manager *ModelManager) (Screen, tea
         
         case key.Matches(msgType, selectUserKeys.Up):
             m.focused_index.Decrease()
+
+        case key.Matches(msgType, selectUserKeys.New):
+            manager.PushScreen(InitializeNewUserModel(m.core))
         }
     }
 
@@ -136,7 +139,7 @@ func (m SelectUserModel) View() string {
     }
 
     // Help
-    items = append(items, m.styles.center.Render(m.help.View(selectUserKeys)))
+    items = append(items, "", m.styles.center.Render(m.help.View(selectUserKeys)))
 
     // Join them all!
     return lipgloss.JoinVertical(
