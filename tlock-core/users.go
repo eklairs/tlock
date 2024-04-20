@@ -25,16 +25,22 @@ type TLockUsers struct {
 
 // Loads the list of users
 func LoadTLockUsers() TLockUsers {
+    // Read users path
     raw, err := os.ReadFile(USERS_PATH);
 
+    // Check for errors
     if err != nil {
+        log.Printf("[users] Users map does not exist, returning empty users map")
+
         return TLockUsers{}
     }
 
+    // Empty users where yaml will populate
     users := TLockUsers{}
 
+    // Parse
     if err = yaml.Unmarshal(raw, &users); err != nil {
-        return TLockUsers{}
+        log.Fatalf("[users] Failed to parse users map, syntax error possibly: %v", err)
     }
 
     return users
