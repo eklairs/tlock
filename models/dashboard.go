@@ -2,13 +2,17 @@ package models
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/internal/modelmanager"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
+	"github.com/pquerna/otp"
+	"github.com/pquerna/otp/totp"
 	"golang.org/x/term"
-    "github.com/pquerna/otp"
 )
 
 type dashboardStyles struct {
@@ -25,6 +29,49 @@ type DashboardModel struct {
     vault tlockvault.TLockVault
     current_index int
     token_current_index int
+}
+
+var DIGIT_LIST = []string {
+    `
+    ┏━┓
+    ┃ ┃
+    ┗━┛`,
+    `
+     ┓
+     ┃
+    ╺┻╸`,
+    `
+    ╺━┓
+    ┏━┛
+    ┗━╸`,
+    `
+    ╺━┓
+     ━┫
+    ╺━┛`,
+    `
+    ╻ ╻
+    ┗━┫
+      ╹`,
+    `
+    ┏━╸
+    ┗━┓
+    ╺━┛`,
+    `
+    ┏━╸
+    ┣━┓
+    ┗━┛`,
+    `
+    ╺━┓
+      ┃
+      ╹`,
+    `
+    ┏━┓
+    ┣━┫
+    ┗━┛`,
+    `
+    ┏━┓
+    ┗━┫
+    ╺━┛`,
 }
 
 // Initialize root model
@@ -125,9 +172,21 @@ func (m DashboardModel) View() string {
             issuer = issuer.Background(lipgloss.Color("#1E1E2E")).Bold(true)
         }
 
-        totp, _ := otp.NewKeyFromURL(uri)
+        _totp, _ := otp.NewKeyFromURL(uri)
+        code, _ := totp.GenerateCode(_totp.Secret(), time.Now())
 
-        tokens = append(tokens, style.Render(fmt.Sprintf("%s • %s", title.Render(totp.AccountName()), issuer.Render(totp.Issuer()))))
+        info := fmt.Sprintf("%s • %s", title.Render(_totp.AccountName()), issuer.Render(_totp.Issuer()))
+        code_ui := make([]string, _totp.Digits())
+
+        for _, code_char := range code {
+            code_digit, _ := strconv.Atoi(string(code_char))
+
+            code_ui = append(code_ui, strings.Trim(DIGIT_LIST[code_digit], "\n"))
+        }
+
+        spacing := style.GetWidth() - lipgloss.Width(info) - lipgloss.Width(lipgloss.JoinHorizontal(lipgloss.Center, code_ui...)) - 10
+
+        tokens = append(tokens, style.Render(lipgloss.JoinHorizontal(lipgloss.Center, info, strings.Repeat(" ", spacing), lipgloss.JoinHorizontal(lipgloss.Center, code_ui...))))
     }
 
     ui := []string {
