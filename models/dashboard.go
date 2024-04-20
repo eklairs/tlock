@@ -82,19 +82,30 @@ func (m DashboardModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 func (m DashboardModel) View() string {
     width, height, _ := term.GetSize(0)
 
-    style := lipgloss.NewStyle().Width(30).Height(height)
+    style := lipgloss.NewStyle().Height(height).Width(30).Padding(1, 3)
+    folder_style := lipgloss.NewStyle().Width(30).Padding(1, 3)
 
     // Folders
     folders := make([]string, 0)
 
-    for _, folder := range m.vault.Data.Folders {
+    for index, folder := range m.vault.Data.Folders {
+        render_fn := folder_style.Render
+
         ui := lipgloss.JoinVertical(
             lipgloss.Left,
             m.styles.title.Render(folder.Name),
             m.styles.dimmed.Render(fmt.Sprintf("%d tokens", len(folder.Uris))),
         )
 
-        folders = append(folders, lipgloss.NewStyle().MarginTop(1).Render(ui))
+        if index == m.current_index {
+            render_fn = folder_style.Copy().Background(lipgloss.Color("#1E1E2E")).
+                Width(23).
+                Padding(1, 2).
+                BorderBackground(lipgloss.Color("#1E1E2E")).
+                Border(lipgloss.ThickBorder(), false, false, false, true).Render
+        }
+
+        folders = append(folders, render_fn(ui))
     }
 
     // Tokens
