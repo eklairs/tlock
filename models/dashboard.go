@@ -166,6 +166,16 @@ func (m DashboardModel) View() string {
     // Folders
     folders := make([]string, 0)
 
+    if len(m.vault.Data.Folders) == 0 {
+        style := lipgloss.NewStyle().
+            Width(width).
+            Height(height).
+            Align(lipgloss.Center, lipgloss.Center).
+            Render("Press A to add new folder")
+
+        return style
+    }
+
     for index, folder := range m.vault.Data.Folders {
         render_fn := folder_style.Render
 
