@@ -27,11 +27,11 @@ type newFolderStyles struct {
 type NewFolderModel struct {
     styles newFolderStyles
     name textinput.Model
-    vault tlockvault.TLockVault
+    vault *tlockvault.TLockVault
 }
 
 // Initialize root model
-func InitializeNewFolderModel(vault tlockvault.TLockVault) NewFolderModel {
+func InitializeNewFolderModel(vault *tlockvault.TLockVault) NewFolderModel {
     dimmed := lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
 
     name := textinput.New();
@@ -66,6 +66,7 @@ func (m NewFolderModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
         switch msgType.String() {
         case "enter":
             m.vault.AddFolder(m.name.Value())
+            manager.PopScreen()
         }
     }
 
