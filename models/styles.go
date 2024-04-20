@@ -5,6 +5,7 @@ import "github.com/charmbracelet/lipgloss"
 // Colors
 var COLOR_ACCENT = lipgloss.Color("4")
 var COLOR_DIMMED = lipgloss.Color("8")
+var COLOR_RED = lipgloss.Color("1")
 var COLOR_BG_OVER = lipgloss.Color("#1E1E2E")
 
 // Styles
@@ -35,6 +36,9 @@ type Styles struct {
 
     // Input
     input lipgloss.Style
+
+    // Error
+    error lipgloss.Style
 }
 
 // Initializes the styles
@@ -56,6 +60,7 @@ func InitializeStyles(width int) Styles {
         title: title,
         dimmed: dimmed,
         inactive: listItem,
+        error: base.Copy().Foreground(COLOR_RED),
         dimmedBgOver: dimmed.Copy().Background(COLOR_BG_OVER),
         input: base.Copy().Padding(1, 3).Background(COLOR_BG_OVER),
         center: base.Copy().Align(lipgloss.Center, lipgloss.Center),

@@ -64,6 +64,9 @@ type EnterPassModel struct {
 
     // User spec
     userSpec tlockcore.UserSpec
+
+    // Any error message
+    errorMessage bool
 }
 
 // Initialize root model
@@ -97,7 +100,7 @@ func (m EnterPassModel) Update(msg tea.Msg, manager *ModelManager) (Screen, tea.
             _, err := tlockvault.Load(m.userSpec.Vault, m.passInput.Value())
 
             if err != nil {
-                panic("ERROR!")
+                m.errorMessage = true
             }
 
             // manager.PushScreen(InitializeDashboardModel(*vault))
@@ -112,13 +115,25 @@ func (m EnterPassModel) Update(msg tea.Msg, manager *ModelManager) (Screen, tea.
 
 // View
 func (m EnterPassModel) View() string {
-    return lipgloss.JoinVertical(
-        lipgloss.Left,
+    // List of items
+    items := []string {
         m.styles.dimmedCenter.Render(fmt.Sprintf("Login in as %s", m.userSpec.Username)), "",
         m.styles.title.Render("Password"), // Username header
         m.styles.dimmed.Render("Enter the super secret password"), // Username description
-        m.styles.input.Render(m.passInput.View()), "",
-        m.styles.center.Render(m.help.View(enterPassKeys)),
+        m.styles.input.Render(m.passInput.View()),
+    }
+
+    // Add error message if any
+    if m.errorMessage {
+        items = append(items, "", m.styles.error.Render("Invalid password, please check if it is correct"))
+    }
+
+    // Rest
+    items = append(items, "", m.styles.center.Render(m.help.View(enterPassKeys)))
+
+    return lipgloss.JoinVertical(
+        lipgloss.Left,
+        items...
     )
 }
 
