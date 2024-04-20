@@ -78,3 +78,9 @@ func (vault *TLockVault) AddFolder(name string) {
     vault.write()
 }
 
+func (vault *TLockVault) UpdateURI(folder, uri int, newURI string) {
+    vault.Data.Folders[folder].Uris[uri] = newURI
+
+    vault.write()
+}
+
