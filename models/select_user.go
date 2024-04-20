@@ -14,18 +14,19 @@ import (
 	. "github.com/eklairs/tlock/internal/modelmanager"
 )
 
-var SELECT_USER_SIZE = 60
+var SELECT_USER_SIZE = 65
 
 // Select user key map
 type selectUserKeyMap struct {
     Up key.Binding
     Down key.Binding
+    Enter key.Binding
     New key.Binding
 }
 
 // ShortHelp()
 func (k selectUserKeyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Up, k.Down, k.New}
+	return []key.Binding{k.Up, k.Down, k.New, k.Enter}
 }
 
 // LongHelp()
@@ -34,6 +35,7 @@ func (k selectUserKeyMap) FullHelp() [][]key.Binding {
         {k.Up},
         {k.Down},
         {k.New},
+        {k.Enter},
 	}
 }
 
@@ -50,6 +52,10 @@ var selectUserKeys = selectUserKeyMap{
 	New: key.NewBinding(
 		key.WithKeys("c"),
 		key.WithHelp("c", "new user"),
+	),
+	Enter: key.NewBinding(
+		key.WithKeys("enter"),
+		key.WithHelp("enter", "login as"),
 	),
 }
 
@@ -105,6 +111,9 @@ func (m SelectUserModel) Update(msg tea.Msg, manager *ModelManager) (Screen, tea
 
         case key.Matches(msgType, selectUserKeys.New):
             manager.PushScreen(InitializeNewUserModel(m.core))
+
+        case key.Matches(msgType, selectUserKeys.Enter):
+            manager.PushScreen(InitializeEnterPassModel(m.core, m.core.Users.Users[m.focused_index.Value]))
         }
     }
 
