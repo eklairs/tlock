@@ -16,8 +16,16 @@ type RootModel struct {
 func InitializeRootModel() RootModel {
     core := tlockcore.New()
 
+    var model modelmanager.Screen
+
+    if len(core.Users.Users)  == 0 {
+        model = InitializeNewUserModel(core)
+    } else {
+        model = InitializeSelectUserModel(core)
+    }
+
     return RootModel {
-        modelmanager: modelmanager.New(InitializeSelectUserModel(core)),
+        modelmanager: modelmanager.New(model),
     }
 }
 
