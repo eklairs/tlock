@@ -22,7 +22,7 @@ type TLockVault struct {
     Vault_path string
 }
 
-func Initialize(password string) string {
+func Initialize(password string) TLockVault {
     id := uuid.New()
     dir := path.Join(xdg.DataHome, "tlock", "root", id.String())
 
@@ -30,7 +30,12 @@ func Initialize(password string) string {
         log.Fatalf("Failed to create user's root dir: %v", err)
     }
 
-    return path.Join(dir, "vault.dat")
+    vault := TLockVault {
+        Data: TLockVaultData{},
+        Vault_path: path.Join(dir, "vault.dat"),
+    }
+
+    return vault
 }
 
 func Load(path, password string) (*TLockVault, error) {

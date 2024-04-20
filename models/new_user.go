@@ -1,12 +1,47 @@
 package models
 
 import (
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/internal/modelmanager"
 	tlockcore "github.com/eklairs/tlock/tlock-core"
 )
+
+type  newUserKeys struct {
+    Tab key.Binding
+    Create key.Binding
+    GoBack key.Binding
+}
+
+func (k  newUserKeys) ShortHelp() []key.Binding {
+	return []key.Binding{k.Tab, k.Create, k.GoBack}
+}
+
+func (k  newUserKeys) FullHelp() [][]key.Binding {
+	return [][]key.Binding{
+        {k.Tab},
+        {k.Create},
+        {k.GoBack},
+	}
+}
+
+var new_user_keys =  newUserKeys{
+	Tab: key.NewBinding(
+		key.WithKeys("tab", "shift+tab"),
+		key.WithHelp("tab/shift+tab", "switch input"),
+	),
+	Create: key.NewBinding(
+		key.WithKeys("enter"),
+		key.WithHelp("enter", "create"),
+	),
+	GoBack: key.NewBinding(
+		key.WithKeys("esc"),
+		key.WithHelp("esc", "go back"),
+	),
+}
 
 var ascii = `
  _____              _____             
@@ -20,11 +55,14 @@ type newUserStyles struct {
     titleCenter lipgloss.Style
     dimmed lipgloss.Style
     input lipgloss.Style
+    center lipgloss.Style
 }
 
 // Root Model
 type NewUserModel struct {
     styles newUserStyles
+    help help.Model
+    key newUserKeys
     core tlockcore.TLockCore
     usernameInput textinput.Model
     passwordInput textinput.Model
@@ -53,10 +91,13 @@ func InitializeNewUserModel(core tlockcore.TLockCore) NewUserModel {
             titleCenter: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("4")).Width(65).Align(lipgloss.Center),
             input: lipgloss.NewStyle().Padding(1, 3).Width(65).Background(lipgloss.Color("#1e1e2e")),
             dimmed: dimmed,
+            center: lipgloss.NewStyle().Align(lipgloss.Center).Width(65),
         },
         usernameInput: usernameInput,
         passwordInput: passwordInput,
         core: core,
+        help: help.New(),
+        key: new_user_keys,
     }
 }
 
@@ -78,8 +119,12 @@ func (m NewUserModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) (m
                 m.usernameInput.Focus()
                 m.passwordInput.Blur()
             }
+        case "esc":
+            manager.PopScreen()
         case "enter":
-            m.core.Users.AddNewUser(m.usernameInput.Value(), m.passwordInput.Value())
+            vault := m.core.Users.AddNewUser(m.usernameInput.Value(), m.passwordInput.Value())
+
+            manager.PushScreen(InitializeDashboardModel(vault))
         }
     }
 
@@ -105,6 +150,6 @@ func (m NewUserModel) View() string {
         m.styles.title.Render("Password"), // Username header
         m.styles.dimmed.Render("Shush! This is a super secret password"), // Username description
         m.styles.input.Render(m.passwordInput.View()), "",
+        m.styles.center.Render(m.help.View(new_user_keys)),
     )
 }
-

@@ -60,9 +60,11 @@ func (users TLockUsers) write() {
 }
 
 // Adds a new user
-func (users *TLockUsers) AddNewUser(username, password string) {
-    vault_path := tlockvault.Initialize(password)
-    users.Users = append(users.Users, UserSpec{ Username: username, Vault: vault_path })
+func (users *TLockUsers) AddNewUser(username, password string) tlockvault.TLockVault {
+    vault := tlockvault.Initialize(password)
+    users.Users = append(users.Users, UserSpec{ Username: username, Vault: vault.Vault_path })
 
     users.write()
+
+    return vault
 }
