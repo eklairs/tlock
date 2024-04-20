@@ -45,6 +45,12 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
             folders.focused_index.Decrease()
         case "X":
             manager.PushScreen(InitializeDeleteFolderModel(&folders.vault, folders.vault.Data.Folders[folders.focused_index.Value].Name))
+        case "shift+down":
+            folders.vault.MoveFolderDown(folders.vault.Data.Folders[folders.focused_index.Value].Name)
+            folders.focused_index.Increase()
+        case "shift+up":
+            folders.vault.MoveFolderUp(folders.vault.Data.Folders[folders.focused_index.Value].Name)
+            folders.focused_index.Decrease()
         }
     }
     return nil

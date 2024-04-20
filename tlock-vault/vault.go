@@ -224,3 +224,46 @@ func (vault TLockVault) swap(folder_index, uri_index1, uri_index2 int) {
     vault.Data.Folders[folder_index].Uris[uri_index2] = temp
 }
 
+// Swaps two folders
+func (vault TLockVault) swap_folder(folder_index1, folder_index2 int) {
+    // Classic swap
+    temp := vault.Data.Folders[folder_index1]
+    vault.Data.Folders[folder_index1] = vault.Data.Folders[folder_index2]
+    vault.Data.Folders[folder_index2] = temp
+}
+
+// Moves down a folder
+func (vault *TLockVault) MoveFolderDown(folder string) int {
+    folder_index := vault.find_folder(folder)
+
+    // Uri is already at the bottom most
+    if folder_index == len(vault.Data.Folders) - 1 {
+        return 0
+    }
+
+    // Swap
+    vault.swap_folder(folder_index, folder_index + 1)
+
+    // Write
+    vault.write()
+
+    return 1
+}
+
+// Moves up a folder
+func (vault *TLockVault) MoveFolderUp(folder string) int {
+    folder_index := vault.find_folder(folder)
+
+    // Uri is already at the bottom most
+    if folder_index == 0 {
+        return 0
+    }
+
+    // Swap
+    vault.swap_folder(folder_index, folder_index - 1)
+
+    // Write
+    vault.write()
+
+    return 1
+}
