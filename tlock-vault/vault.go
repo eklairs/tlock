@@ -126,3 +126,12 @@ func (vault *TLockVault) MoveUp(folder, uri int) int {
 
     return 1
 }
+
+func (vault *TLockVault) MoveURI(folder, uri, toFolder int) int {
+    toMove := vault.Data.Folders[folder].Uris[uri]
+
+    vault.Data.Folders[folder].Uris = remove(vault.Data.Folders[folder].Uris, uri)
+    vault.Data.Folders[toFolder].Uris = append(vault.Data.Folders[toFolder].Uris, toMove)
+
+    return 1
+}

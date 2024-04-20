@@ -144,6 +144,8 @@ func (m DashboardModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
             m.token_current_index += m.vault.MoveDown(m.current_index, m.token_current_index)
         case "ctrl+up":
             m.token_current_index -= m.vault.MoveUp(m.current_index, m.token_current_index)
+        case "r":
+            manager.PushScreen(InitializeMoveTokenModel(&m.vault, m.current_index, m.token_current_index))
         }
     }
 
