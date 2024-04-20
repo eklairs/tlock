@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func remove(slice []string, s int) []string {
+func remove[T any](slice []T, s int) []T {
     return append(slice[:s], slice[s+1:]...)
 }
 
@@ -95,6 +95,12 @@ func (vault *TLockVault) UpdateURI(folder, uri int, newURI string) {
 
 func (vault *TLockVault) DeleteURI(folder, uri int) {
     vault.Data.Folders[folder].Uris = remove(vault.Data.Folders[folder].Uris, uri)
+
+    vault.write()
+}
+
+func (vault *TLockVault) DeleteFolder(folder int) {
+    vault.Data.Folders = remove(vault.Data.Folders, folder)
 
     vault.write()
 }
