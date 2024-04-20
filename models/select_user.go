@@ -5,23 +5,30 @@ import (
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/internal/boundedinteger"
-	"github.com/eklairs/tlock/internal/modelmanager"
+
+	tea "github.com/charmbracelet/bubbletea"
 	tlockcore "github.com/eklairs/tlock/tlock-core"
+
+	. "github.com/eklairs/tlock/internal/modelmanager"
 )
 
+var SELECT_USER_SIZE = 60
+
+// Select user key map
 type selectUserKeyMap struct {
     Up key.Binding
     Down key.Binding
     New key.Binding
 }
 
+// ShortHelp()
 func (k selectUserKeyMap) ShortHelp() []key.Binding {
 	return []key.Binding{k.Up, k.Down, k.New}
 }
 
+// LongHelp()
 func (k selectUserKeyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
         {k.Up},
@@ -30,7 +37,8 @@ func (k selectUserKeyMap) FullHelp() [][]key.Binding {
 	}
 }
 
-var keys = selectUserKeyMap{
+// Keys
+var selectUserKeys = selectUserKeyMap{
 	Up: key.NewBinding(
 		key.WithKeys("up", "k"),
 		key.WithHelp("↑/k", "move up"),
@@ -45,50 +53,37 @@ var keys = selectUserKeyMap{
 	),
 }
 
-var _ascii = `
- _____     _         _      _____             
-|   __|___| |___ ___| |_   |  |  |___ ___ ___ 
-|__   | -_| | -_|  _|  _|  |  |  |_ -| -_|  _|
-|_____|___|_|___|___|_|    |_____|___|___|_|  
+// Select user ascii
+var selectUserAscii = `
+ ____       _           _     _   _               
+/ ___|  ___| | ___  ___| |_  | | | |___  ___ _ __ 
+\___ \ / _ \ |/ _ \/ __| __| | | | / __|/ _ \ '__|
+ ___) |  __/ |  __/ (__| |_  | |_| \__ \  __/ |   
+|____/ \___|_|\___|\___|\__|  \___/|___/\___|_|   
 `
 
-type selectUserStyles struct {
-    title lipgloss.Style
-    titleCenter lipgloss.Style
-    center lipgloss.Style
-    dimmed lipgloss.Style
-    dimmedCenter lipgloss.Style
-    input lipgloss.Style
-    userItem lipgloss.Style
-    userItemFocused lipgloss.Style
-}
-
-// Root Model
+// Select User Model
 type SelectUserModel struct {
-    styles selectUserStyles
+    // Styles
+    styles Styles
+
+    // Help
     help help.Model
-    focused_index boundedinteger.BoundedInteger
+
+    // Core
     core tlockcore.TLockCore
+
+    // Focused user index
+    focused_index boundedinteger.BoundedInteger
 }
 
-// Initialize root model
+// Initializes a new instance of the SelectUserModel
 func InitializeSelectUserModel(core tlockcore.TLockCore) SelectUserModel {
-    dimmed := lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
-
     return SelectUserModel {
-        styles: selectUserStyles{
-            title: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("4")),
-            titleCenter: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("4")).Width(65).Align(lipgloss.Center),
-            input: lipgloss.NewStyle().Padding(1, 3).Width(65).Background(lipgloss.Color("#1e1e2e")),
-            dimmed: dimmed,
-            dimmedCenter: dimmed.Width(65).Copy().Align(lipgloss.Center),
-            userItem: lipgloss.NewStyle().Padding(1, 3).Width(65).Foreground(lipgloss.Color("8")),
-            userItemFocused: lipgloss.NewStyle().Padding(1, 3).Width(65).Background(lipgloss.Color("#1E1E2E")).Foreground(lipgloss.Color("12")),
-            center: lipgloss.NewStyle().Align(lipgloss.Center).Width(65),
-        },
         core: core,
-        focused_index: boundedinteger.New(0, len(core.Users.Users)),
         help: help.New(),
+        styles: InitializeStyles(SELECT_USER_SIZE),
+        focused_index: boundedinteger.New(0, len(core.Users.Users)),
     }
 }
 
@@ -98,21 +93,15 @@ func (m SelectUserModel) Init() tea.Cmd {
 }
 
 // Update
-func (m SelectUserModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
+func (m SelectUserModel) Update(msg tea.Msg, manager *ModelManager) (Screen, tea.Cmd) {
     switch msgType := msg.(type) {
     case tea.KeyMsg:
-        switch msgType.String() {
-        case tea.KeyDown.String(), "j":
+        switch {
+        case key.Matches(msgType, selectUserKeys.Down):
             m.focused_index.Increase()
         
-        case tea.KeyUp.String(), "k":
+        case key.Matches(msgType, selectUserKeys.Up):
             m.focused_index.Decrease()
-
-        case "enter":
-            manager.PushScreen(InitializeEnterPassModel(m.core, m.focused_index.Value))
-
-        case "c":
-            manager.PushScreen(InitializeNewUserModel(m.core))
         }
     }
 
@@ -121,35 +110,38 @@ func (m SelectUserModel) Update(msg tea.Msg, manager *modelmanager.ModelManager)
 
 // View
 func (m SelectUserModel) View() string {
-    user_items := []string {
-        m.styles.titleCenter.Render(_ascii), // Title
+    // List of ui items
+    items := []string {
         m.styles.dimmedCenter.Render("Select a user to continue as"), "",
     }
 
+    // Render all the list users
     for index, user := range m.core.Users.Users {
-        render_fn := m.styles.userItem.Render
+        render_fn := m.styles.inactive.Render
 
         if index == m.focused_index.Value {
-            render_fn = m.styles.userItemFocused.Render
+            render_fn = m.styles.active.Render
         }
 
         renderable := render_fn(
             lipgloss.JoinHorizontal(
                 lipgloss.Center,
                 user.Username,
-                strings.Repeat(" ", 65 - len(user.Username) - 1 - 6),
+                strings.Repeat(" ", SELECT_USER_SIZE - len(user.Username) - 1 - 6),
                 "›",
             ),
         )
 
-        user_items = append(user_items, renderable)
+        items = append(items, renderable)
     }
 
-    user_items = append(user_items, "", m.styles.center.Render(m.help.View(keys)))
+    // Help
+    items = append(items, m.styles.center.Render(m.help.View(selectUserKeys)))
 
+    // Join them all!
     return lipgloss.JoinVertical(
         lipgloss.Left,
-        user_items...,
+        items...
     )
 }
 
