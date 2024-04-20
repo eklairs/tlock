@@ -49,7 +49,7 @@ func Load(path, password string) (*TLockVault, error) {
         return nil, err
     }
 
-    data, _err := Decrypt(raw)
+    data, _err := _Decrypt(raw)
 
     if _err != nil {
         return nil, _err
@@ -61,7 +61,7 @@ func Load(path, password string) (*TLockVault, error) {
     }, nil
 }
 
-func Decrypt(data []byte) (*TLockVaultData, error) {
+func _Decrypt(data []byte) (*TLockVaultData, error) {
     out := TLockVaultData{}
 
     if err := yaml.Unmarshal(data, &out); err != nil {
