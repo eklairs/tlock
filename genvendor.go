@@ -59,11 +59,11 @@ func parse_nerd_fonts_map() map[string]map[string]string {
 
 func main() {
     // Clear current vendor and build dirs
-    os.RemoveAll("vendor")
+    os.RemoveAll("tlock-vendor")
     os.RemoveAll("build")
 
     // Recreate
-    os.Mkdir("vendor", os.ModePerm)
+    os.Mkdir("tlock-vendor", os.ModePerm)
     os.Mkdir("build", os.ModePerm)
 
     // Clone simple icons
@@ -94,7 +94,7 @@ func main() {
 
     // Write vendor
     dump, _ := json.Marshal(vendor);
-    file, _ := os.Create(path.Join("vendor", "icons.json"))
+    file, _ := os.Create(path.Join("tlock-vendor", "icons.json"))
 
     file.Write(dump)
 }
