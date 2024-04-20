@@ -136,6 +136,8 @@ func (m DashboardModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
             }
         case "A":
             manager.PushScreen(InitializeNewFolderModel(&m.vault))
+        case "e":
+            manager.PushScreen(InitializeEditTokenModel(&m.vault, m.current_index, m.token_current_index))
         }
     }
 

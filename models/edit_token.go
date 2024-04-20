@@ -28,7 +28,7 @@ type editTokenStyles struct {
 // Root Model
 type EditTokenModel struct {
     styles editTokenStyles
-    vault tlockvault.TLockVault
+    vault *tlockvault.TLockVault
     folder int
     original int
     inputs []textinput.Model
@@ -47,7 +47,7 @@ func buildTextInput(width int, value, placeholder string, styles editTokenStyles
 }
 
 // Initialize root model
-func InitializeEditTokenModel(vault tlockvault.TLockVault, folder, original int) EditTokenModel {
+func InitializeEditTokenModel(vault *tlockvault.TLockVault, folder, original int) EditTokenModel {
     dimmed := lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
     styles := editTokenStyles{
         title: lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("4")),
@@ -101,6 +101,7 @@ func (m EditTokenModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
             })
 
             m.vault.UpdateURI(m.folder, m.original, key.URL())
+            manager.PopScreen()
         }
     }
 
