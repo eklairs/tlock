@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -9,10 +11,10 @@ import (
 )
 
 var __ascii = `
- _____     _         _      _____             
-|   __|___| |___ ___| |_   |  |  |___ ___ ___ 
-|__   | -_| | -_|  _|  _|  |  |  |_ -| -_|  _|
-|_____|___|_|___|___|_|    |_____|___|___|_|  
+ _____     _              _____             
+|   __|___| |_ ___ ___   |  _  |___ ___ ___ 
+|   __|   |  _| -_|  _|  |   __| .'|_ -|_ -|
+|_____|_|_|_| |___|_|    |__|  |__,|___|___|
 `
 
 type enterPassStyles struct {
@@ -28,10 +30,11 @@ type EnterPassModel struct {
     styles enterPassStyles
     passInput textinput.Model
     core tlockcore.TLockCore
+    userSpec tlockcore.UserSpec
 }
 
 // Initialize root model
-func InitializeEnterPassModel(core tlockcore.TLockCore) EnterPassModel {
+func InitializeEnterPassModel(core tlockcore.TLockCore, userIndex int) EnterPassModel {
     dimmed := lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
 
     passwordInput := textinput.New();
@@ -51,6 +54,7 @@ func InitializeEnterPassModel(core tlockcore.TLockCore) EnterPassModel {
         },
         core: core,
         passInput: passwordInput,
+        userSpec: core.Users.Users[userIndex],
     }
 }
 
@@ -77,7 +81,8 @@ func (m EnterPassModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 func (m EnterPassModel) View() string {
     return lipgloss.JoinVertical(
         lipgloss.Left,
-        m.styles.titleCenter.Render(__ascii), "", // Title
+        m.styles.titleCenter.Render(__ascii), // Title
+        m.styles.dimmedCenter.Render(fmt.Sprintf("Login in as %s", m.userSpec.Username)), "",
         m.styles.title.Render("Password"), // Username header
         m.styles.dimmed.Render("Enter the super secret password"), // Username description
         m.styles.input.Render(m.passInput.View()), "",

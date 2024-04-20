@@ -68,6 +68,9 @@ func (m SelectUserModel) Update(msg tea.Msg, manager *modelmanager.ModelManager)
         
         case tea.KeyUp.String(), "k":
             m.focused_index.Decrease()
+
+        case "enter":
+            manager.PushScreen(InitializeEnterPassModel(m.core, m.focused_index.Value))
         }
     }
 

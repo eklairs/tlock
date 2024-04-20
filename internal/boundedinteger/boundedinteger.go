@@ -25,7 +25,7 @@ func (integer *BoundedInteger) Increase() {
 // Decreases the value by 1
 func (integer *BoundedInteger) Decrease() {
     if integer.Value == 0 {
-        integer.Value = integer.Max
+        integer.Value = integer.Max - 1
     } else {
         integer.Value -= 1
     }
