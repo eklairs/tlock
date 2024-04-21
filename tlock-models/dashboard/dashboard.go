@@ -18,14 +18,14 @@ type DashboardModel struct {
 	// Folders
 	folders folders.Folders
 
-    // Tokens
-    tokens tokens.Tokens
+	// Tokens
+	tokens tokens.Tokens
 }
 
 func InitializeDashboardModel(vault tlockvault.TLockVault, context context.Context) DashboardModel {
 	return DashboardModel{
 		vault:   vault,
-        tokens: tokens.InitializeTokens(vault, context, vault.Data.Folders[0].Name),
+		tokens:  tokens.InitializeTokens(vault, context, vault.Data.Folders[0].Name),
 		folders: folders.InitializeFolders(vault, context),
 	}
 }
@@ -45,6 +45,6 @@ func (m DashboardModel) View() string {
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		m.folders.View(),
-        m.tokens.View(),
+		m.tokens.View(),
 	)
 }

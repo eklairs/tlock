@@ -69,11 +69,11 @@ type Tokens struct {
 	// Styles
 	styles tlockstyles.Styles
 
-    // Folder
-    folder string
+	// Folder
+	folder string
 
-    // Help
-    help help.Model
+	// Help
+	help help.Model
 }
 
 // Initializes a new instance of folders
@@ -88,8 +88,8 @@ func InitializeTokens(vault tlockvault.TLockVault, context context.Context, fold
 		vault:   vault,
 		styles:  styles,
 		context: context,
-        folder: folder,
-        help: buildhelp.BuildHelp(styles),
+		folder:  folder,
+		help:    buildhelp.BuildHelp(styles),
 	}
 }
 
@@ -102,6 +102,8 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 			tokens.focused_index.Increase()
 		case "k":
 			tokens.focused_index.Decrease()
+        case "s":
+            manager.PushScreen(InitializeTokenFromScreen(tokens.context))
 		}
 	}
 
@@ -113,28 +115,27 @@ func (tokens Tokens) View() string {
 	// Get term size
 	_, height, _ := term.GetSize(0)
 
-    // Get URIs
-    uris := tokens.vault.GetTokens(tokens.folder)
+	// Get URIs
+	uris := tokens.vault.GetTokens(tokens.folder)
 
-    if len(uris) == 0 {
-        style := tokens.styles.Base.Copy().
-            Height(height).
-            Align(lipgloss.Center, lipgloss.Center)
+	if len(uris) == 0 {
+		style := tokens.styles.Base.Copy().
+			Height(height).
+			Align(lipgloss.Center, lipgloss.Center)
 
-        ui := lipgloss.JoinVertical(
-            lipgloss.Left,
-            tokens.styles.Center.Render(tokens.styles.Title.Copy().UnsetWidth().Render(EmptyAsciiArt)),
-            tokens.styles.Center.Render(tokens.styles.Base.Copy().UnsetWidth().Render("So empty! How about adding a new token?")),
-            tokens.styles.Center.Copy().UnsetWidth().Render(tokens.help.View(tokenKeys)),
-        )
+		ui := lipgloss.JoinVertical(
+			lipgloss.Left,
+			tokens.styles.Center.Render(tokens.styles.Title.Copy().UnsetWidth().Render(EmptyAsciiArt)),
+			tokens.styles.Center.Render(tokens.styles.Base.Copy().UnsetWidth().Render("So empty! How about adding a new token?")),
+			tokens.styles.Center.Copy().UnsetWidth().Render(tokens.help.View(tokenKeys)),
+		)
 
-        return style.Render(ui)
-    }
+		return style.Render(ui)
+	}
 
 	// List of items
 	items := make([]string, 0)
 
-    // Render
+	// Render
 	return lipgloss.JoinVertical(lipgloss.Center, items...)
 }
-

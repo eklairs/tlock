@@ -13,4 +13,3 @@ var CATPPUCCIN_THEME = Theme{
 	Error:        lipgloss.Color("#f38ba8"),
 	FoldersBg:    lipgloss.Color("#1a1a28"),
 }
-
