@@ -75,6 +75,9 @@ type Tokens struct {
 
 	// Help
 	help help.Model
+
+    // Tokens
+    tokens []string
 }
 
 // Initializes a new instance of folders
@@ -114,8 +117,9 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 
 	case folders.FolderChangedMsg:
 		tokens.folder = &msgType.Folder
+        tokens.tokens = tokens.vault.GetTokens(msgType.Folder)
 
-        tokens.focused_index = boundedinteger.New(0, len(tokens.vault.GetTokens(msgType.Folder)))
+        tokens.focused_index = boundedinteger.New(0, len(tokens.tokens))
 	}
 
 	return nil
@@ -131,10 +135,7 @@ func (tokens Tokens) View() string {
         return ""
     }
 
-	// Get URIs
-	uris := tokens.vault.GetTokens(*tokens.folder)
-
-	if len(uris) == 0 {
+	if len(tokens.tokens) == 0 {
 		style := tokens.styles.Base.Copy().
 			Height(height).
 			Align(lipgloss.Center, lipgloss.Center)
@@ -153,7 +154,7 @@ func (tokens Tokens) View() string {
 	items := make([]string, 0)
 
 	// Iter
-	for index, token := range uris {
+	for index, token := range tokens.tokens {
 		// Generate key
 		authKey, _ := otp.NewKeyFromURL(token)
 

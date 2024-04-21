@@ -16,6 +16,14 @@ import (
 
 var FOLDERS_WIDTH = 40
 
+func notifyFolderChanged(folder string) tea.Cmd {
+    return func() tea.Msg {
+        return FolderChangedMsg{
+            Folder: folder,
+        }
+    }
+}
+
 type FolderChangedMsg struct {
     Folder string
 }
@@ -57,19 +65,11 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		case "J":
 			folders.focused_index.Increase()
 
-            cmds = append(cmds, func() tea.Msg {
-                return FolderChangedMsg{
-                    Folder: folders.vault.Data.Folders[folders.focused_index.Value].Name,
-                }
-            })
+            cmds = append(cmds, notifyFolderChanged(folders.vault.Data.Folders[folders.focused_index.Value].Name))
 		case "K":
 			folders.focused_index.Decrease()
 
-            cmds = append(cmds, func() tea.Msg {
-                return FolderChangedMsg{
-                    Folder: folders.vault.Data.Folders[folders.focused_index.Value].Name,
-                }
-            })
+            cmds = append(cmds, notifyFolderChanged(folders.vault.Data.Folders[folders.focused_index.Value].Name))
 		case "A":
 			manager.PushScreen(InitializeAddFolderModel(folders.context))
 		case "E":
@@ -86,19 +86,19 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		folders.focused_index = boundedinteger.New(len(folders.vault.Data.Folders) - 1, len(folders.vault.Data.Folders))
 
         // Switch
-        cmds = append(cmds, func() tea.Msg {
-            return FolderChangedMsg{
-                Folder: msgType.FolderName,
-            }
-        })
+        cmds = append(cmds, notifyFolderChanged(msgType.FolderName))
 
 	case EditNewFolderMsg:
 		folders.vault.RenameFolder(msgType.OldName, msgType.NewName)
+
+        cmds = append(cmds, notifyFolderChanged(msgType.NewName))
 
 	case DeleteFolderMsg:
 		folders.vault.DeleteFolder(msgType.FolderName)
 
 		folders.focused_index = boundedinteger.New(min(folders.focused_index.Value, len(folders.vault.Data.Folders)-1), len(folders.vault.Data.Folders))
+
+        cmds = append(cmds, notifyFolderChanged(folders.vault.Data.Folders[folders.focused_index.Value].Name))
 	}
 
 	return tea.Batch(cmds...)
