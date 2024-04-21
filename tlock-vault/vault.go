@@ -118,6 +118,15 @@ func (vault *TLockVault) AddFolder(name string) {
     vault.write()
 }
 
+// Adds a new folder with `name`
+func (vault *TLockVault) RenameFolder(old_name, new_name string) {
+    folder_index := vault.find_folder(old_name)
+
+    vault.Data.Folders[folder_index].Name = new_name
+
+    vault.write()
+}
+
 // Deletes a folder with the given name
 func (vault *TLockVault) DeleteFolder(name string) {
     vault.Data.Folders = remove(vault.Data.Folders, vault.find_folder(name))

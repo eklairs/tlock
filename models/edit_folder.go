@@ -89,11 +89,13 @@ func (m EditFolderModel) Update(msg tea.Msg, manager *ModelManager) (Screen, tea
         case "esc":
             manager.PopScreen()
         case "enter":
-            // m.vault.EditFolder(m.folder)
+            m.vault.RenameFolder(m.folder, m.folderNameInput.Value())
 
             manager.PopScreen()
         }
     }
+
+    m.folderNameInput, _ = m.folderNameInput.Update(msg)
 
 	return m, nil
 }
@@ -103,7 +105,7 @@ func (m EditFolderModel) Update(msg tea.Msg, manager *ModelManager) (Screen, tea
 func (m EditFolderModel) View() string {
     return lipgloss.JoinVertical(
         lipgloss.Left,
-        m.styles.dimmedCenter.Render("Choose a new name for your folder"),
+        m.styles.dimmedCenter.Render("Choose a new name for your folder"), "",
         m.styles.title.Render("Name"), // Username header
         m.styles.dimmed.Render("Choose an awesome name for your folder, like Social"), // Username description 
         m.styles.input.Render(m.folderNameInput.View()),
