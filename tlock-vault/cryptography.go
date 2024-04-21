@@ -69,7 +69,7 @@ func Decrypt(password string, data []byte) ([]byte, error) {
 	// Extract salt and data
 	salt, data := data[len(data)-SALT_SIZE:], data[:len(data)-SALT_SIZE]
 
-	key, salt := GenerateKey(password, salt)
+	key, _ := GenerateKey(password, salt)
 
 	// Initialize AES
 	if blockCipher, err = aes.NewCipher(key); err != nil {

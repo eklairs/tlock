@@ -34,11 +34,11 @@ type TLockVault struct {
 	// Path to the vault file
 	Path string
 
-	// Password to encrypt with
-	password string
-
 	// Data
 	Data TLockVaultData
+
+	// Password to encrypt with
+	password string
 }
 
 // Initializes a new vault at the given path
