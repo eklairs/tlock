@@ -45,7 +45,7 @@ func InitializeFolders(vault tlockvault.TLockVault, context context.Context) Fol
 
 // Handles update messages
 func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) tea.Cmd {
-switch msgType := msg.(type) {
+	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch msgType.String() {
 		case "J":
@@ -88,7 +88,7 @@ func (folders Folders) View() string {
 	style := lipgloss.NewStyle().
 		Width(FOLDERS_WIDTH + 1).
 		Height(height).
-        Background(folders.context.Theme.FoldersBg)
+		Background(folders.context.Theme.FoldersBg)
 
 	// List of items
 	items := make([]string, len(folders.vault.Data.Folders))
@@ -111,4 +111,3 @@ func (folders Folders) View() string {
 
 	return style.Render(lipgloss.JoinVertical(lipgloss.Center, items...))
 }
-

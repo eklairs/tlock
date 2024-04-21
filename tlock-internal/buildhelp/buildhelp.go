@@ -6,7 +6,7 @@ import (
 )
 
 func BuildHelp(styles tlockstyles.Styles) help.Model {
-    // Help menu
+	// Help menu
 	help := help.New()
 
 	// Comply help menu styles to themes
@@ -15,5 +15,5 @@ func BuildHelp(styles tlockstyles.Styles) help.Model {
 	help.Styles.ShortDesc = styles.Dimmed.Copy().UnsetWidth()
 	help.Styles.ShortSeparator = styles.Dimmed.Copy().UnsetWidth()
 
-    return help
+	return help
 }

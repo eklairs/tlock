@@ -115,7 +115,6 @@ func (vault TLockVault) write() {
 	}
 }
 
-
 // == Vault actions ==
 
 // == Folders functions ==
@@ -154,4 +153,3 @@ func (vault *TLockVault) DeleteFolder(name string) {
 func (vault TLockVault) find_folder(name string) int {
 	return slices.IndexFunc(vault.Data.Folders, func(item FolderSpec) bool { return item.Name == name })
 }
-

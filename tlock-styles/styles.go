@@ -53,13 +53,13 @@ func SetBackgroundColor(o *termenv.Output) {
 // Initializes new instance of styles
 func InitializeStyle(width int, theme tlockthemes.Theme) Styles {
 	// Terminal option for setting background color to the theme's window bg
-    renderer := lipgloss.NewRenderer(os.Stdout, termenv.WithProfile(termenv.TrueColor), func(o *termenv.Output) {
-        // Convert it to rgba
-        r, g, b, _ := theme.WindowBg.RGBA()
+	renderer := lipgloss.NewRenderer(os.Stdout, termenv.WithProfile(termenv.TrueColor), func(o *termenv.Output) {
+		// Convert it to rgba
+		r, g, b, _ := theme.WindowBg.RGBA()
 
-        // Set background color
-        o.SetBackgroundColor(o.Color(fmt.Sprintf("#%02x%02x%02x", r, g, b)))
-    })
+		// Set background color
+		o.SetBackgroundColor(o.Color(fmt.Sprintf("#%02x%02x%02x", r, g, b)))
+	})
 
 	// Base
 	base := renderer.NewStyle().
@@ -89,4 +89,3 @@ func InitializeStyle(width int, theme tlockthemes.Theme) Styles {
 			Border(lipgloss.OuterHalfBlockBorder(), false, false, false, true),
 	}
 }
-

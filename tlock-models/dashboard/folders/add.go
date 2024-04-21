@@ -64,15 +64,15 @@ type AddFolderModel struct {
 
 // Initialize add folder model
 func InitializeAddFolderModel(context context.Context) AddFolderModel {
-    // Initialize theme
+	// Initialize theme
 	styles := tlockstyles.InitializeStyle(ADD_FOLDER_SIZE, context.Theme)
 
-    // Initialize input box
+	// Initialize input box
 	name := tlockstyles.InitializeInputBox(styles, "Your folder name goes here...")
 	name.Focus()
 
 	// Help menu
-    help := buildhelp.BuildHelp(styles)
+	help := buildhelp.BuildHelp(styles)
 
 	return AddFolderModel{
 		name:   name,
@@ -122,4 +122,3 @@ func (m AddFolderModel) View() string {
 		m.styles.Center.Render(m.help.View(addFolderKeys)),
 	)
 }
-

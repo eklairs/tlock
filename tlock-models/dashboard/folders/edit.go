@@ -68,16 +68,16 @@ type EditFolderModel struct {
 
 // Initialize edit folder model
 func InitializeEditFolderModel(oldName string, context context.Context) EditFolderModel {
-    // Initialize style
+	// Initialize style
 	styles := tlockstyles.InitializeStyle(ADD_FOLDER_SIZE, context.Theme)
 
-    // Initialize input box
+	// Initialize input box
 	name := tlockstyles.InitializeInputBox(styles, "Your new folder name goes here...")
 	name.SetValue(oldName)
 	name.Focus()
 
 	// Help menu
-    help := buildhelp.BuildHelp(styles)
+	help := buildhelp.BuildHelp(styles)
 
 	return EditFolderModel{
 		name:    name,
@@ -129,4 +129,3 @@ func (m EditFolderModel) View() string {
 		m.styles.Center.Render(m.help.View(editFolderKeys)),
 	)
 }
-

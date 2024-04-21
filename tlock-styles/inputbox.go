@@ -6,7 +6,7 @@ import (
 
 // Creates a new input box
 func InitializeInputBox(styles Styles, placeholder string) textinput.Model {
-    return InitializeInputBoxCustomWidth(styles, placeholder, 58)
+	return InitializeInputBoxCustomWidth(styles, placeholder, 58)
 }
 
 // Creates a new input box
@@ -19,4 +19,3 @@ func InitializeInputBoxCustomWidth(styles Styles, placeholder string, width int)
 
 	return input
 }
-

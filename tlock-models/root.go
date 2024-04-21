@@ -9,14 +9,14 @@ import (
 
 // Root Model
 type RootModel struct {
-    modelmanager modelmanager.ModelManager
+	modelmanager modelmanager.ModelManager
 }
 
 // Initialize root model
 func InitializeRootModel() RootModel {
-    context := context.InitializeContext()
+	context := context.InitializeContext()
 
-    // Screen to initialize with
+	// Screen to initialize with
 	var screen modelmanager.Screen
 
 	if len(context.Core.Users) == 0 {
@@ -25,9 +25,9 @@ func InitializeRootModel() RootModel {
 		screen = login.InitializeSelectUserModel(context)
 	}
 
-    return RootModel{
-        modelmanager: modelmanager.New(screen),
-    }
+	return RootModel{
+		modelmanager: modelmanager.New(screen),
+	}
 }
 
 // Init
@@ -47,7 +47,7 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-    // Update model manager
+	// Update model manager
 	cmds = append(cmds, m.modelmanager.Update(msg))
 
 	return m, tea.Batch(cmds...)
@@ -55,6 +55,5 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // View
 func (m RootModel) View() string {
-    return m.modelmanager.View()
+	return m.modelmanager.View()
 }
-

@@ -62,11 +62,11 @@ type DeleteFolderModel struct {
 
 // Initialize root model
 func InitializeDeleteFolderModel(folder string, context context.Context) DeleteFolderModel {
-    // Initialize styles
+	// Initialize styles
 	styles := tlockstyles.InitializeStyle(DELETE_FOLDER_SIZE, context.Theme)
 
-    // Initialize help
-    help := buildhelp.BuildHelp(styles)
+	// Initialize help
+	help := buildhelp.BuildHelp(styles)
 
 	return DeleteFolderModel{
 		styles: styles,
@@ -119,4 +119,3 @@ func (model DeleteFolderModel) View() string {
 		model.styles.Center.Render(model.help.View(deleteFolderKeys)),
 	)
 }
-
