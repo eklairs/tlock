@@ -64,7 +64,7 @@ func (manager *ModelManager) PushScreen(screen Screen) {
 
 // Pops the top screen from the stack
 func (manager *ModelManager) PopScreen() {
-	if len(manager.stack) > 0 {
+	if len(manager.stack) > 1 {
 		manager.operation = Operation{
 			Action: OperationPop,
 			Screen: nil,
