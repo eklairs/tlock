@@ -26,7 +26,7 @@ type Folders struct {
 	context context.Context
 
 	// Vault
-	vault tlockvault.TLockVault
+	vault *tlockvault.TLockVault
 
 	// Focused index
 	focused_index boundedinteger.BoundedInteger
@@ -36,7 +36,7 @@ type Folders struct {
 }
 
 // Initializes a new instance of folders
-func InitializeFolders(vault tlockvault.TLockVault, context context.Context) Folders {
+func InitializeFolders(vault *tlockvault.TLockVault, context context.Context) Folders {
 	styles := tlockstyles.InitializeStyle(FOLDERS_WIDTH, context.Theme)
 
 	return Folders{

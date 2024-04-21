@@ -5,8 +5,8 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/pquerna/otp"
 	"golang.org/x/term"
-    "github.com/pquerna/otp"
 
 	"github.com/eklairs/tlock/tlock-internal/boundedinteger"
 	"github.com/eklairs/tlock/tlock-internal/buildhelp"
@@ -18,7 +18,7 @@ import (
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
 
-// Edit folder key map
+// Tokens key map
 type tokenKeyMap struct {
 	Manual key.Binding
 	Screen key.Binding
@@ -62,7 +62,7 @@ type Tokens struct {
 	context context.Context
 
 	// Vault
-	vault tlockvault.TLockVault
+	vault *tlockvault.TLockVault
 
 	// Focused index
 	focused_index boundedinteger.BoundedInteger
@@ -71,27 +71,26 @@ type Tokens struct {
 	styles tlockstyles.Styles
 
 	// Folder
-	folder string
+	folder *string
 
 	// Help
 	help help.Model
 }
 
 // Initializes a new instance of folders
-func InitializeTokens(vault tlockvault.TLockVault, context context.Context, folder string) Tokens {
+func InitializeTokens(vault *tlockvault.TLockVault, context context.Context) Tokens {
 	// Terminal size
 	width, _, _ := term.GetSize(0)
 
 	// Styles
-	styles := tlockstyles.InitializeStyle(width - folders.FOLDERS_WIDTH - 6, context.Theme)
+	styles := tlockstyles.InitializeStyle(width-folders.FOLDERS_WIDTH-6, context.Theme)
 
 	return Tokens{
 		vault:   vault,
 		styles:  styles,
 		context: context,
-		folder:  folder,
+		folder:  nil,
 		help:    buildhelp.BuildHelp(styles),
-        focused_index: boundedinteger.New(0, len(vault.ReadFolder(folder))),
 	}
 }
 
@@ -104,15 +103,17 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 			tokens.focused_index.Increase()
 		case "k":
 			tokens.focused_index.Decrease()
-        case "s":
-            manager.PushScreen(InitializeTokenFromScreen(tokens.context))
+		case "s":
+			manager.PushScreen(InitializeTokenFromScreen(tokens.context))
 		}
 
-    case AddTokenMsg:
-        tokens.vault.AddToken(tokens.folder, msgType.URI)
+	case AddTokenMsg:
+        if tokens.folder != nil {
+            tokens.vault.AddToken(*tokens.folder, msgType.URI)
+        }
 
-    case folders.FolderChangedMsg:
-        tokens.folder = msgType.Folder
+	case folders.FolderChangedMsg:
+		tokens.folder = &msgType.Folder
 	}
 
 	return nil
@@ -123,8 +124,13 @@ func (tokens Tokens) View() string {
 	// Get term size
 	_, height, _ := term.GetSize(0)
 
+    // If the folder is nil, then we have not yet recieved the change folder message, so we should not render anything
+    if tokens.folder == nil {
+        return ""
+    }
+
 	// Get URIs
-	uris := tokens.vault.GetTokens(tokens.folder)
+	uris := tokens.vault.GetTokens(*tokens.folder)
 
 	if len(uris) == 0 {
 		style := tokens.styles.Base.Copy().
@@ -144,37 +150,38 @@ func (tokens Tokens) View() string {
 	// List of items
 	items := make([]string, 0)
 
-    // Iter
-    for index, token := range tokens.vault.GetTokens(tokens.folder) {
-        // Generate key
-        authKey, _ := otp.NewKeyFromURL(token)
+	// Iter
+	for index, token := range uris {
+		// Generate key
+		authKey, _ := otp.NewKeyFromURL(token)
 
-        var ui string
+		var ui string
 
-        // Check if it is the focused one
-        if index == tokens.focused_index.Value {
-            ui = lipgloss.JoinHorizontal(
-                lipgloss.Left,
-                tokens.styles.Title.Copy().UnsetWidth().Render(authKey.AccountName()),
-                tokens.styles.Dimmed.Copy().UnsetWidth().Background(tokens.context.Theme.WindowBgOver).Render(" • "),
-                tokens.styles.Dimmed.Copy().UnsetWidth().Background(tokens.context.Theme.WindowBgOver).Render(authKey.Issuer()),
-            )
+		// Check if it is the focused one
+		if index == tokens.focused_index.Value {
+			ui = lipgloss.JoinHorizontal(
+				lipgloss.Left,
+				tokens.styles.Title.Copy().UnsetWidth().Render(authKey.AccountName()),
+				tokens.styles.Dimmed.Copy().UnsetWidth().Background(tokens.context.Theme.WindowBgOver).Render(" • "),
+				tokens.styles.Dimmed.Copy().UnsetWidth().Background(tokens.context.Theme.WindowBgOver).Render(authKey.Issuer()),
+			)
 
-            ui = tokens.styles.ActiveItem.Render(ui)
-        } else {
-            ui = lipgloss.JoinHorizontal(
-                lipgloss.Left,
-                tokens.styles.Title.Copy().UnsetWidth().Render(authKey.AccountName()),
-                tokens.styles.Dimmed.Copy().UnsetWidth().Render(" • "),
-                tokens.styles.Dimmed.Copy().UnsetWidth().Render(authKey.Issuer()),
-            )
+			ui = tokens.styles.ActiveItem.Render(ui)
+		} else {
+			ui = lipgloss.JoinHorizontal(
+				lipgloss.Left,
+				tokens.styles.Title.Copy().UnsetWidth().Render(authKey.AccountName()),
+				tokens.styles.Dimmed.Copy().UnsetWidth().Render(" • "),
+				tokens.styles.Dimmed.Copy().UnsetWidth().Render(authKey.Issuer()),
+			)
 
-            ui = tokens.styles.InactiveListItem.Render(ui)
-        }
+			ui = tokens.styles.InactiveListItem.Render(ui)
+		}
 
-        items = append(items, ui)
-    }
+		items = append(items, ui)
+	}
 
 	// Render
 	return lipgloss.JoinVertical(lipgloss.Center, items...)
 }
+

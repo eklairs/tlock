@@ -1,32 +1,79 @@
 package dashboard
 
 import (
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/eklairs/tlock/tlock-internal/buildhelp"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-models/dashboard/folders"
 	"github.com/eklairs/tlock/tlock-models/dashboard/tokens"
+	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
+	"golang.org/x/term"
 )
+
+// Dashboard key map
+type dashboardKeyMap struct {
+	Help key.Binding
+	Add  key.Binding
+}
+
+// ShortHelp()
+func (k dashboardKeyMap) ShortHelp() []key.Binding {
+	return []key.Binding{k.Help, k.Add}
+}
+
+// FullHelp()
+func (k dashboardKeyMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{
+		{k.Help},
+		{k.Add},
+	}
+}
+
+// Keys
+var dashboardKeys = dashboardKeyMap{
+	Help: key.NewBinding(
+		key.WithKeys("?"),
+		key.WithHelp("?", "help"),
+	),
+	Add: key.NewBinding(
+		key.WithKeys("A"),
+		key.WithHelp("A", "add"),
+	),
+}
 
 // Dashboard Model
 type DashboardModel struct {
 	// Vault
-	vault tlockvault.TLockVault
+	vault *tlockvault.TLockVault
 
 	// Folders
 	folders folders.Folders
 
 	// Tokens
 	tokens tokens.Tokens
+
+	// Help
+	help help.Model
+
+	// Styles
+	styles tlockstyles.Styles
 }
 
 func InitializeDashboardModel(vault tlockvault.TLockVault, context context.Context) DashboardModel {
+	width, _, _ := term.GetSize(0)
+	styles := tlockstyles.InitializeStyle(width, context.Theme)
+
 	return DashboardModel{
-		vault:   vault,
-		tokens:  tokens.InitializeTokens(vault, context, vault.Data.Folders[0].Name),
-		folders: folders.InitializeFolders(vault, context),
+		vault:   &vault,
+		styles:  styles,
+		help:    buildhelp.BuildHelp(styles),
+		tokens:  tokens.InitializeTokens(&vault, context),
+		folders: folders.InitializeFolders(&vault, context),
 	}
 }
 
@@ -42,10 +89,27 @@ func (m DashboardModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 
 // View
 func (m DashboardModel) View() string {
+	if len(m.vault.Data.Folders) == 0 {
+        _, height, _ := term.GetSize(0)
+
+		style := m.styles.Base.Copy().
+			Height(height).
+			Align(lipgloss.Center, lipgloss.Center)
+
+		ui := lipgloss.JoinVertical(
+			lipgloss.Left,
+			m.styles.Center.Render(m.styles.Title.Copy().UnsetWidth().Render(tokens.EmptyAsciiArt)),
+			m.styles.Center.Render(m.styles.Base.Copy().UnsetWidth().Render("So empty! How about adding a new folder?")),
+			m.styles.Center.Copy().UnsetWidth().Render(m.help.View(dashboardKeys)),
+		)
+
+		return style.Render(ui)
+	}
+
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		m.folders.View(),
-        "  ",
+		"  ",
 		m.tokens.View(),
 	)
 }
