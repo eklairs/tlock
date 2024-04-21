@@ -12,4 +12,3 @@ var CATPPUCCIN_THEME = Theme{
 	Accent:       lipgloss.Color("#b4befe"),
 	Error:        lipgloss.Color("#f38ba8"),
 }
-

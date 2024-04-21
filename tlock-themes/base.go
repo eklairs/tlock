@@ -25,4 +25,3 @@ type Theme struct {
 	// Error
 	Error lipgloss.Color
 }
-

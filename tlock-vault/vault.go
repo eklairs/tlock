@@ -113,4 +113,3 @@ func (vault TLockVault) write() {
 		log.Fatalf("Failed to write to file: %v", err)
 	}
 }
-

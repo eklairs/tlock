@@ -106,4 +106,3 @@ func (manager ModelManager) View() string {
 		manager.stack[len(manager.stack)-1].View(),
 	)
 }
-

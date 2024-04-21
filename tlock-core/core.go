@@ -82,4 +82,3 @@ func (users *TLockCore) AddNewUser(username, password string) tlockvault.TLockVa
 	// Return vault
 	return vault
 }
-

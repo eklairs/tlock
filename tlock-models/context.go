@@ -7,18 +7,17 @@ import (
 
 // TLock Context
 type Context struct {
-    // Current theme
-    Theme tlockthemes.Theme
+	// Current theme
+	Theme tlockthemes.Theme
 
-    // Core
-    Core tlockcore.TLockCore
+	// Core
+	Core tlockcore.TLockCore
 }
 
 // Initializes a new instance of the context
 func InitializeContext() Context {
-    return Context{
-        Theme: tlockthemes.CATPPUCCIN_THEME,
-        Core: tlockcore.New(),
-    }
+	return Context{
+		Theme: tlockthemes.CATPPUCCIN_THEME,
+		Core:  tlockcore.New(),
+	}
 }
-

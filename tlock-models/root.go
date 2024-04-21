@@ -6,14 +6,11 @@ import (
 
 // Root Model
 type RootModel struct {
-
 }
 
 // Initialize root model
 func InitializeRootModel() RootModel {
-	return RootModel{
-
-	}
+	return RootModel{}
 }
 
 // Init
@@ -38,6 +35,5 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // View
 func (m RootModel) View() string {
-    return ""
+	return ""
 }
-

@@ -30,4 +30,3 @@ func (integer *BoundedInteger) Decrease() {
 		integer.Value -= 1
 	}
 }
-

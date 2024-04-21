@@ -93,4 +93,3 @@ func Decrypt(password string, data []byte) ([]byte, error) {
 
 	return decryptedText, nil
 }
-
