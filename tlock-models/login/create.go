@@ -117,7 +117,7 @@ func (model CreateUserModel) Update(msg tea.Msg, manager *modelmanager.ModelMana
 		case key.Matches(msgType, createUserKeys.Create):
             vault := model.context.Core.AddNewUser(model.usernameInput.Value(), model.passwordInput.Value())
 
-            manager.PushScreen(dashboard.InitializeDashboardModel(vault))
+            manager.PushScreen(dashboard.InitializeDashboardModel(vault, model.context))
 		}
 	}
 

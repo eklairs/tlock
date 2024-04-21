@@ -11,4 +11,5 @@ var CATPPUCCIN_THEME = Theme{
 	Dimmed:       lipgloss.Color("#585b70"),
 	Accent:       lipgloss.Color("#b4befe"),
 	Error:        lipgloss.Color("#f38ba8"),
+	FoldersBg:    lipgloss.Color("#1a1a28"),
 }

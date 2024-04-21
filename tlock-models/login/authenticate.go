@@ -112,7 +112,7 @@ func (model EnterPassModel) Update(msg tea.Msg, manager *modelmanager.ModelManag
 			if err != nil {
 				model.errorMessage = true
 			} else {
-				manager.PushScreen(dashboard.InitializeDashboardModel(*vault))
+				manager.PushScreen(dashboard.InitializeDashboardModel(*vault, model.context))
 			}
 		}
 	}

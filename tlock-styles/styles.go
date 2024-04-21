@@ -80,7 +80,7 @@ func InitializeStyle(width int, theme tlockthemes.Theme) Styles {
 		Input:            base.Copy().Background(theme.WindowBgOver).Padding(1, 3),
 		InputPlaceholder: base.Copy().UnsetWidth().Background(theme.WindowBgOver).Foreground(theme.Dimmed),
 		Error:            base.Copy().Foreground(theme.Error),
-		FolderInactive:   base.Copy().Padding(1, 3),
+		FolderInactive:   base.Copy().Padding(1, 3).Background(theme.FoldersBg),
 		FolderActive: base.Copy().
 			Background(theme.WindowBgOver).
 			Padding(1, 3).

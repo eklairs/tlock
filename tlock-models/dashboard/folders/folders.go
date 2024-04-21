@@ -1,0 +1,93 @@
+package folders
+
+import (
+	"fmt"
+
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/eklairs/tlock/tlock-internal/boundedinteger"
+	"github.com/eklairs/tlock/tlock-internal/context"
+	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	"golang.org/x/term"
+
+	tlockstyles "github.com/eklairs/tlock/tlock-styles"
+	tlockvault "github.com/eklairs/tlock/tlock-vault"
+)
+
+var FOLDERS_WIDTH = 40
+
+// Folders
+type Folders struct {
+	// Context
+	context context.Context
+
+	// Vault
+	vault tlockvault.TLockVault
+
+	// Focused index
+	focused_index boundedinteger.BoundedInteger
+
+	// Styles
+	styles tlockstyles.Styles
+}
+
+// Initializes a new instance of folders
+func InitializeFolders(vault tlockvault.TLockVault, context context.Context) Folders {
+	styles := tlockstyles.InitializeStyle(FOLDERS_WIDTH, context.Theme)
+
+	return Folders{
+		vault:         vault,
+		styles:        styles,
+		context:       context,
+		focused_index: boundedinteger.New(0, len(vault.Data.Folders)),
+	}
+}
+
+// Handles update messages
+func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) tea.Cmd {
+	switch msgType := msg.(type) {
+	case tea.KeyMsg:
+		switch msgType.String() {
+		case "J":
+			folders.focused_index.Increase()
+		case "K":
+			folders.focused_index.Decrease()
+		}
+	}
+
+	return nil
+}
+
+// View
+func (folders Folders) View() string {
+	// Get term size
+	_, height, _ := term.GetSize(0)
+
+	// Full style
+	style := lipgloss.NewStyle().
+		Width(FOLDERS_WIDTH + 1).
+		Height(height).
+        Background(folders.context.Theme.FoldersBg)
+
+	// List of items
+	items := make([]string, len(folders.vault.Data.Folders))
+
+	for index, folder := range folders.vault.Data.Folders {
+		render_fn := folders.styles.FolderInactive.Render
+
+		if index == folders.focused_index.Value {
+			render_fn = folders.styles.FolderActive.Render
+		}
+
+		ui := lipgloss.JoinVertical(
+			lipgloss.Left,
+			folders.styles.Title.Render(folder.Name),
+			folders.styles.Dimmed.Render(fmt.Sprintf("%d tokens", len(folder.Uris))),
+		)
+
+		items[index] = render_fn(ui)
+	}
+
+	return style.Render(lipgloss.JoinVertical(lipgloss.Center, items...))
+}
+

@@ -24,4 +24,8 @@ type Theme struct {
 
 	// Error
 	Error lipgloss.Color
+
+    // Folders background color
+    FoldersBg lipgloss.Color
 }
+
