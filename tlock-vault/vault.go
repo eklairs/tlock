@@ -154,6 +154,15 @@ func (vault *TLockVault) ReadFolder(name string) []string {
 	return vault.Data.Folders[vault.find_folder(name)].Uris
 }
 
+// Adds a new token to the folder
+func (vault *TLockVault) AddToken(folder, uri string) {
+    folder_index := vault.find_folder(folder)
+
+    vault.Data.Folders[folder_index].Uris = append(vault.Data.Folders[folder_index].Uris, uri)
+
+    vault.write()
+}
+
 // Returns the index of the folder based on the name
 func (vault TLockVault) find_folder(name string) int {
 	return slices.IndexFunc(vault.Data.Folders, func(item FolderSpec) bool { return item.Name == name })

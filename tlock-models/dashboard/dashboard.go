@@ -45,6 +45,7 @@ func (m DashboardModel) View() string {
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		m.folders.View(),
+        "  ",
 		m.tokens.View(),
 	)
 }

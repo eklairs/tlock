@@ -16,6 +16,10 @@ import (
 
 var FOLDERS_WIDTH = 40
 
+type FolderChangedMsg struct {
+    Folder string
+}
+
 // Folders
 type Folders struct {
 	// Context
@@ -45,13 +49,27 @@ func InitializeFolders(vault tlockvault.TLockVault, context context.Context) Fol
 
 // Handles update messages
 func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) tea.Cmd {
+    var cmd tea.Cmd
+
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch msgType.String() {
 		case "J":
 			folders.focused_index.Increase()
+
+            cmd = func() tea.Msg {
+                return FolderChangedMsg{
+                    Folder: folders.vault.Data.Folders[folders.focused_index.Value].Name,
+                }
+            }
 		case "K":
 			folders.focused_index.Decrease()
+
+            cmd = func() tea.Msg {
+                return FolderChangedMsg{
+                    Folder: folders.vault.Data.Folders[folders.focused_index.Value].Name,
+                }
+            }
 		case "A":
 			manager.PushScreen(InitializeAddFolderModel(folders.context))
 		case "E":
@@ -76,7 +94,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		folders.focused_index = boundedinteger.New(min(folders.focused_index.Value, len(folders.vault.Data.Folders)-1), len(folders.vault.Data.Folders))
 	}
 
-	return nil
+	return cmd
 }
 
 // View

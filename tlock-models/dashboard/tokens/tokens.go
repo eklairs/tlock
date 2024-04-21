@@ -6,6 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"golang.org/x/term"
+    "github.com/pquerna/otp"
 
 	"github.com/eklairs/tlock/tlock-internal/boundedinteger"
 	"github.com/eklairs/tlock/tlock-internal/buildhelp"
@@ -82,7 +83,7 @@ func InitializeTokens(vault tlockvault.TLockVault, context context.Context, fold
 	width, _, _ := term.GetSize(0)
 
 	// Styles
-	styles := tlockstyles.InitializeStyle(width-folders.FOLDERS_WIDTH, context.Theme)
+	styles := tlockstyles.InitializeStyle(width - folders.FOLDERS_WIDTH - 6, context.Theme)
 
 	return Tokens{
 		vault:   vault,
@@ -90,6 +91,7 @@ func InitializeTokens(vault tlockvault.TLockVault, context context.Context, fold
 		context: context,
 		folder:  folder,
 		help:    buildhelp.BuildHelp(styles),
+        focused_index: boundedinteger.New(0, len(vault.ReadFolder(folder))),
 	}
 }
 
@@ -105,6 +107,12 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
         case "s":
             manager.PushScreen(InitializeTokenFromScreen(tokens.context))
 		}
+
+    case AddTokenMsg:
+        tokens.vault.AddToken(tokens.folder, msgType.URI)
+
+    case folders.FolderChangedMsg:
+        tokens.folder = msgType.Folder
 	}
 
 	return nil
@@ -135,6 +143,37 @@ func (tokens Tokens) View() string {
 
 	// List of items
 	items := make([]string, 0)
+
+    // Iter
+    for index, token := range tokens.vault.GetTokens(tokens.folder) {
+        // Generate key
+        authKey, _ := otp.NewKeyFromURL(token)
+
+        var ui string
+
+        // Check if it is the focused one
+        if index == tokens.focused_index.Value {
+            ui = lipgloss.JoinHorizontal(
+                lipgloss.Left,
+                tokens.styles.Title.Copy().UnsetWidth().Render(authKey.AccountName()),
+                tokens.styles.Dimmed.Copy().UnsetWidth().Background(tokens.context.Theme.WindowBgOver).Render(" • "),
+                tokens.styles.Dimmed.Copy().UnsetWidth().Background(tokens.context.Theme.WindowBgOver).Render(authKey.Issuer()),
+            )
+
+            ui = tokens.styles.ActiveItem.Render(ui)
+        } else {
+            ui = lipgloss.JoinHorizontal(
+                lipgloss.Left,
+                tokens.styles.Title.Copy().UnsetWidth().Render(authKey.AccountName()),
+                tokens.styles.Dimmed.Copy().UnsetWidth().Render(" • "),
+                tokens.styles.Dimmed.Copy().UnsetWidth().Render(authKey.Issuer()),
+            )
+
+            ui = tokens.styles.InactiveListItem.Render(ui)
+        }
+
+        items = append(items, ui)
+    }
 
 	// Render
 	return lipgloss.JoinVertical(lipgloss.Center, items...)
