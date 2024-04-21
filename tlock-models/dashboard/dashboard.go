@@ -25,7 +25,7 @@ type DashboardModel struct {
 func InitializeDashboardModel(vault tlockvault.TLockVault, context context.Context) DashboardModel {
 	return DashboardModel{
 		vault:   vault,
-        tokens: tokens.InitializeTokens(vault, context),
+        tokens: tokens.InitializeTokens(vault, context, vault.Data.Folders[0].Name),
 		folders: folders.InitializeFolders(vault, context),
 	}
 }

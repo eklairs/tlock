@@ -149,6 +149,11 @@ func (vault *TLockVault) DeleteFolder(name string) {
 	vault.write()
 }
 
+// Returns all the icons inside of a folder
+func (vault *TLockVault) ReadFolder(name string) []string {
+    return vault.Data.Folders[vault.find_folder(name)].Uris
+}
+
 // Returns the index of the folder based on the name
 func (vault TLockVault) find_folder(name string) int {
 	return slices.IndexFunc(vault.Data.Folders, func(item FolderSpec) bool { return item.Name == name })
