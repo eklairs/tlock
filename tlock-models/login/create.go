@@ -99,6 +99,8 @@ func (model CreateUserModel) Init() tea.Cmd {
 
 // Update
 func (model CreateUserModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
+    var cmd tea.Cmd
+
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -117,7 +119,7 @@ func (model CreateUserModel) Update(msg tea.Msg, manager *modelmanager.ModelMana
 		case key.Matches(msgType, createUserKeys.Create):
 			vault := model.context.Core.AddNewUser(model.usernameInput.Value(), model.passwordInput.Value())
 
-			manager.PushScreen(dashboard.InitializeDashboardModel(vault, model.context))
+			cmd = manager.PushScreen(dashboard.InitializeDashboardModel(vault, model.context))
 		}
 	}
 
@@ -129,7 +131,7 @@ func (model CreateUserModel) Update(msg tea.Msg, manager *modelmanager.ModelMana
 		model.passwordInput, _ = model.passwordInput.Update(msg)
 	}
 
-	return model, nil
+	return model, cmd
 }
 
 // View

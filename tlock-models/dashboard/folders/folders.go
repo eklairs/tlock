@@ -49,7 +49,7 @@ func InitializeFolders(vault *tlockvault.TLockVault, context context.Context) Fo
 
 // Handles update messages
 func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) tea.Cmd {
-    var cmd tea.Cmd
+    cmds := make([]tea.Cmd, 0)
 
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
@@ -57,19 +57,19 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		case "J":
 			folders.focused_index.Increase()
 
-            cmd = func() tea.Msg {
+            cmds = append(cmds, func() tea.Msg {
                 return FolderChangedMsg{
                     Folder: folders.vault.Data.Folders[folders.focused_index.Value].Name,
                 }
-            }
+            })
 		case "K":
 			folders.focused_index.Decrease()
 
-            cmd = func() tea.Msg {
+            cmds = append(cmds, func() tea.Msg {
                 return FolderChangedMsg{
                     Folder: folders.vault.Data.Folders[folders.focused_index.Value].Name,
                 }
-            }
+            })
 		case "A":
 			manager.PushScreen(InitializeAddFolderModel(folders.context))
 		case "E":
@@ -83,7 +83,14 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		folders.vault.AddFolder(msgType.FolderName)
 
 		// Update focused index bounds
-		folders.focused_index = boundedinteger.New(folders.focused_index.Value, len(folders.vault.Data.Folders))
+		folders.focused_index = boundedinteger.New(len(folders.vault.Data.Folders) - 1, len(folders.vault.Data.Folders))
+
+        // Switch
+        cmds = append(cmds, func() tea.Msg {
+            return FolderChangedMsg{
+                Folder: msgType.FolderName,
+            }
+        })
 
 	case EditNewFolderMsg:
 		folders.vault.RenameFolder(msgType.OldName, msgType.NewName)
@@ -94,7 +101,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		folders.focused_index = boundedinteger.New(min(folders.focused_index.Value, len(folders.vault.Data.Folders)-1), len(folders.vault.Data.Folders))
 	}
 
-	return cmd
+	return tea.Batch(cmds...)
 }
 
 // View

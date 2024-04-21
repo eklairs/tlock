@@ -101,6 +101,8 @@ func (model EnterPassModel) Init() tea.Cmd {
 
 // Update
 func (model EnterPassModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
+    var cmd tea.Cmd
+
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -112,7 +114,7 @@ func (model EnterPassModel) Update(msg tea.Msg, manager *modelmanager.ModelManag
 			if err != nil {
 				model.errorMessage = true
 			} else {
-				manager.PushScreen(dashboard.InitializeDashboardModel(*vault, model.context))
+				cmd = manager.PushScreen(dashboard.InitializeDashboardModel(*vault, model.context))
 			}
 		}
 	}
@@ -120,7 +122,7 @@ func (model EnterPassModel) Update(msg tea.Msg, manager *modelmanager.ModelManag
 	// Update input box
 	model.passInput, _ = model.passInput.Update(msg)
 
-	return model, nil
+	return model, cmd
 }
 
 // View

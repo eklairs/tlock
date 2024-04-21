@@ -55,11 +55,13 @@ func New(rootScreen Screen) ModelManager {
 }
 
 // Adds a new screen on the stack
-func (manager *ModelManager) PushScreen(screen Screen) {
+func (manager *ModelManager) PushScreen(screen Screen) tea.Cmd {
 	manager.operation = Operation{
 		Action: OperationPush,
 		Screen: &screen,
 	}
+
+    return screen.Init()
 }
 
 // Pops the top screen from the stack

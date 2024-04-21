@@ -79,7 +79,17 @@ func InitializeDashboardModel(vault tlockvault.TLockVault, context context.Conte
 
 // Init
 func (m DashboardModel) Init() tea.Cmd {
-	return nil
+    var cmd tea.Cmd
+
+    if len(m.vault.Data.Folders) != 0 {
+        cmd = func() tea.Msg {
+            return folders.FolderChangedMsg{
+                Folder: m.vault.Data.Folders[0].Name,
+            }
+        }
+    }
+
+	return cmd
 }
 
 // Update
