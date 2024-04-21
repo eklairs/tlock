@@ -45,14 +45,35 @@ func InitializeFolders(vault tlockvault.TLockVault, context context.Context) Fol
 
 // Handles update messages
 func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) tea.Cmd {
-	switch msgType := msg.(type) {
+switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch msgType.String() {
 		case "J":
 			folders.focused_index.Increase()
 		case "K":
 			folders.focused_index.Decrease()
+		case "A":
+			manager.PushScreen(InitializeAddFolderModel(folders.context))
+		case "E":
+			manager.PushScreen(InitializeEditFolderModel(folders.vault.Data.Folders[folders.focused_index.Value].Name, folders.context))
+		case "X":
+			manager.PushScreen(InitializeDeleteFolderModel(folders.vault.Data.Folders[folders.focused_index.Value].Name, folders.context))
 		}
+
+	case AddNewFolderMsg:
+		// Add folder
+		folders.vault.AddFolder(msgType.FolderName)
+
+		// Update focused index bounds
+		folders.focused_index = boundedinteger.New(folders.focused_index.Value, len(folders.vault.Data.Folders))
+
+	case EditNewFolderMsg:
+		folders.vault.RenameFolder(msgType.OldName, msgType.NewName)
+
+	case DeleteFolderMsg:
+		folders.vault.DeleteFolder(msgType.FolderName)
+
+		folders.focused_index = boundedinteger.New(min(folders.focused_index.Value, len(folders.vault.Data.Folders)-1), len(folders.vault.Data.Folders))
 	}
 
 	return nil

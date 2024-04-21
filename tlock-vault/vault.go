@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"slices"
 
 	"github.com/adrg/xdg"
 	"github.com/google/uuid"
@@ -113,3 +114,44 @@ func (vault TLockVault) write() {
 		log.Fatalf("Failed to write to file: %v", err)
 	}
 }
+
+
+// == Vault actions ==
+
+// == Folders functions ==
+
+// Adds a new folder with `name`
+func (vault *TLockVault) AddFolder(name string) {
+	vault.Data.Folders = append(vault.Data.Folders, FolderSpec{Name: name})
+
+	vault.write()
+}
+
+// Adds a new folder with `name`
+func (vault *TLockVault) RenameFolder(old_name, new_name string) {
+	folder_index := vault.find_folder(old_name)
+
+	vault.Data.Folders[folder_index].Name = new_name
+
+	vault.write()
+}
+
+// Returns all the tokens inside of a folder
+func (vault *TLockVault) GetTokens(folder string) []string {
+	folder_index := vault.find_folder(folder)
+
+	return vault.Data.Folders[folder_index].Uris
+}
+
+// Deletes a folder with the given name
+func (vault *TLockVault) DeleteFolder(name string) {
+	vault.Data.Folders = remove(vault.Data.Folders, vault.find_folder(name))
+
+	vault.write()
+}
+
+// Returns the index of the folder based on the name
+func (vault TLockVault) find_folder(name string) int {
+	return slices.IndexFunc(vault.Data.Folders, func(item FolderSpec) bool { return item.Name == name })
+}
+
