@@ -43,6 +43,8 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
             folders.focused_index.Increase()
         case "K":
             folders.focused_index.Decrease()
+        case "E":
+            manager.PushScreen(InitializeEditFolderModel(&folders.vault, folders.vault.Data.Folders[folders.focused_index.Value].Name))
         case "X":
             manager.PushScreen(InitializeDeleteFolderModel(&folders.vault, folders.vault.Data.Folders[folders.focused_index.Value].Name))
         case "shift+down":
