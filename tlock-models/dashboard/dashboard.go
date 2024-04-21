@@ -62,6 +62,9 @@ type DashboardModel struct {
 
 	// Styles
 	styles tlockstyles.Styles
+
+    // Context
+    context context.Context
 }
 
 func InitializeDashboardModel(vault tlockvault.TLockVault, context context.Context) DashboardModel {
@@ -71,6 +74,7 @@ func InitializeDashboardModel(vault tlockvault.TLockVault, context context.Conte
 	return DashboardModel{
 		vault:   &vault,
 		styles:  styles,
+        context: context,
 		help:    buildhelp.BuildHelp(styles),
 		tokens:  tokens.InitializeTokens(&vault, context),
 		folders: folders.InitializeFolders(&vault, context),
@@ -94,6 +98,14 @@ func (m DashboardModel) Init() tea.Cmd {
 
 // Update
 func (m DashboardModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
+    switch msgType := msg.(type) {
+    case tea.KeyMsg:
+        switch {
+        case key.Matches(msgType, dashboardKeys.Help):
+            manager.PushScreen(InitializeHelpModel(m.context))
+        }
+    }
+
 	return m, tea.Batch(m.folders.Update(msg, manager), m.tokens.Update(msg, manager))
 }
 
