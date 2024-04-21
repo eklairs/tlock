@@ -114,6 +114,8 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 
 	case folders.FolderChangedMsg:
 		tokens.folder = &msgType.Folder
+
+        tokens.focused_index = boundedinteger.New(0, len(tokens.vault.GetTokens(msgType.Folder)))
 	}
 
 	return nil
