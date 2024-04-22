@@ -48,7 +48,7 @@ var dashboardKeys = dashboardKeyMap{
 	),
 	ChangeTheme: key.NewBinding(
 		key.WithKeys("ctrl+t"),
-		key.WithHelp("ctrl+t", "change theme"),
+		key.WithHelp("Ctrl + T", "change theme"),
 	),
 }
 

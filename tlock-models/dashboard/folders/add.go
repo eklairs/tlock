@@ -19,6 +19,10 @@ type AddNewFolderMsg struct {
 
 var ADD_FOLDER_SIZE = 65
 
+var addFolderAscii = `
+▄▀█ █▀▄ █▀▄
+█▀█ █▄▀ █▄▀`
+
 // Add folder key map
 type addFolderKeyMap struct {
 	GoBack key.Binding
@@ -116,6 +120,8 @@ func (model AddFolderModel) Update(msg tea.Msg, manager *modelmanager.ModelManag
 func (m AddFolderModel) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
+        m.styles.Center.Render(m.styles.Title.Render(addFolderAscii)), "",
+        m.styles.Center.Render(m.styles.Dimmed.Render("Add a new folder")), "",
 		m.styles.Title.Render("Name"), // Folder name header
 		m.styles.Dimmed.Render("Choose a name for your folder, like Socials!"), "", // Folder name description
 		m.styles.Input.Render(m.name.View()), "",
