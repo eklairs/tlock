@@ -83,7 +83,7 @@ func InitializeStyle(width int, theme tlockthemes.Theme) Styles {
 		InputPlaceholder: base.Copy().UnsetWidth().Background(theme.WindowBgOver).Foreground(theme.Dimmed),
 		Error:            base.Copy().Foreground(theme.Error),
 		AccentTitle:      base.Copy().UnsetWidth().Background(theme.Accent).Padding(0, 1).Foreground(theme.WindowBg),
-		DimmedTitle:      base.Copy().UnsetWidth().Background(theme.WindowBgOver).Padding(0, 1).Foreground(theme.Dimmed),
+		DimmedTitle:      base.Copy().UnsetWidth().Background(theme.WindowBgOver).Padding(0, 1).Foreground(theme.WindowFg),
 		FolderInactive:   base.Copy().Padding(1, 3),
 		FolderActive: base.Copy().
 			Background(theme.WindowBgOver).

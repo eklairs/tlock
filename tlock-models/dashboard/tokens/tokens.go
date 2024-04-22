@@ -1,11 +1,15 @@
 package tokens
 
 import (
+	"strings"
+	"time"
+
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/pquerna/otp"
+	"github.com/pquerna/otp/totp"
 	"golang.org/x/term"
 
 	"github.com/eklairs/tlock/tlock-internal/boundedinteger"
@@ -97,8 +101,22 @@ func InitializeTokens(vault *tlockvault.TLockVault, context context.Context) Tok
 	}
 }
 
+type refreshTokens struct{}
+
+func notifyRefreshTokens() tea.Msg {
+    time.Sleep(time.Minute * 1)
+
+    return refreshTokens{}
+}
+
+func (tokens *Tokens) Init() tea.Cmd {
+    return notifyRefreshTokens
+}
+
 // Handles update messages
 func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) tea.Cmd {
+    cmds := make([]tea.Cmd, 0)
+
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch msgType.String() {
@@ -120,20 +138,25 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 		tokens.tokens = tokens.vault.GetTokens(msgType.Folder)
 
 		tokens.focused_index = boundedinteger.New(0, len(tokens.tokens))
+
+    case refreshTokens:
+        cmds = append(cmds, notifyRefreshTokens)
 	}
 
-	return nil
+	return tea.Batch(cmds...)
 }
 
 // View
 func (tokens Tokens) View() string {
 	// Get term size
-	_, height, _ := term.GetSize(0)
+	width, height, _ := term.GetSize(0)
 
 	// If the folder is nil, then we have not yet recieved the change folder message, so we should not render anything
 	if tokens.folder == nil {
 		return ""
 	}
+
+    tokensWidth := width - folders.FOLDERS_WIDTH - 13
 
 	if len(tokens.tokens) == 0 {
 		style := tokens.styles.Base.Copy().
@@ -161,30 +184,56 @@ func (tokens Tokens) View() string {
 		// Generate key
 		authKey, _ := otp.NewKeyFromURL(token)
 
-		var ui string
+        // Token info
+        tokenInfo := lipgloss.JoinHorizontal(
+            lipgloss.Left,
+            tokens.styles.Dimmed.Copy().UnsetWidth().Render(authKey.AccountName()),
+            tokens.styles.Dimmed.Copy().UnsetWidth().Render(" • "),
+            tokens.styles.Dimmed.Copy().UnsetWidth().Render(authKey.Issuer()),
+        )
+
+        // Render fn
+        render_fn := tokens.styles.InactiveListItem.Render
 
 		// Check if it is the focused one
 		if index == tokens.focused_index.Value {
-			ui = lipgloss.JoinHorizontal(
+			tokenInfo = lipgloss.JoinHorizontal(
 				lipgloss.Left,
 				tokens.styles.Title.Copy().UnsetWidth().Render(authKey.AccountName()),
 				tokens.styles.Dimmed.Copy().UnsetWidth().Background(tokens.context.Theme.WindowBgOver).Render(" • "),
-				tokens.styles.Dimmed.Copy().UnsetWidth().Background(tokens.context.Theme.WindowBgOver).Render(authKey.Issuer()),
+				tokens.styles.Base.Copy().UnsetWidth().Background(tokens.context.Theme.WindowBgOver).Render(authKey.Issuer()),
 			)
 
-			ui = tokens.styles.ActiveItem.Render(ui)
-		} else {
-			ui = lipgloss.JoinHorizontal(
-				lipgloss.Left,
-				tokens.styles.Title.Copy().UnsetWidth().Render(authKey.AccountName()),
-				tokens.styles.Dimmed.Copy().UnsetWidth().Render(" • "),
-				tokens.styles.Dimmed.Copy().UnsetWidth().Render(authKey.Issuer()),
-			)
-
-			ui = tokens.styles.InactiveListItem.Render(ui)
+            render_fn = tokens.styles.ActiveItem.Render
 		}
 
-		items = append(items, ui)
+        // Token str
+        currentToken, _ := totp.GenerateCode(authKey.Secret(), time.Now())
+        tokenRenderable := ""
+
+        style := lipgloss.NewStyle().
+            Bold(true).
+            PaddingRight(3).
+            Background(tokens.context.Theme.WindowBgOver).
+            Foreground(tokens.context.Theme.Accent)
+
+        spacer_style := lipgloss.NewStyle().
+            Background(tokens.context.Theme.WindowBgOver)
+
+        for _, tokenChar := range currentToken {
+            tokenRenderable = lipgloss.JoinHorizontal(lipgloss.Left, tokenRenderable, style.Render(string(tokenChar)))
+        }
+
+        // Final ui
+        ui := lipgloss.JoinHorizontal(
+            lipgloss.Left,
+            tokenInfo,
+            spacer_style.Render(strings.Repeat(" ", tokensWidth - lipgloss.Width(tokenInfo) - lipgloss.Width(tokenRenderable))),
+            tokenRenderable,
+        )
+
+		// items = append(items, render_fn(ui))
+        items = append(items, render_fn(ui))
 	}
 
 	// Render

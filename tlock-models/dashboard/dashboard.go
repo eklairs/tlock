@@ -131,7 +131,7 @@ func (m DashboardModel) Init() tea.Cmd {
 		}
 	}
 
-	return cmd
+	return tea.Batch(cmd, m.tokens.Init())
 }
 
 // Update
