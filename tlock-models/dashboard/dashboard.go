@@ -1,6 +1,9 @@
 package dashboard
 
 import (
+	"strings"
+	"time"
+
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -14,6 +17,35 @@ import (
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"golang.org/x/term"
 )
+
+// Bottom bar
+func BottomBar(width int, currentUser string, styles tlockstyles.Styles) string {
+    style := styles.Base.Copy().
+        Width(width).
+        Height(1).
+        Margin(1)
+
+    left := lipgloss.JoinHorizontal(
+        lipgloss.Left,
+        styles.AccentTitle.Render("TLock"),
+        styles.DimmedTitle.Render("v1.0.0"),
+    )
+
+    right := lipgloss.JoinHorizontal(
+        lipgloss.Right,
+        styles.DimmedTitle.Render(time.Now().Format("2 January, 2006")),
+        styles.AccentTitle.Render(currentUser),
+    )
+
+    bar := lipgloss.JoinHorizontal(
+        lipgloss.Center,
+        left,
+        strings.Repeat(" ", width - lipgloss.Width(left) - lipgloss.Width(right) - 2),
+        right,
+    )
+
+    return style.Render(bar)
+}
 
 // Dashboard key map
 type dashboardKeyMap struct {
@@ -117,9 +149,9 @@ func (m DashboardModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 
 // View
 func (m DashboardModel) View() string {
-	if len(m.vault.Data.Folders) == 0 {
-		_, height, _ := term.GetSize(0)
+    width, height, _ := term.GetSize(0)
 
+	if len(m.vault.Data.Folders) == 0 {
 		style := m.styles.Base.Copy().
 			Height(height).
 			Align(lipgloss.Center, lipgloss.Center)
@@ -134,10 +166,13 @@ func (m DashboardModel) View() string {
 		return style.Render(ui)
 	}
 
-	return lipgloss.JoinHorizontal(
+	return lipgloss.JoinVertical(
 		lipgloss.Left,
-		m.folders.View(),
-		"  ",
-		m.tokens.View(),
+        lipgloss.JoinHorizontal(
+            lipgloss.Left,
+            m.folders.View(), "   ",
+            m.tokens.View(),
+        ),
+        BottomBar(width, "Eklairs", m.styles),
 	)
 }

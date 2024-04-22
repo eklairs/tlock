@@ -112,11 +112,13 @@ func (folders Folders) View() string {
 	// Full style
 	style := lipgloss.NewStyle().
 		Width(FOLDERS_WIDTH + 1).
-		Height(height).
-		Background(folders.context.Theme.FoldersBg)
+		Height(height - 3)
 
 	// List of items
-	items := make([]string, len(folders.vault.Data.Folders))
+	items := make([]string, 0)
+
+    // Header
+    items = append(items, folders.styles.AccentTitle.Copy().Margin(1).Render("FOLDERS"))
 
 	for index, folder := range folders.vault.Data.Folders {
 		render_fn := folders.styles.FolderInactive.Render
@@ -125,14 +127,14 @@ func (folders Folders) View() string {
 			render_fn = folders.styles.FolderActive.Render
 		}
 
-		ui := lipgloss.JoinHorizontal(
+		ui := lipgloss.JoinVertical(
 			lipgloss.Left,
 			folders.styles.Title.Copy().UnsetWidth().Render(folder.Name),
 			folders.styles.Dimmed.Render(fmt.Sprintf("%d tokens", len(folder.Uris))),
 		)
 
-		items[index] = render_fn(ui)
+        items = append(items, render_fn(ui))
 	}
 
-	return style.Render(lipgloss.JoinVertical(lipgloss.Center, items...))
+	return style.Render(lipgloss.JoinVertical(lipgloss.Left, items...))
 }

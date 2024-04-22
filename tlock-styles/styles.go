@@ -44,6 +44,12 @@ type Styles struct {
 
 	// Folder active
 	FolderActive lipgloss.Style
+
+	// Title
+	AccentTitle lipgloss.Style
+
+    // Dimmed title
+    DimmedTitle lipgloss.Style
 }
 
 // Initializes new instance of styles
@@ -76,10 +82,12 @@ func InitializeStyle(width int, theme tlockthemes.Theme) Styles {
 		Input:            base.Copy().Background(theme.WindowBgOver).Padding(1, 3),
 		InputPlaceholder: base.Copy().UnsetWidth().Background(theme.WindowBgOver).Foreground(theme.Dimmed),
 		Error:            base.Copy().Foreground(theme.Error),
-		FolderInactive:   base.Copy().Padding(1, 3).Background(theme.FoldersBg),
+		AccentTitle:      base.Copy().UnsetWidth().Background(theme.Accent).Padding(0, 1).Foreground(theme.WindowBg),
+		DimmedTitle:      base.Copy().UnsetWidth().Background(theme.WindowBgOver).Padding(0, 1).Foreground(theme.Dimmed),
+		FolderInactive:   base.Copy().Padding(1, 3),
 		FolderActive: base.Copy().
 			Background(theme.WindowBgOver).
-			Padding(1, 3).
+			Padding(1, 2).
 			BorderBackground(theme.WindowBgOver).
 			BorderForeground(theme.Accent).
 			Border(lipgloss.OuterHalfBlockBorder(), false, false, false, true),

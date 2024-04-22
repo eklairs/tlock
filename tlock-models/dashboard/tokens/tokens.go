@@ -137,13 +137,13 @@ func (tokens Tokens) View() string {
 
 	if len(tokens.tokens) == 0 {
 		style := tokens.styles.Base.Copy().
-			Height(height).
+			Height(height - 3).
 			Align(lipgloss.Center, lipgloss.Center)
 
 		ui := lipgloss.JoinVertical(
 			lipgloss.Left,
 			tokens.styles.Center.Render(tokens.styles.Title.Copy().UnsetWidth().Render(EmptyAsciiArt)),
-			tokens.styles.Center.Render(tokens.styles.Base.Copy().UnsetWidth().Render("So empty! How about adding a new token?")),
+			tokens.styles.Center.Render(tokens.styles.Title.Copy().UnsetBold().UnsetWidth().Render("So empty! How about adding a new token?")), "",
 			tokens.styles.Center.Copy().UnsetWidth().Render(tokens.help.View(tokenKeys)),
 		)
 
@@ -152,6 +152,9 @@ func (tokens Tokens) View() string {
 
 	// List of items
 	items := make([]string, 0)
+
+    // Header
+    items = append(items, tokens.styles.AccentTitle.Copy().Margin(1).Render("TOKENS"))
 
 	// Iter
 	for index, token := range tokens.tokens {
@@ -185,5 +188,6 @@ func (tokens Tokens) View() string {
 	}
 
 	// Render
-	return lipgloss.JoinVertical(lipgloss.Center, items...)
+	return lipgloss.JoinVertical(lipgloss.Left, items...)
 }
+
