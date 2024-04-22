@@ -125,9 +125,9 @@ func (folders Folders) View() string {
 			render_fn = folders.styles.FolderActive.Render
 		}
 
-		ui := lipgloss.JoinVertical(
+		ui := lipgloss.JoinHorizontal(
 			lipgloss.Left,
-			folders.styles.Title.Render(folder.Name),
+			folders.styles.Title.Copy().UnsetWidth().Render(folder.Name),
 			folders.styles.Dimmed.Render(fmt.Sprintf("%d tokens", len(folder.Uris))),
 		)
 

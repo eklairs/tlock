@@ -16,6 +16,10 @@ import (
 
 var TOKEN_FROM_SCREEN_WIDTH = 65
 
+var fromScreenAsciiArt = `
+█▀ █▀▀ █▀█ █▀▀ █▀▀ █▄ █
+▄█ █▄▄ █▀▄ ██▄ ██▄ █ ▀█`
+
 // From screen key map
 type fromScreenKeyMap struct {
 	GoBack key.Binding
@@ -120,6 +124,7 @@ func (model TokenFromScreen) View() string {
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
+		model.styles.Center.Render(model.styles.Title.Render(fromScreenAsciiArt)), "",
 		model.styles.Center.Render(model.styles.Dimmed.Render("Place your QRCode window in the same screen as tlock")), "",
 		model.styles.Center.Render(lipgloss.JoinHorizontal(
 			lipgloss.Left,
