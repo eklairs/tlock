@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/pquerna/otp"
+	"github.com/pquerna/otp/hotp"
 	"github.com/pquerna/otp/totp"
 	"golang.org/x/term"
 
@@ -81,7 +82,7 @@ type Tokens struct {
 	help help.Model
 
 	// Tokens
-	tokens []string
+	tokens []tlockvault.TokenURI
 }
 
 // Initializes a new instance of folders
@@ -126,6 +127,14 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 			tokens.focused_index.Decrease()
 		case "s":
 			manager.PushScreen(InitializeTokenFromScreen(tokens.context))
+        case "n":
+            focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
+
+            authKey, _ := otp.NewKeyFromURL(focused_uri)
+
+            if authKey.Type() == "hotp" {
+                tokens.vault.IncrementTokenUsageCounter(*tokens.folder, focused_uri)
+            }
 		}
 
 	case AddTokenMsg:
@@ -182,7 +191,7 @@ func (tokens Tokens) View() string {
 	// Iter
 	for index, token := range tokens.tokens {
 		// Generate key
-		authKey, _ := otp.NewKeyFromURL(token)
+		authKey, _ := otp.NewKeyFromURL(token.URI)
 
         // Token info
         tokenInfo := lipgloss.JoinHorizontal(
@@ -208,7 +217,14 @@ func (tokens Tokens) View() string {
 		}
 
         // Token str
-        currentToken, _ := totp.GenerateCode(authKey.Secret(), time.Now())
+        var currentToken string
+
+        if authKey.Type() == "hotp" {
+            currentToken, _ = hotp.GenerateCode(authKey.Secret(), uint64(token.UsageCounter))
+        } else {
+            currentToken, _ = totp.GenerateCode(authKey.Secret(), time.Now())
+        }
+
         tokenRenderable := ""
 
         style := lipgloss.NewStyle().

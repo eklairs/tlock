@@ -16,13 +16,22 @@ func remove[T any](slice []T, s int) []T {
 	return append(slice[:s], slice[s+1:]...)
 }
 
+type TokenURI struct {
+    // URI
+    URI string
+
+    // Usage count
+    // Only in case of HOTP based tokens
+    UsageCounter int
+}
+
 // Represents a folder
 type FolderSpec struct {
 	// Name
 	Name string
 
 	// Tokens uris
-	Uris []string
+	Uris []TokenURI
 }
 
 // Data inside of the vault
@@ -136,7 +145,7 @@ func (vault *TLockVault) RenameFolder(old_name, new_name string) {
 }
 
 // Returns all the tokens inside of a folder
-func (vault *TLockVault) GetTokens(folder string) []string {
+func (vault *TLockVault) GetTokens(folder string) []TokenURI {
 	folder_index := vault.find_folder(folder)
 
 	return vault.Data.Folders[folder_index].Uris
@@ -149,18 +158,23 @@ func (vault *TLockVault) DeleteFolder(name string) {
 	vault.write()
 }
 
-// Returns all the icons inside of a folder
-func (vault *TLockVault) ReadFolder(name string) []string {
-	return vault.Data.Folders[vault.find_folder(name)].Uris
-}
-
 // Adds a new token to the folder
 func (vault *TLockVault) AddToken(folder, uri string) {
 	folder_index := vault.find_folder(folder)
 
-	vault.Data.Folders[folder_index].Uris = append(vault.Data.Folders[folder_index].Uris, uri)
+	vault.Data.Folders[folder_index].Uris = append(vault.Data.Folders[folder_index].Uris, TokenURI{URI: uri, UsageCounter: 0})
 
 	vault.write()
+}
+
+// Increaments the usage counter for the given URI inside of a folder
+func (vault *TLockVault) IncrementTokenUsageCounter(folder, target_uri string) {
+    folder_index := vault.find_folder(folder)
+    token_index := slices.IndexFunc(vault.Data.Folders[folder_index].Uris, func(uri TokenURI) bool { return uri.URI == target_uri })
+
+    vault.Data.Folders[folder_index].Uris[token_index].UsageCounter += 1
+
+    vault.write()
 }
 
 // Returns the index of the folder based on the name
