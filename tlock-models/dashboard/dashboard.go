@@ -17,13 +17,14 @@ import (
 
 // Dashboard key map
 type dashboardKeyMap struct {
-	Help key.Binding
-	Add  key.Binding
+	Help        key.Binding
+	Add         key.Binding
+	ChangeTheme key.Binding
 }
 
 // ShortHelp()
 func (k dashboardKeyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Help, k.Add}
+	return []key.Binding{k.Help, k.Add, k.ChangeTheme}
 }
 
 // FullHelp()
@@ -31,6 +32,7 @@ func (k dashboardKeyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
 		{k.Help},
 		{k.Add},
+        {k.ChangeTheme},
 	}
 }
 
@@ -38,11 +40,15 @@ func (k dashboardKeyMap) FullHelp() [][]key.Binding {
 var dashboardKeys = dashboardKeyMap{
 	Help: key.NewBinding(
 		key.WithKeys("?"),
-		key.WithHelp("?", "help"),
+		key.WithHelp("?", "help menu"),
 	),
 	Add: key.NewBinding(
 		key.WithKeys("A"),
-		key.WithHelp("A", "add"),
+		key.WithHelp("A", "add folder"),
+	),
+	ChangeTheme: key.NewBinding(
+		key.WithKeys("ctrl+t"),
+		key.WithHelp("ctrl+t", "change theme"),
 	),
 }
 
@@ -119,9 +125,9 @@ func (m DashboardModel) View() string {
 			Align(lipgloss.Center, lipgloss.Center)
 
 		ui := lipgloss.JoinVertical(
-			lipgloss.Left,
-			m.styles.Center.Render(m.styles.Title.Copy().UnsetWidth().Render(tokens.EmptyAsciiArt)),
-			m.styles.Center.Render(m.styles.Base.Copy().UnsetWidth().Render("So empty! How about adding a new folder?")),
+			lipgloss.Center,
+		    m.styles.Title.Copy().UnsetWidth().Render(tokens.EmptyAsciiArt),
+			m.styles.Title.Copy().UnsetBold().UnsetWidth().Render("So empty! How about adding a new folder?"), "",
 			m.styles.Center.Copy().UnsetWidth().Render(m.help.View(dashboardKeys)),
 		)
 
