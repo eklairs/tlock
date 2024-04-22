@@ -1,9 +1,6 @@
 package tokens
 
 import (
-    "github.com/kbinani/screenshot"
-    "github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/qrcode"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -12,6 +9,9 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
+	"github.com/kbinani/screenshot"
+	"github.com/makiuchi-d/gozxing"
+	"github.com/makiuchi-d/gozxing/qrcode"
 )
 
 var TOKEN_FROM_SCREEN_WIDTH = 65
@@ -19,7 +19,7 @@ var TOKEN_FROM_SCREEN_WIDTH = 65
 // From screen key map
 type fromScreenKeyMap struct {
 	GoBack key.Binding
-	Start key.Binding
+	Start  key.Binding
 }
 
 // ShortHelp()
@@ -80,32 +80,32 @@ func (model TokenFromScreen) Init() tea.Cmd {
 
 // Update
 func (model TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
-    var cmd tea.Cmd
+	var cmd tea.Cmd
 
-    switch msgType := msg.(type) {
-    case tea.KeyMsg:
-        switch {
-        case key.Matches(msgType, fromScreenKeys.GoBack):
-            manager.PopScreen()
+	switch msgType := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msgType, fromScreenKeys.GoBack):
+			manager.PopScreen()
 
-        case key.Matches(msgType, fromScreenKeys.Start):
-            if image, err := screenshot.CaptureRect(screenshot.GetDisplayBounds(0)); err == nil {
-                if bmp, err := gozxing.NewBinaryBitmapFromImage(image); err == nil {
-                    qrReader := qrcode.NewQRCodeReader()
+		case key.Matches(msgType, fromScreenKeys.Start):
+			if image, err := screenshot.CaptureRect(screenshot.GetDisplayBounds(0)); err == nil {
+				if bmp, err := gozxing.NewBinaryBitmapFromImage(image); err == nil {
+					qrReader := qrcode.NewQRCodeReader()
 
-                    if result, err := qrReader.Decode(bmp, nil); err == nil {
-                        cmd = func() tea.Msg {
-                            return AddTokenMsg {
-                                URI: result.String(),
-                            }
-                        }
-                    }
-                }
-            }
+					if result, err := qrReader.Decode(bmp, nil); err == nil {
+						cmd = func() tea.Msg {
+							return AddTokenMsg{
+								URI: result.String(),
+							}
+						}
+					}
+				}
+			}
 
-            manager.PopScreen()
-        }
-    }
+			manager.PopScreen()
+		}
+	}
 
 	return model, cmd
 }
@@ -124,9 +124,9 @@ func (model TokenFromScreen) View() string {
 		model.styles.Center.Render(lipgloss.JoinHorizontal(
 			lipgloss.Left,
 			mockScreenStyle.Render("TLock"),
-            "    ",
+			"    ",
 			mockScreenStyle.Render("QRCode Window"),
 		)), "",
-        model.styles.Center.Render(model.help.View(fromScreenKeys)),
+		model.styles.Center.Render(model.help.View(fromScreenKeys)),
 	)
 }

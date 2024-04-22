@@ -63,8 +63,8 @@ type DashboardModel struct {
 	// Styles
 	styles tlockstyles.Styles
 
-    // Context
-    context context.Context
+	// Context
+	context context.Context
 }
 
 func InitializeDashboardModel(vault tlockvault.TLockVault, context context.Context) DashboardModel {
@@ -74,7 +74,7 @@ func InitializeDashboardModel(vault tlockvault.TLockVault, context context.Conte
 	return DashboardModel{
 		vault:   &vault,
 		styles:  styles,
-        context: context,
+		context: context,
 		help:    buildhelp.BuildHelp(styles),
 		tokens:  tokens.InitializeTokens(&vault, context),
 		folders: folders.InitializeFolders(&vault, context),
@@ -83,28 +83,28 @@ func InitializeDashboardModel(vault tlockvault.TLockVault, context context.Conte
 
 // Init
 func (m DashboardModel) Init() tea.Cmd {
-    var cmd tea.Cmd
+	var cmd tea.Cmd
 
-    if len(m.vault.Data.Folders) != 0 {
-        cmd = func() tea.Msg {
-            return folders.FolderChangedMsg{
-                Folder: m.vault.Data.Folders[0].Name,
-            }
-        }
-    }
+	if len(m.vault.Data.Folders) != 0 {
+		cmd = func() tea.Msg {
+			return folders.FolderChangedMsg{
+				Folder: m.vault.Data.Folders[0].Name,
+			}
+		}
+	}
 
 	return cmd
 }
 
 // Update
 func (m DashboardModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
-    switch msgType := msg.(type) {
-    case tea.KeyMsg:
-        switch {
-        case key.Matches(msgType, dashboardKeys.Help):
-            manager.PushScreen(InitializeHelpModel(m.context))
-        }
-    }
+	switch msgType := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msgType, dashboardKeys.Help):
+			manager.PushScreen(InitializeHelpModel(m.context))
+		}
+	}
 
 	return m, tea.Batch(m.folders.Update(msg, manager), m.tokens.Update(msg, manager))
 }
@@ -112,7 +112,7 @@ func (m DashboardModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 // View
 func (m DashboardModel) View() string {
 	if len(m.vault.Data.Folders) == 0 {
-        _, height, _ := term.GetSize(0)
+		_, height, _ := term.GetSize(0)
 
 		style := m.styles.Base.Copy().
 			Height(height).

@@ -76,16 +76,13 @@ func InitializeCreateUserModel(context context.Context) CreateUserModel {
 	// Initialize styles
 	styles := tlockstyles.InitializeStyle(SELECT_USER_WIDTH, context.Theme)
 
-	// Initialize help menu
-	help := buildhelp.BuildHelp(styles)
-
 	// Input box for username
 	usernameInput := tlockstyles.InitializeInputBox(styles, "Your username goes here...")
 	usernameInput.Focus()
 
 	return CreateUserModel{
 		context:       context,
-		help:          help,
+		help:          buildhelp.BuildHelp(styles),
 		styles:        styles,
 		usernameInput: usernameInput,
 		passwordInput: tlockstyles.InitializeInputBox(styles, "Your password goes here..."),
@@ -99,7 +96,7 @@ func (model CreateUserModel) Init() tea.Cmd {
 
 // Update
 func (model CreateUserModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
-    var cmd tea.Cmd
+	var cmd tea.Cmd
 
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:

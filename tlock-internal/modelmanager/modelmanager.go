@@ -61,7 +61,7 @@ func (manager *ModelManager) PushScreen(screen Screen) tea.Cmd {
 		Screen: &screen,
 	}
 
-    return screen.Init()
+	return screen.Init()
 }
 
 // Pops the top screen from the stack

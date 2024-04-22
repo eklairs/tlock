@@ -61,7 +61,7 @@ func (users TLockCore) write() {
 
 	// Check for errors
 	if err != nil {
-		log.Fatalf("Failed to create users file")
+		log.Fatalf("Failed to create users file: %v", err)
 	}
 
 	// Write

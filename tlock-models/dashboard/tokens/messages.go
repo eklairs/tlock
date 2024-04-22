@@ -1,6 +1,5 @@
 package tokens
 
 type AddTokenMsg struct {
-    URI string
+	URI string
 }
-

@@ -101,7 +101,7 @@ func (model EnterPassModel) Init() tea.Cmd {
 
 // Update
 func (model EnterPassModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
-    var cmd tea.Cmd
+	var cmd tea.Cmd
 
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:

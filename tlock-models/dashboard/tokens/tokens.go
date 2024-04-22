@@ -76,8 +76,8 @@ type Tokens struct {
 	// Help
 	help help.Model
 
-    // Tokens
-    tokens []string
+	// Tokens
+	tokens []string
 }
 
 // Initializes a new instance of folders
@@ -111,15 +111,15 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 		}
 
 	case AddTokenMsg:
-        if tokens.folder != nil {
-            tokens.vault.AddToken(*tokens.folder, msgType.URI)
-        }
+		if tokens.folder != nil {
+			tokens.vault.AddToken(*tokens.folder, msgType.URI)
+		}
 
 	case folders.FolderChangedMsg:
 		tokens.folder = &msgType.Folder
-        tokens.tokens = tokens.vault.GetTokens(msgType.Folder)
+		tokens.tokens = tokens.vault.GetTokens(msgType.Folder)
 
-        tokens.focused_index = boundedinteger.New(0, len(tokens.tokens))
+		tokens.focused_index = boundedinteger.New(0, len(tokens.tokens))
 	}
 
 	return nil
@@ -130,10 +130,10 @@ func (tokens Tokens) View() string {
 	// Get term size
 	_, height, _ := term.GetSize(0)
 
-    // If the folder is nil, then we have not yet recieved the change folder message, so we should not render anything
-    if tokens.folder == nil {
-        return ""
-    }
+	// If the folder is nil, then we have not yet recieved the change folder message, so we should not render anything
+	if tokens.folder == nil {
+		return ""
+	}
 
 	if len(tokens.tokens) == 0 {
 		style := tokens.styles.Base.Copy().
@@ -187,4 +187,3 @@ func (tokens Tokens) View() string {
 	// Render
 	return lipgloss.JoinVertical(lipgloss.Center, items...)
 }
-

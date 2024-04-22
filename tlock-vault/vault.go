@@ -156,11 +156,11 @@ func (vault *TLockVault) ReadFolder(name string) []string {
 
 // Adds a new token to the folder
 func (vault *TLockVault) AddToken(folder, uri string) {
-    folder_index := vault.find_folder(folder)
+	folder_index := vault.find_folder(folder)
 
-    vault.Data.Folders[folder_index].Uris = append(vault.Data.Folders[folder_index].Uris, uri)
+	vault.Data.Folders[folder_index].Uris = append(vault.Data.Folders[folder_index].Uris, uri)
 
-    vault.write()
+	vault.write()
 }
 
 // Returns the index of the folder based on the name

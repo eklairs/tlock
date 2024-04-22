@@ -81,12 +81,10 @@ func InitializeSelectUserModel(context context.Context) SelectUserModel {
 	// Initialize styles
 	styles := tlockstyles.InitializeStyle(SELECT_USER_WIDTH, context.Theme)
 
-	// Initialize build
-	help := buildhelp.BuildHelp(styles)
-
+	// Return
 	return SelectUserModel{
 		context:       context,
-		help:          help,
+		help:          buildhelp.BuildHelp(styles),
 		focused_index: boundedinteger.New(0, len(context.Core.Users)),
 		styles:        styles,
 	}
@@ -102,12 +100,12 @@ func (model SelectUserModel) Update(msg tea.Msg, manager *modelmanager.ModelMana
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msgType, selectUserKeys.New):
-			manager.PushScreen(InitializeCreateUserModel(model.context))
 		case key.Matches(msgType, selectUserKeys.Up):
 			model.focused_index.Decrease()
 		case key.Matches(msgType, selectUserKeys.Down):
 			model.focused_index.Increase()
+		case key.Matches(msgType, selectUserKeys.New):
+			manager.PushScreen(InitializeCreateUserModel(model.context))
 		case key.Matches(msgType, selectUserKeys.Enter):
 			manager.PushScreen(InitializeEnterPassModel(model.context, model.context.Core.Users[model.focused_index.Value]))
 		}
