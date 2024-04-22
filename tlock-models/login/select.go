@@ -18,6 +18,10 @@ import (
 
 var SELECT_USER_WIDTH = 65
 
+var selectUserAsciiArt = `
+█   █▀█ █▀▀ █ █▄ █
+█▄▄ █▄█ █▄█ █ █ ▀█`
+
 // Select user key map
 type selectUserKeyMap struct {
 	Up    key.Binding
@@ -120,7 +124,10 @@ func (model SelectUserModel) View() string {
 	// -6 is for the padding on both the ends of the horizontal axis
 	listItemWidth := SELECT_USER_WIDTH - 6
 
-	items := []string{}
+	items := []string{
+		model.styles.Title.Copy().UnsetWidth().Render(selectUserAsciiArt), "",
+		model.styles.Dimmed.Copy().UnsetWidth().Render("Select a user to continue as"), "",
+	}
 
 	// Add all the user's name
 	for index, user := range model.context.Core.Users {
@@ -145,7 +152,7 @@ func (model SelectUserModel) View() string {
 	items = append(items, "", model.styles.Center.Render(model.help.View(selectUserKeys)))
 
 	return lipgloss.JoinVertical(
-		lipgloss.Left,
+		lipgloss.Center,
 		items...,
 	)
 }

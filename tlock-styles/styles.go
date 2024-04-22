@@ -46,10 +46,6 @@ type Styles struct {
 	FolderActive lipgloss.Style
 }
 
-func SetBackgroundColor(o *termenv.Output) {
-
-}
-
 // Initializes new instance of styles
 func InitializeStyle(width int, theme tlockthemes.Theme) Styles {
 	// Terminal option for setting background color to the theme's window bg
@@ -75,7 +71,7 @@ func InitializeStyle(width int, theme tlockthemes.Theme) Styles {
 		Center:           base.Copy().AlignHorizontal(lipgloss.Center),
 		Dimmed:           base.Copy().Foreground(theme.Dimmed),
 		Title:            base.Copy().Bold(true).Foreground(theme.Accent),
-		ActiveItem:       listItem.Copy().Background(theme.WindowBgOver).Foreground(theme.Accent),
+		ActiveItem:       listItem.Copy().Background(theme.WindowBgOver).Foreground(theme.Accent).Bold(true),
 		InactiveListItem: listItem,
 		Input:            base.Copy().Background(theme.WindowBgOver).Padding(1, 3),
 		InputPlaceholder: base.Copy().UnsetWidth().Background(theme.WindowBgOver).Foreground(theme.Dimmed),

@@ -16,6 +16,10 @@ import (
 
 var CREATE_USER_WIDTH = 65
 
+var createUserAsciiArt = `
+█▀▀ █▀█ █▀▀ ▄▀█ ▀█▀ █▀▀   █ █ █▀ █▀▀ █▀█
+█▄▄ █▀▄ ██▄ █▀█  █  ██▄   █▄█ ▄█ ██▄ █▀▄`
+
 // Create user key map
 type createUserKeyMap struct {
 	Tab    key.Binding
@@ -134,7 +138,9 @@ func (model CreateUserModel) Update(msg tea.Msg, manager *modelmanager.ModelMana
 // View
 func (model CreateUserModel) View() string {
 	return lipgloss.JoinVertical(
-		lipgloss.Left,
+		lipgloss.Center,
+		model.styles.Title.Copy().UnsetWidth().Render(createUserAsciiArt), "",
+		model.styles.Dimmed.Copy().UnsetWidth().Render("Create a new user"), "",
 		model.styles.Title.Render("Username"),
 		model.styles.Dimmed.Render("Choose an awesome username, like Komaru!"),
 		model.styles.Input.Render(model.usernameInput.View()), "",

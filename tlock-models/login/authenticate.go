@@ -21,6 +21,10 @@ import (
 
 var ENTER_PASS_SIZE = 65
 
+var enterPassAsciiArt = `
+█▀█ ▄▀█ █▀ █▀ █ █ █ █▀█ █▀█ █▀▄
+█▀▀ █▀█ ▄█ ▄█ ▀▄▀▄▀ █▄█ █▀▄ █▄▀`
+
 // Enter pass key map
 type enterPassKeyMap struct {
 	Login key.Binding
@@ -129,9 +133,10 @@ func (model EnterPassModel) Update(msg tea.Msg, manager *modelmanager.ModelManag
 func (m EnterPassModel) View() string {
 	// List of items
 	items := []string{
-		m.styles.Dimmed.Copy().AlignHorizontal(lipgloss.Center).Render(fmt.Sprintf("Login in as %s", m.userSpec.Username)), "",
+		m.styles.Title.Copy().UnsetWidth().Render(enterPassAsciiArt), "",
+		m.styles.Dimmed.Copy().UnsetWidth().Render(fmt.Sprintf("Login in as %s", m.userSpec.Username)), "",
 		m.styles.Title.Render("Password"),
-		m.styles.Dimmed.Render("Enter the super secret password"),
+		m.styles.Dimmed.Render("Enter the super secret password"), "",
 		m.styles.Input.Render(m.passInput.View()),
 	}
 
@@ -144,7 +149,7 @@ func (m EnterPassModel) View() string {
 	items = append(items, "", m.styles.Center.Render(m.help.View(enterPassKeys)))
 
 	return lipgloss.JoinVertical(
-		lipgloss.Left,
+		lipgloss.Center,
 		items...,
 	)
 }
