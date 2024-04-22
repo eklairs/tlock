@@ -39,7 +39,7 @@ func main() {
 	log.Printf("[tlock] Starting tlock!")
 
 	// Initialize tea program
-	program := tea.NewProgram(models.InitializeRootModel(), tea.WithAltScreen())
+	program := tea.NewProgram(models.InitializeRootModel(), tea.WithAltScreen(), tea.WithMouseCellMotion())
 
 	// Start tea program
 	if _, err := program.Run(); err != nil {
