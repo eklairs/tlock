@@ -12,6 +12,7 @@ import (
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/hotp"
 	"github.com/pquerna/otp/totp"
+	"golang.design/x/clipboard"
 	"golang.org/x/term"
 
 	"github.com/eklairs/tlock/tlock-internal/boundedinteger"
@@ -138,6 +139,21 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
             focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
 
             manager.PushScreen(InitializeEditTokenModel(focused_uri))
+        case "c":
+            if tokens.context.ClipboardAvailability {
+                focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value]
+                focused_token, _ := otp.NewKeyFromURL(focused_uri.URI)
+
+                var token string
+
+                if focused_token.Type() == "totp" {
+                    token, _ = totp.GenerateCode(focused_token.Secret(), time.Now())
+                } else {
+                    token, _ = hotp.GenerateCode(focused_token.Secret(), uint64(focused_uri.UsageCounter))
+                }
+
+                clipboard.Write(clipboard.FmtText, []byte(token))
+            }
         case "n":
             focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
 
