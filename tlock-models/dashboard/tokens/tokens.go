@@ -139,6 +139,24 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
             focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
 
             manager.PushScreen(InitializeEditTokenModel(focused_uri))
+        case "ctrl+up":
+            if tokens.folder != nil {
+                focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
+
+                if tokens.vault.MoveTokenUp(*tokens.folder, focused_uri) {
+                    tokens.focused_index.Decrease()
+                }
+            }
+
+        case "ctrl+down":
+            if tokens.folder != nil {
+                focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
+
+                if tokens.vault.MoveTokenDown(*tokens.folder, focused_uri) {
+                    tokens.focused_index.Increase()
+                }
+            }
+
         case "c":
             if tokens.context.ClipboardAvailability {
                 focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value]
