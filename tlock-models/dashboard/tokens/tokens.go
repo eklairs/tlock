@@ -130,6 +130,10 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 			manager.PushScreen(InitializeTokenFromScreen(tokens.context))
         case "a":
             manager.PushScreen(InitializeAddTokenModel())
+        case "m":
+            focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
+
+            manager.PushScreen(InitializeMoveTokenModel(tokens.vault, tokens.context, *tokens.folder, focused_uri))
         case "e":
             focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
 

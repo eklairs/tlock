@@ -219,3 +219,18 @@ func (vault *TLockVault) EditToken(folder, old, new string) {
 
 	vault.write()
 }
+
+func (vault *TLockVault) MoveURI(folder, token_uri, toFolder string) int {
+	folder_index := vault.find_folder(folder)
+    to_folder := vault.find_folder(toFolder)
+    token_index := slices.IndexFunc(vault.Data.Folders[folder_index].Uris, func(uri TokenURI) bool { return uri.URI == token_uri })
+
+    toMove := vault.Data.Folders[folder_index].Uris[token_index]
+
+    vault.Data.Folders[folder_index].Uris = remove(vault.Data.Folders[folder_index].Uris, token_index)
+    vault.Data.Folders[to_folder].Uris = append(vault.Data.Folders[to_folder].Uris, toMove)
+
+    vault.write()
+
+    return 1
+};
