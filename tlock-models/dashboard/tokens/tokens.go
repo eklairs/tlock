@@ -1,6 +1,7 @@
 package tokens
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -105,7 +106,7 @@ func InitializeTokens(vault *tlockvault.TLockVault, context context.Context) Tok
 type refreshTokens struct{}
 
 func notifyRefreshTokens() tea.Msg {
-    time.Sleep(time.Minute * 1)
+    time.Sleep(time.Second * 1)
 
     return refreshTokens{}
 }
@@ -140,6 +141,8 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 	case AddTokenMsg:
 		if tokens.folder != nil {
 			tokens.vault.AddToken(*tokens.folder, msgType.URI)
+
+            tokens.tokens = tokens.vault.GetTokens(*tokens.folder)
 		}
 
 	case folders.FolderChangedMsg:
@@ -240,12 +243,23 @@ func (tokens Tokens) View() string {
             tokenRenderable = lipgloss.JoinHorizontal(lipgloss.Left, tokenRenderable, style.Render(string(tokenChar)))
         }
 
+        timeRemainingRenderable := ""
+
+        // Reset information
+        if authKey.Type() == "totp" {
+            // https://github.com/pyauth/pyotp/issues/87#issuecomment-561284149
+            timeRemaining := authKey.Period() - uint64(time.Now().Unix()) % authKey.Period()
+
+            timeRemainingRenderable = tokens.styles.Dimmed.Copy().UnsetWidth().Italic(true).Render(fmt.Sprintf("Refreshing in %d", timeRemaining))
+        }
+
         // Final ui
         ui := lipgloss.JoinHorizontal(
             lipgloss.Left,
             tokenInfo,
-            spacer_style.Render(strings.Repeat(" ", tokensWidth - lipgloss.Width(tokenInfo) - lipgloss.Width(tokenRenderable))),
+            spacer_style.Render(strings.Repeat(" ", tokensWidth - lipgloss.Width(tokenInfo) - lipgloss.Width(tokenRenderable) - lipgloss.Width(timeRemainingRenderable))),
             tokenRenderable,
+            timeRemainingRenderable,
         )
 
 		// items = append(items, render_fn(ui))
