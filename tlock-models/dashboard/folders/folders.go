@@ -76,6 +76,14 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 			manager.PushScreen(InitializeEditFolderModel(folders.vault.Data.Folders[folders.focused_index.Value].Name, folders.context))
 		case "X":
 			manager.PushScreen(InitializeDeleteFolderModel(folders.vault.Data.Folders[folders.focused_index.Value].Name, folders.context))
+        case "ctrl+k":
+            folders.vault.MoveFolderUp(folders.vault.Data.Folders[folders.focused_index.Value].Name)
+
+            folders.focused_index.Decrease()
+        case "ctrl+j":
+            folders.vault.MoveFolderDown(folders.vault.Data.Folders[folders.focused_index.Value].Name)
+
+            folders.focused_index.Increase()
 		}
 
 	case AddNewFolderMsg:

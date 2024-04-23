@@ -167,6 +167,34 @@ func (vault *TLockVault) AddToken(folder, uri string) {
 	vault.write()
 }
 
+// Moves the folder up
+func (vault *TLockVault) MoveFolderUp(folder string) {
+	folder_index := vault.find_folder(folder)
+
+    // If is folder is already at top, just return; we dont need to do anything
+    if folder_index == 0 {
+        return
+    }
+
+    vault.Data.Folders[folder_index], vault.Data.Folders[folder_index - 1] = vault.Data.Folders[folder_index - 1], vault.Data.Folders[folder_index]
+
+	vault.write()
+}
+
+// Moves the folder down
+func (vault *TLockVault) MoveFolderDown(folder string) {
+	folder_index := vault.find_folder(folder)
+
+    // If is folder is already at top, just return; we dont need to do anything
+    if folder_index == len(vault.Data.Folders) - 1 {
+        return
+    }
+
+    vault.Data.Folders[folder_index], vault.Data.Folders[folder_index + 1] = vault.Data.Folders[folder_index + 1], vault.Data.Folders[folder_index]
+
+	vault.write()
+}
+
 // Increaments the usage counter for the given URI inside of a folder
 func (vault *TLockVault) IncrementTokenUsageCounter(folder, target_uri string) {
     folder_index := vault.find_folder(folder)
