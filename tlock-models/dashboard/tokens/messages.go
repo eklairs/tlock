@@ -5,6 +5,6 @@ type AddTokenMsg struct {
 }
 
 type EditTokenMsg struct {
-    Old string
+	Old string
 	New string
 }

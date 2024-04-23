@@ -111,8 +111,8 @@ func (model DeleteFolderModel) Update(msg tea.Msg, manager *modelmanager.ModelMa
 func (model DeleteFolderModel) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
-        model.styles.Center.Render(model.styles.Title.Render(deleteFolderAsciiArt)), "",
-        model.styles.Center.Render(model.styles.Dimmed.Render("Permanently delete tokens folder")), "",
+		model.styles.Center.Render(model.styles.Title.Render(deleteFolderAsciiArt)), "",
+		model.styles.Center.Render(model.styles.Dimmed.Render("Permanently delete tokens folder")), "",
 		model.styles.Center.Render(lipgloss.JoinHorizontal(
 			lipgloss.Center,
 			model.styles.Base.Copy().UnsetWidth().Render("Are you sure you want to "),

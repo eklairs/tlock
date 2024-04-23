@@ -17,12 +17,12 @@ func remove[T any](slice []T, s int) []T {
 }
 
 type TokenURI struct {
-    // URI
-    URI string
+	// URI
+	URI string
 
-    // Usage count
-    // Only in case of HOTP based tokens
-    UsageCounter int
+	// Usage count
+	// Only in case of HOTP based tokens
+	UsageCounter int
 }
 
 // Represents a folder
@@ -171,101 +171,101 @@ func (vault *TLockVault) AddToken(folder, uri string) {
 func (vault *TLockVault) MoveFolderUp(folder string) bool {
 	folder_index := vault.find_folder(folder)
 
-    // If is folder is already at top, just return; we dont need to do anything
-    if folder_index == 0 {
-        return false
-    }
+	// If is folder is already at top, just return; we dont need to do anything
+	if folder_index == 0 {
+		return false
+	}
 
-    vault.Data.Folders[folder_index], vault.Data.Folders[folder_index - 1] = vault.Data.Folders[folder_index - 1], vault.Data.Folders[folder_index]
+	vault.Data.Folders[folder_index], vault.Data.Folders[folder_index-1] = vault.Data.Folders[folder_index-1], vault.Data.Folders[folder_index]
 
 	vault.write()
 
-    return true
+	return true
 }
 
 // Moves the folder down
 func (vault *TLockVault) MoveFolderDown(folder string) bool {
 	folder_index := vault.find_folder(folder)
 
-    // If is folder is already at top, just return; we dont need to do anything
-    if folder_index == len(vault.Data.Folders) - 1 {
-        return false
-    }
+	// If is folder is already at top, just return; we dont need to do anything
+	if folder_index == len(vault.Data.Folders)-1 {
+		return false
+	}
 
-    vault.Data.Folders[folder_index], vault.Data.Folders[folder_index + 1] = vault.Data.Folders[folder_index + 1], vault.Data.Folders[folder_index]
+	vault.Data.Folders[folder_index], vault.Data.Folders[folder_index+1] = vault.Data.Folders[folder_index+1], vault.Data.Folders[folder_index]
 
 	vault.write()
 
-    return true
+	return true
 }
 
 // Increaments the usage counter for the given URI inside of a folder
 func (vault *TLockVault) IncrementTokenUsageCounter(folder, target_uri string) {
-    folder_index := vault.find_folder(folder)
-    token_index := vault.find_token(folder_index, target_uri)
+	folder_index := vault.find_folder(folder)
+	token_index := vault.find_token(folder_index, target_uri)
 
-    vault.Data.Folders[folder_index].Uris[token_index].UsageCounter += 1
+	vault.Data.Folders[folder_index].Uris[token_index].UsageCounter += 1
 
-    vault.write()
+	vault.write()
 }
 
 // Edits a new token in the folder
 func (vault *TLockVault) EditToken(folder, old, new string) {
 	folder_index := vault.find_folder(folder)
-    token_index := vault.find_token(folder_index, old)
+	token_index := vault.find_token(folder_index, old)
 
-    vault.Data.Folders[folder_index].Uris[token_index].URI = new
+	vault.Data.Folders[folder_index].Uris[token_index].URI = new
 
 	vault.write()
 }
 
 func (vault *TLockVault) MoveURI(folder, token_uri, toFolder string) int {
 	folder_index := vault.find_folder(folder)
-    to_folder := vault.find_folder(toFolder)
-    token_index := vault.find_token(folder_index, token_uri)
+	to_folder := vault.find_folder(toFolder)
+	token_index := vault.find_token(folder_index, token_uri)
 
-    toMove := vault.Data.Folders[folder_index].Uris[token_index]
+	toMove := vault.Data.Folders[folder_index].Uris[token_index]
 
-    vault.Data.Folders[folder_index].Uris = remove(vault.Data.Folders[folder_index].Uris, token_index)
-    vault.Data.Folders[to_folder].Uris = append(vault.Data.Folders[to_folder].Uris, toMove)
+	vault.Data.Folders[folder_index].Uris = remove(vault.Data.Folders[folder_index].Uris, token_index)
+	vault.Data.Folders[to_folder].Uris = append(vault.Data.Folders[to_folder].Uris, toMove)
 
-    vault.write()
+	vault.write()
 
-    return 1
-};
+	return 1
+}
 
 // Moves the token in a folder up
 func (vault *TLockVault) MoveTokenUp(folder, token string) bool {
 	folder_index := vault.find_folder(folder)
-    token_index := vault.find_token(folder_index, token)
+	token_index := vault.find_token(folder_index, token)
 
-    // If is folder is already at top, just return; we dont need to do anything
-    if token_index == 0 {
-        return false
-    }
+	// If is folder is already at top, just return; we dont need to do anything
+	if token_index == 0 {
+		return false
+	}
 
-    vault.Data.Folders[folder_index].Uris[token_index], vault.Data.Folders[folder_index].Uris[token_index - 1] = vault.Data.Folders[folder_index].Uris[token_index - 1], vault.Data.Folders[folder_index].Uris[token_index]
+	vault.Data.Folders[folder_index].Uris[token_index], vault.Data.Folders[folder_index].Uris[token_index-1] = vault.Data.Folders[folder_index].Uris[token_index-1], vault.Data.Folders[folder_index].Uris[token_index]
 
 	vault.write()
 
-    return true
+	return true
 }
 
 // Moves the token in a folder down
 func (vault *TLockVault) MoveTokenDown(folder, token string) bool {
 	folder_index := vault.find_folder(folder)
-    token_index := vault.find_token(folder_index, token)
+	token_index := vault.find_token(folder_index, token)
 
-    // If is folder is already at bottom, just return; we dont need to do anything
-    if token_index == len(vault.Data.Folders[folder_index].Uris) - 1 {
-        return false
-    }
+	// If is folder is already at bottom, just return; we dont need to do anything
+	if token_index == len(vault.Data.Folders[folder_index].Uris)-1 {
+		return false
+	}
 
-    vault.Data.Folders[folder_index].Uris[token_index], vault.Data.Folders[folder_index].Uris[token_index + 1] = vault.Data.Folders[folder_index].Uris[token_index + 1], vault.Data.Folders[folder_index].Uris[token_index]
+	vault.Data.Folders[folder_index].Uris[token_index], vault.Data.Folders[folder_index].Uris[token_index+1] = vault.Data.Folders[folder_index].Uris[token_index+1], vault.Data.Folders[folder_index].Uris[token_index]
 
 	vault.write()
 
-    return true
+	return true
 }
 
 // Returns the index of the folder based on the name
@@ -277,4 +277,3 @@ func (vault TLockVault) find_folder(name string) int {
 func (vault TLockVault) find_token(folder_index int, token string) int {
 	return slices.IndexFunc(vault.Data.Folders[folder_index].Uris, func(item TokenURI) bool { return item.URI == token })
 }
-

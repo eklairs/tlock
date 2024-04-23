@@ -127,8 +127,8 @@ func (model EditFolderModel) Update(msg tea.Msg, manager *modelmanager.ModelMana
 func (m EditFolderModel) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
-        m.styles.Center.Render(m.styles.Title.Render(editFolderAscii)), "",
-        m.styles.Center.Render(m.styles.Dimmed.Render("Rename a folder to a new name")), "",
+		m.styles.Center.Render(m.styles.Title.Render(editFolderAscii)), "",
+		m.styles.Center.Render(m.styles.Dimmed.Render("Rename a folder to a new name")), "",
 		m.styles.Title.Render("Name"),
 		m.styles.Dimmed.Render("Choose the new name for your folder"), "",
 		m.styles.Input.Render(m.name.View()), "",

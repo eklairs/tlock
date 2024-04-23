@@ -76,15 +76,15 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 			manager.PushScreen(InitializeEditFolderModel(folders.vault.Data.Folders[folders.focused_index.Value].Name, folders.context))
 		case "D":
 			manager.PushScreen(InitializeDeleteFolderModel(folders.vault.Data.Folders[folders.focused_index.Value].Name, folders.context))
-        case "ctrl+k":
-            if folders.vault.MoveFolderUp(folders.vault.Data.Folders[folders.focused_index.Value].Name) {
-                folders.focused_index.Decrease()
-            }
+		case "ctrl+k":
+			if folders.vault.MoveFolderUp(folders.vault.Data.Folders[folders.focused_index.Value].Name) {
+				folders.focused_index.Decrease()
+			}
 
-        case "ctrl+j":
-            if folders.vault.MoveFolderDown(folders.vault.Data.Folders[folders.focused_index.Value].Name) {
-                folders.focused_index.Increase()
-            }
+		case "ctrl+j":
+			if folders.vault.MoveFolderDown(folders.vault.Data.Folders[folders.focused_index.Value].Name) {
+				folders.focused_index.Increase()
+			}
 		}
 
 	case AddNewFolderMsg:
@@ -126,8 +126,8 @@ func (folders Folders) View() string {
 	// List of items
 	items := make([]string, 0)
 
-    // Header
-    items = append(items, folders.styles.AccentTitle.Copy().Margin(1).Render("FOLDERS"))
+	// Header
+	items = append(items, folders.styles.AccentTitle.Copy().Margin(1).Render("FOLDERS"))
 
 	for index, folder := range folders.vault.Data.Folders {
 		render_fn := folders.styles.FolderInactive.Render
@@ -142,7 +142,7 @@ func (folders Folders) View() string {
 			folders.styles.Dimmed.Render(fmt.Sprintf("%d tokens", len(folder.Uris))),
 		)
 
-        items = append(items, render_fn(ui))
+		items = append(items, render_fn(ui))
 	}
 
 	return style.Render(lipgloss.JoinVertical(lipgloss.Left, items...))

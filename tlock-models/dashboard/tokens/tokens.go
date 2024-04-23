@@ -107,18 +107,18 @@ func InitializeTokens(vault *tlockvault.TLockVault, context context.Context) Tok
 type refreshTokens struct{}
 
 func notifyRefreshTokens() tea.Msg {
-    time.Sleep(time.Second * 1)
+	time.Sleep(time.Second * 1)
 
-    return refreshTokens{}
+	return refreshTokens{}
 }
 
 func (tokens *Tokens) Init() tea.Cmd {
-    return notifyRefreshTokens
+	return notifyRefreshTokens
 }
 
 // Handles update messages
 func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) tea.Cmd {
-    cmds := make([]tea.Cmd, 0)
+	cmds := make([]tea.Cmd, 0)
 
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
@@ -129,73 +129,73 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 			tokens.focused_index.Decrease()
 		case "s":
 			manager.PushScreen(InitializeTokenFromScreen(tokens.context))
-        case "a":
-            manager.PushScreen(InitializeAddTokenModel())
-        case "m":
-            focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
+		case "a":
+			manager.PushScreen(InitializeAddTokenModel())
+		case "m":
+			focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
 
-            manager.PushScreen(InitializeMoveTokenModel(tokens.vault, tokens.context, *tokens.folder, focused_uri))
-        case "e":
-            focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
+			manager.PushScreen(InitializeMoveTokenModel(tokens.vault, tokens.context, *tokens.folder, focused_uri))
+		case "e":
+			focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
 
-            manager.PushScreen(InitializeEditTokenModel(focused_uri))
-        case "ctrl+up":
-            if tokens.folder != nil {
-                focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
+			manager.PushScreen(InitializeEditTokenModel(focused_uri))
+		case "ctrl+up":
+			if tokens.folder != nil {
+				focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
 
-                if tokens.vault.MoveTokenUp(*tokens.folder, focused_uri) {
-                    tokens.focused_index.Decrease()
-                }
-            }
+				if tokens.vault.MoveTokenUp(*tokens.folder, focused_uri) {
+					tokens.focused_index.Decrease()
+				}
+			}
 
-        case "ctrl+down":
-            if tokens.folder != nil {
-                focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
+		case "ctrl+down":
+			if tokens.folder != nil {
+				focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
 
-                if tokens.vault.MoveTokenDown(*tokens.folder, focused_uri) {
-                    tokens.focused_index.Increase()
-                }
-            }
+				if tokens.vault.MoveTokenDown(*tokens.folder, focused_uri) {
+					tokens.focused_index.Increase()
+				}
+			}
 
-        case "c":
-            if tokens.context.ClipboardAvailability {
-                focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value]
-                focused_token, _ := otp.NewKeyFromURL(focused_uri.URI)
+		case "c":
+			if tokens.context.ClipboardAvailability {
+				focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value]
+				focused_token, _ := otp.NewKeyFromURL(focused_uri.URI)
 
-                var token string
+				var token string
 
-                if focused_token.Type() == "totp" {
-                    token, _ = totp.GenerateCode(focused_token.Secret(), time.Now())
-                } else {
-                    token, _ = hotp.GenerateCode(focused_token.Secret(), uint64(focused_uri.UsageCounter))
-                }
+				if focused_token.Type() == "totp" {
+					token, _ = totp.GenerateCode(focused_token.Secret(), time.Now())
+				} else {
+					token, _ = hotp.GenerateCode(focused_token.Secret(), uint64(focused_uri.UsageCounter))
+				}
 
-                clipboard.Write(clipboard.FmtText, []byte(token))
-            }
-        case "n":
-            focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
+				clipboard.Write(clipboard.FmtText, []byte(token))
+			}
+		case "n":
+			focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
 
-            authKey, _ := otp.NewKeyFromURL(focused_uri)
+			authKey, _ := otp.NewKeyFromURL(focused_uri)
 
-            if authKey.Type() == "hotp" {
-                tokens.vault.IncrementTokenUsageCounter(*tokens.folder, focused_uri)
-            }
+			if authKey.Type() == "hotp" {
+				tokens.vault.IncrementTokenUsageCounter(*tokens.folder, focused_uri)
+			}
 		}
 
 	case AddTokenMsg:
 		if tokens.folder != nil {
 			tokens.vault.AddToken(*tokens.folder, msgType.URI)
 
-            tokens.tokens = tokens.vault.GetTokens(*tokens.folder)
-            tokens.focused_index = boundedinteger.New(tokens.focused_index.Value, len(tokens.tokens))
+			tokens.tokens = tokens.vault.GetTokens(*tokens.folder)
+			tokens.focused_index = boundedinteger.New(tokens.focused_index.Value, len(tokens.tokens))
 		}
 
 	case EditTokenMsg:
 		if tokens.folder != nil {
-            tokens.vault.EditToken(*tokens.folder, msgType.Old, msgType.New)
+			tokens.vault.EditToken(*tokens.folder, msgType.Old, msgType.New)
 
-            tokens.tokens = tokens.vault.GetTokens(*tokens.folder)
-            tokens.focused_index = boundedinteger.New(tokens.focused_index.Value, len(tokens.tokens))
+			tokens.tokens = tokens.vault.GetTokens(*tokens.folder)
+			tokens.focused_index = boundedinteger.New(tokens.focused_index.Value, len(tokens.tokens))
 		}
 
 	case folders.FolderChangedMsg:
@@ -204,8 +204,8 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 
 		tokens.focused_index = boundedinteger.New(0, len(tokens.tokens))
 
-    case refreshTokens:
-        cmds = append(cmds, notifyRefreshTokens)
+	case refreshTokens:
+		cmds = append(cmds, notifyRefreshTokens)
 	}
 
 	return tea.Batch(cmds...)
@@ -221,11 +221,11 @@ func (tokens Tokens) View() string {
 		return ""
 	}
 
-    tokensWidth := width - folders.FOLDERS_WIDTH - 13
+	tokensWidth := width - folders.FOLDERS_WIDTH - 13
 
 	if len(tokens.tokens) == 0 {
 		style := tokens.styles.Base.Copy().
-			Height(height - 3).
+			Height(height-3).
 			Align(lipgloss.Center, lipgloss.Center)
 
 		ui := lipgloss.JoinVertical(
@@ -241,24 +241,24 @@ func (tokens Tokens) View() string {
 	// List of items
 	items := make([]string, 0)
 
-    // Header
-    items = append(items, tokens.styles.AccentTitle.Copy().Margin(1).Render("TOKENS"))
+	// Header
+	items = append(items, tokens.styles.AccentTitle.Copy().Margin(1).Render("TOKENS"))
 
 	// Iter
 	for index, token := range tokens.tokens {
 		// Generate key
 		authKey, _ := otp.NewKeyFromURL(token.URI)
 
-        // Token info
-        tokenInfo := lipgloss.JoinHorizontal(
-            lipgloss.Left,
-            tokens.styles.Dimmed.Copy().UnsetWidth().Render(authKey.AccountName()),
-            tokens.styles.Dimmed.Copy().UnsetWidth().Render(" • "),
-            tokens.styles.Dimmed.Copy().UnsetWidth().Render(authKey.Issuer()),
-        )
+		// Token info
+		tokenInfo := lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			tokens.styles.Dimmed.Copy().UnsetWidth().Render(authKey.AccountName()),
+			tokens.styles.Dimmed.Copy().UnsetWidth().Render(" • "),
+			tokens.styles.Dimmed.Copy().UnsetWidth().Render(authKey.Issuer()),
+		)
 
-        // Render fn
-        render_fn := tokens.styles.InactiveListItem.Render
+		// Render fn
+		render_fn := tokens.styles.InactiveListItem.Render
 
 		// Check if it is the focused one
 		if index == tokens.focused_index.Value {
@@ -269,57 +269,56 @@ func (tokens Tokens) View() string {
 				tokens.styles.Base.Copy().UnsetWidth().Background(tokens.context.Theme.WindowBgOver).Render(authKey.Issuer()),
 			)
 
-            render_fn = tokens.styles.ActiveItem.Render
+			render_fn = tokens.styles.ActiveItem.Render
 		}
 
-        // Token str
-        var currentToken string
+		// Token str
+		var currentToken string
 
-        if authKey.Type() == "hotp" {
-            currentToken, _ = hotp.GenerateCode(authKey.Secret(), uint64(token.UsageCounter))
-        } else {
-            currentToken, _ = totp.GenerateCode(authKey.Secret(), time.Now())
-        }
+		if authKey.Type() == "hotp" {
+			currentToken, _ = hotp.GenerateCode(authKey.Secret(), uint64(token.UsageCounter))
+		} else {
+			currentToken, _ = totp.GenerateCode(authKey.Secret(), time.Now())
+		}
 
-        tokenRenderable := ""
+		tokenRenderable := ""
 
-        style := lipgloss.NewStyle().
-            Bold(true).
-            PaddingRight(3).
-            Background(tokens.context.Theme.WindowBgOver).
-            Foreground(tokens.context.Theme.Accent)
+		style := lipgloss.NewStyle().
+			Bold(true).
+			PaddingRight(3).
+			Background(tokens.context.Theme.WindowBgOver).
+			Foreground(tokens.context.Theme.Accent)
 
-        spacer_style := lipgloss.NewStyle().
-            Background(tokens.context.Theme.WindowBgOver)
+		spacer_style := lipgloss.NewStyle().
+			Background(tokens.context.Theme.WindowBgOver)
 
-        for _, tokenChar := range currentToken {
-            tokenRenderable = lipgloss.JoinHorizontal(lipgloss.Left, tokenRenderable, style.Render(string(tokenChar)))
-        }
+		for _, tokenChar := range currentToken {
+			tokenRenderable = lipgloss.JoinHorizontal(lipgloss.Left, tokenRenderable, style.Render(string(tokenChar)))
+		}
 
-        timeRemainingRenderable := ""
+		timeRemainingRenderable := ""
 
-        // Reset information
-        if authKey.Type() == "totp" {
-            // https://github.com/pyauth/pyotp/issues/87#issuecomment-561284149
-            timeRemaining := authKey.Period() - uint64(time.Now().Unix()) % authKey.Period()
+		// Reset information
+		if authKey.Type() == "totp" {
+			// https://github.com/pyauth/pyotp/issues/87#issuecomment-561284149
+			timeRemaining := authKey.Period() - uint64(time.Now().Unix())%authKey.Period()
 
-            timeRemainingRenderable = tokens.styles.Dimmed.Copy().UnsetWidth().Italic(true).Render(fmt.Sprintf("Refreshing in %d", timeRemaining))
-        }
+			timeRemainingRenderable = tokens.styles.Dimmed.Copy().UnsetWidth().Italic(true).Render(fmt.Sprintf("Refreshing in %d", timeRemaining))
+		}
 
-        // Final ui
-        ui := lipgloss.JoinHorizontal(
-            lipgloss.Left,
-            tokenInfo,
-            spacer_style.Render(strings.Repeat(" ", tokensWidth - lipgloss.Width(tokenInfo) - lipgloss.Width(tokenRenderable) - lipgloss.Width(timeRemainingRenderable))),
-            tokenRenderable,
-            timeRemainingRenderable,
-        )
+		// Final ui
+		ui := lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			tokenInfo,
+			spacer_style.Render(strings.Repeat(" ", tokensWidth-lipgloss.Width(tokenInfo)-lipgloss.Width(tokenRenderable)-lipgloss.Width(timeRemainingRenderable))),
+			tokenRenderable,
+			timeRemainingRenderable,
+		)
 
 		// items = append(items, render_fn(ui))
-        items = append(items, render_fn(ui))
+		items = append(items, render_fn(ui))
 	}
 
 	// Render
 	return lipgloss.JoinVertical(lipgloss.Left, items...)
 }
-

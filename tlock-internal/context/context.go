@@ -14,17 +14,17 @@ type Context struct {
 	// Core
 	Core tlockcore.TLockCore
 
-    // Is clipboard available
-    ClipboardAvailability bool
+	// Is clipboard available
+	ClipboardAvailability bool
 }
 
 // Initializes a new instance of the context
 func InitializeContext() Context {
-    err := clipboard.Init()
+	err := clipboard.Init()
 
 	return Context{
-		Theme: tlockthemes.CATPPUCCIN_THEME,
-		Core:  tlockcore.New(),
-        ClipboardAvailability: err == nil,
+		Theme:                 tlockthemes.CATPPUCCIN_THEME,
+		Core:                  tlockcore.New(),
+		ClipboardAvailability: err == nil,
 	}
 }

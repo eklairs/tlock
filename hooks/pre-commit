@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+
+echo "=> gofmt-ing staged files"
+
+files=$(git diff --name-only --cached)
+
+for file in $files
+do
+    if [[ $file == *.go ]] && [[ -e $file ]]
+    then
+        echo "=> Formatting $file"
+
+        gofmt -w "$file"
+
+        git add $file
+    fi
+done
+

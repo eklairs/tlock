@@ -48,8 +48,8 @@ type Styles struct {
 	// Title
 	AccentTitle lipgloss.Style
 
-    // Dimmed title
-    DimmedTitle lipgloss.Style
+	// Dimmed title
+	DimmedTitle lipgloss.Style
 }
 
 // Initializes new instance of styles

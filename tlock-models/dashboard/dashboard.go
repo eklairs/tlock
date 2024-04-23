@@ -20,31 +20,31 @@ import (
 
 // Bottom bar
 func BottomBar(width int, currentUser string, styles tlockstyles.Styles) string {
-    style := styles.Base.Copy().
-        Width(width).
-        Height(1).
-        Margin(1)
+	style := styles.Base.Copy().
+		Width(width).
+		Height(1).
+		Margin(1)
 
-    left := lipgloss.JoinHorizontal(
-        lipgloss.Left,
-        styles.AccentTitle.Render("TLock"),
-        styles.DimmedTitle.Render("v1.0.0"),
-    )
+	left := lipgloss.JoinHorizontal(
+		lipgloss.Left,
+		styles.AccentTitle.Render("TLock"),
+		styles.DimmedTitle.Render("v1.0.0"),
+	)
 
-    right := lipgloss.JoinHorizontal(
-        lipgloss.Right,
-        styles.DimmedTitle.Render(time.Now().Format("2 January, 2006")),
-        styles.AccentTitle.Render(currentUser),
-    )
+	right := lipgloss.JoinHorizontal(
+		lipgloss.Right,
+		styles.DimmedTitle.Render(time.Now().Format("2 January, 2006")),
+		styles.AccentTitle.Render(currentUser),
+	)
 
-    bar := lipgloss.JoinHorizontal(
-        lipgloss.Center,
-        left,
-        strings.Repeat(" ", width - lipgloss.Width(left) - lipgloss.Width(right) - 2),
-        right,
-    )
+	bar := lipgloss.JoinHorizontal(
+		lipgloss.Center,
+		left,
+		strings.Repeat(" ", width-lipgloss.Width(left)-lipgloss.Width(right)-2),
+		right,
+	)
 
-    return style.Render(bar)
+	return style.Render(bar)
 }
 
 // Dashboard key map
@@ -64,7 +64,7 @@ func (k dashboardKeyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
 		{k.Help},
 		{k.Add},
-        {k.ChangeTheme},
+		{k.ChangeTheme},
 	}
 }
 
@@ -149,7 +149,7 @@ func (m DashboardModel) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 
 // View
 func (m DashboardModel) View() string {
-    width, height, _ := term.GetSize(0)
+	width, height, _ := term.GetSize(0)
 
 	if len(m.vault.Data.Folders) == 0 {
 		style := m.styles.Base.Copy().
@@ -158,7 +158,7 @@ func (m DashboardModel) View() string {
 
 		ui := lipgloss.JoinVertical(
 			lipgloss.Center,
-		    m.styles.Title.Copy().UnsetWidth().Render(tokens.EmptyAsciiArt),
+			m.styles.Title.Copy().UnsetWidth().Render(tokens.EmptyAsciiArt),
 			m.styles.Title.Copy().UnsetBold().UnsetWidth().Render("So empty! How about adding a new folder?"), "",
 			m.styles.Center.Copy().UnsetWidth().Render(m.help.View(dashboardKeys)),
 		)
@@ -168,11 +168,11 @@ func (m DashboardModel) View() string {
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
-        lipgloss.JoinHorizontal(
-            lipgloss.Left,
-            m.folders.View(), "   ",
-            m.tokens.View(),
-        ),
-        BottomBar(width, "Eklairs", m.styles),
+		lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			m.folders.View(), "   ",
+			m.tokens.View(),
+		),
+		BottomBar(width, "Eklairs", m.styles),
 	)
 }
