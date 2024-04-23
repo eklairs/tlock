@@ -130,6 +130,10 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 			manager.PushScreen(InitializeTokenFromScreen(tokens.context))
         case "a":
             manager.PushScreen(InitializeAddTokenModel())
+        case "e":
+            focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
+
+            manager.PushScreen(InitializeEditTokenModel(focused_uri))
         case "n":
             focused_uri := tokens.vault.GetTokens(*tokens.folder)[tokens.focused_index.Value].URI
 
@@ -143,6 +147,14 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 	case AddTokenMsg:
 		if tokens.folder != nil {
 			tokens.vault.AddToken(*tokens.folder, msgType.URI)
+
+            tokens.tokens = tokens.vault.GetTokens(*tokens.folder)
+            tokens.focused_index = boundedinteger.New(tokens.focused_index.Value, len(tokens.tokens))
+		}
+
+	case EditTokenMsg:
+		if tokens.folder != nil {
+            tokens.vault.EditToken(*tokens.folder, msgType.Old, msgType.New)
 
             tokens.tokens = tokens.vault.GetTokens(*tokens.folder)
             tokens.focused_index = boundedinteger.New(tokens.focused_index.Value, len(tokens.tokens))

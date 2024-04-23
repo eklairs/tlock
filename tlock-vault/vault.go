@@ -209,3 +209,13 @@ func (vault *TLockVault) IncrementTokenUsageCounter(folder, target_uri string) {
 func (vault TLockVault) find_folder(name string) int {
 	return slices.IndexFunc(vault.Data.Folders, func(item FolderSpec) bool { return item.Name == name })
 }
+
+// Edits a new token in the folder
+func (vault *TLockVault) EditToken(folder, old, new string) {
+	folder_index := vault.find_folder(folder)
+    token_index := slices.IndexFunc(vault.Data.Folders[folder_index].Uris, func(uri TokenURI) bool { return uri.URI == old })
+
+    vault.Data.Folders[folder_index].Uris[token_index].URI = new
+
+	vault.write()
+}
