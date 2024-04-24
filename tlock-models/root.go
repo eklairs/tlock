@@ -2,14 +2,20 @@ package tlockmodels
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	"github.com/eklairs/tlock/tlock-models/auth"
 )
 
 // Root Model
-type RootModel struct{}
+type RootModel struct {
+	modelmanager modelmanager.ModelManager
+}
 
 // Initialize root model
 func InitializeRootModel() RootModel {
-	return RootModel{}
+	return RootModel{
+		modelmanager: modelmanager.New(auth.InitializeSelectUserScreen()),
+	}
 }
 
 // Init
@@ -29,10 +35,12 @@ func (m RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
+	cmds = append(cmds, m.modelmanager.Update(msg))
+
 	return m, tea.Batch(cmds...)
 }
 
 // View
 func (m RootModel) View() string {
-	return ""
+	return m.modelmanager.View()
 }
