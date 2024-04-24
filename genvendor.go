@@ -141,5 +141,9 @@ func main() {
 	// Create and write
 	file, _ := os.Create(path.Join(VENDOR_DIR, "themes.json"))
 
+	// Write
 	file.Write(themes_dump)
+
+	// Debug
+	debug("Done writing themes!")
 }
