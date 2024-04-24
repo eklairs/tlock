@@ -2,5 +2,5 @@ package tlockvendor
 
 import _ "embed"
 
-//go:embed themes.json
+//go:embed proprietary/themes.json
 var ThemesJSON []byte

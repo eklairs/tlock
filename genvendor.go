@@ -25,8 +25,10 @@ type ThemeVendor struct {
 }
 
 const LOG_PREFIX = "=>"
+
 const BUILD_DIR = "build"
-const VENDOR_DIR = "tlock-vendor"
+
+var VENDOR_DIR = path.Join("tlock-vendor", "proprietary")
 
 func Map[T, V any](ts []T, fn func(T) V) []V {
 	result := make([]V, len(ts))
@@ -59,7 +61,7 @@ func main() {
 	os.MkdirAll(VENDOR_DIR, os.ModePerm)
 
 	// Debug
-	debug("Generating tlock vendor...")
+	debug("Generating tlock proprietary vendor...")
 
 	// Clone monkeytype
 	debug("Cloning monkeytypegame/monkeytype...")
