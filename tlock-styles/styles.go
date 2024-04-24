@@ -10,6 +10,9 @@ var Styles TLockStyles
 
 // Represents a theme
 type Theme struct {
+	// Name
+	Name string
+
 	// Background color
 	Background lipgloss.Color
 
