@@ -10,19 +10,10 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	"github.com/tdewolff/parse/v2"
 	"github.com/tdewolff/parse/v2/css"
 )
-
-type ThemeVendor struct {
-	Name            string
-	BackgroundColor string
-	AccentColor     string
-	SubColor        string
-	SubAltColor     string
-	TextColor       string
-	Error           string
-}
 
 const LOG_PREFIX = "=>"
 
@@ -72,7 +63,7 @@ func main() {
 	css_entries, _ := os.ReadDir(themes_dir)
 
 	// Themes list
-	themes := make([]ThemeVendor, 0)
+	themes := make([]tlockstyles.Theme, 0)
 
 	for _, file := range css_entries {
 		if strings.HasSuffix(file.Name(), ".css") {
@@ -83,7 +74,7 @@ func main() {
 			lexer := css.NewLexer(parse.NewInput(strings.NewReader(string(css_raw[:]))))
 
 			// Theme instance
-			theme := ThemeVendor{
+			theme := tlockstyles.Theme{
 				Name: parse_name(file.Name()),
 			}
 
@@ -111,19 +102,19 @@ func main() {
 					}
 				case css.HashToken:
 					if startCollectingVars {
-						hex_color := string(text[:])
+						hex_color := lipgloss.Color(string(text[:]))
 
 						switch previousCustomName {
 						case "--bg-color":
-							theme.BackgroundColor = hex_color
+							theme.Background = hex_color
 						case "--main-color":
-							theme.AccentColor = hex_color
+							theme.Accent = hex_color
 						case "--sub-color":
-							theme.SubColor = hex_color
+							theme.Sub = hex_color
 						case "--sub-alt-color":
-							theme.SubAltColor = hex_color
+							theme.SubAlt = hex_color
 						case "--text-color":
-							theme.TextColor = hex_color
+							theme.Text = hex_color
 						case "--error-color":
 							theme.Error = hex_color
 						}
