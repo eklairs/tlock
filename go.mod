@@ -6,8 +6,12 @@ require (
 	github.com/adrg/xdg v0.4.0
 	github.com/charmbracelet/bubbletea v0.25.0
 	github.com/charmbracelet/lipgloss v0.10.0
+	github.com/google/uuid v1.6.0
+	github.com/kelindar/binary v1.0.19
+	github.com/muesli/termenv v0.15.2
 	github.com/tdewolff/parse/v2 v2.7.12
-	golang.org/x/term v0.6.0
+	golang.org/x/crypto v0.22.0
+	golang.org/x/term v0.19.0
 )
 
 require (
@@ -20,9 +24,8 @@ require (
 	github.com/muesli/ansi v0.0.0-20211018074035-2e021307bc4b // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/reflow v0.3.0 // indirect
-	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.12.0 // indirect
-	golang.org/x/text v0.3.8 // indirect
+	golang.org/x/sys v0.19.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 )
