@@ -11,7 +11,9 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	"github.com/eklairs/tlock/tlock-models/dashboard"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
+	tlockvault "github.com/eklairs/tlock/tlock-vault"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -159,7 +161,19 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 		case key.Matches(msgType, selectUserKeys.New):
 			manager.PushScreen(InitializeCreateUserScreen(screen.context))
 		case key.Matches(msgType, selectUserKeys.Enter):
-			manager.PushScreen(InitializeEnterPassScreen(screen.context, screen.context.Core.Users[screen.listview.Index()]))
+			// User
+			user := screen.context.Core.Users[screen.listview.Index()]
+
+			// Try to decrypt user with empty password
+			vault, err := tlockvault.Load(user.Vault, "")
+
+			if err != nil {
+				// It is encrypted with a password, require password
+				manager.PushScreen(InitializeEnterPassScreen(screen.context, screen.context.Core.Users[screen.listview.Index()]))
+			} else {
+				// YAY!
+				manager.PushScreen(dashboard.InitializeDashboardScreen(*vault))
+			}
 		}
 	}
 

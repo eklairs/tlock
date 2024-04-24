@@ -130,13 +130,13 @@ func (screen CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 		case key.Matches(msgType, createUserKeys.Create):
 			if screen.usernameInput.Value() == "" {
 				screen.usernameError = &USERNAME_EMPTY
+			} else {
+				// Create new user
+				vault := screen.context.Core.AddNewUser(screen.usernameInput.Value(), screen.passwordInput.Value())
+
+				// Move to dashboard screen
+				manager.PushScreen(dashboard.InitializeDashboardScreen(vault))
 			}
-
-			// Create new user
-			vault := screen.context.Core.AddNewUser(screen.usernameInput.Value(), screen.passwordInput.Value())
-
-			// Move to dashboard screen
-			manager.PushScreen(dashboard.InitializeDashboardScreen(vault))
 		}
 	}
 
