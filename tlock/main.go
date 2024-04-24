@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/eklairs/tlock/tlock-internal/context"
+	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	"github.com/muesli/termenv"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -48,10 +49,14 @@ func main() {
 	// Initialize context
 	context := context.InitializeContext()
 
+	// Initialize styles
+	tlockstyles.InitializeStyles(context.GetCurrentTheme())
+
+	// Patch stdout
 	original_bg, output := PatchOutput(context)
 
 	// Start program
-	program := tea.NewProgram(tlockmodels.InitializeRootModel(), tea.WithAltScreen(), tea.WithOutput(output))
+	program := tea.NewProgram(tlockmodels.InitializeRootModel(context), tea.WithAltScreen(), tea.WithOutput(output))
 
 	// Run
 	if _, err := program.Run(); err != nil {

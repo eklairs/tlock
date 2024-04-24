@@ -57,7 +57,7 @@ func InitializeStyles(theme Theme) {
 
 	// Initialize styles
 	Styles = TLockStyles{
-		Title:            with(base).Foreground(theme.Accent),
+		Title:            with(base).Foreground(theme.Accent).Bold(true),
 		SubText:          with(base).Foreground(theme.Sub),
 		ListItemActive:   with(paddedItem).Background(theme.SubAlt),
 		ListItemInactive: with(paddedItem),

@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strings"
 
+	tlockcore "github.com/eklairs/tlock/tlock-core"
 	"github.com/eklairs/tlock/tlock-internal/config"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvendor "github.com/eklairs/tlock/tlock-vendor"
@@ -17,6 +18,9 @@ type Context struct {
 
 	// Config
 	Config config.Config
+
+	// Core
+	Core tlockcore.TLockCore
 }
 
 // Initializes a new instance of the context
@@ -30,6 +34,7 @@ func InitializeContext() Context {
 	// Return
 	return Context{
 		Themes: themes,
+		Core:   tlockcore.New(),
 		Config: config.GetConfig(),
 	}
 }

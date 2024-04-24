@@ -2,6 +2,7 @@ package tlockmodels
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-models/auth"
 )
@@ -12,9 +13,9 @@ type RootModel struct {
 }
 
 // Initialize root model
-func InitializeRootModel() RootModel {
+func InitializeRootModel(context context.Context) RootModel {
 	return RootModel{
-		modelmanager: modelmanager.New(auth.InitializeSelectUserScreen()),
+		modelmanager: modelmanager.New(auth.InitializeSelectUserScreen(context)),
 	}
 }
 
