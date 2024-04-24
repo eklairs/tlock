@@ -158,6 +158,8 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 		switch {
 		case key.Matches(msgType, selectUserKeys.New):
 			manager.PushScreen(InitializeCreateUserScreen(screen.context))
+		case key.Matches(msgType, selectUserKeys.Enter):
+			manager.PushScreen(InitializeEnterPassScreen(screen.context, screen.context.Core.Users[screen.listview.Index()]))
 		}
 	}
 
