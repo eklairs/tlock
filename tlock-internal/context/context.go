@@ -3,6 +3,7 @@ package context
 import (
 	"encoding/json"
 	"slices"
+	"strings"
 
 	"github.com/eklairs/tlock/tlock-internal/config"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
@@ -35,7 +36,7 @@ func InitializeContext() Context {
 
 // Finds the index of the theme
 func (context Context) findTheme(name string) int {
-	return slices.IndexFunc(context.Themes, func(theme tlockstyles.Theme) bool { return theme.Name == name })
+	return slices.IndexFunc(context.Themes, func(theme tlockstyles.Theme) bool { return strings.ToLower(theme.Name) == strings.ToLower(name) })
 }
 
 // Returns the current theme spec
