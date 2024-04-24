@@ -131,7 +131,7 @@ func InitializeSelectUserScreen(context context.Context) SelectUserScreen {
 	}
 
 	// Build listview
-	listview := components.ListViewSimple(usersItem, selectUserDelegate{}, SELECT_USER_WIDTH, 13)
+	listview := components.ListViewSimple(usersItem, selectUserDelegate{}, SELECT_USER_WIDTH, min(len(context.Core.Users)*3, 12))
 
 	return SelectUserScreen{
 		context:  context,
@@ -175,7 +175,7 @@ func (screen SelectUserScreen) View() string {
 		lipgloss.Center,
 		tlockstyles.Styles.Title.Render(selectUserAsciiArt), "",
 		tlockstyles.Styles.SubText.Render("Select a user to login as"), "",
-		screen.listview.View(),
+		screen.listview.View(), "",
 		screen.help.View(selectUserKeys),
 	)
 }
