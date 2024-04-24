@@ -12,6 +12,7 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	"github.com/eklairs/tlock/tlock-models/dashboard"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
@@ -107,11 +108,13 @@ func (screen EnterPassScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 		case key.Matches(msgType, enterPassKeys.Back):
 			manager.PopScreen()
 		case key.Matches(msgType, enterPassKeys.Login):
-			_, err := tlockvault.Load(screen.user.Vault, screen.passInput.Value())
+			vault, err := tlockvault.Load(screen.user.Vault, screen.passInput.Value())
 
 			// Show error message if vault was failed to be unlocked
 			if err != nil {
 				screen.errorMessage = &ERROR_PASSWORD_WRONG
+			} else {
+				manager.PushScreen(dashboard.InitializeDashboardScreen(*vault))
 			}
 		}
 	}

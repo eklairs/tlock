@@ -9,6 +9,7 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	"github.com/eklairs/tlock/tlock-models/dashboard"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 )
 
@@ -74,7 +75,7 @@ type CreateUserScreen struct {
 	usernameError *string
 }
 
-// Initializes a new instance of the create user model
+// Initializes a new instance of the create user screen
 func InitializeCreateUserScreen(context context.Context) CreateUserScreen {
 	// Input box for username
 	usernameInput := components.InitializeInputBox("Your username goes here...")
@@ -89,28 +90,28 @@ func InitializeCreateUserScreen(context context.Context) CreateUserScreen {
 }
 
 // Init
-func (model CreateUserScreen) Init() tea.Cmd {
+func (screen CreateUserScreen) Init() tea.Cmd {
 	return nil
 }
 
 // Update
-func (model CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
+func (screen CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
 	var cmd tea.Cmd
 
 	// Update input boxes
-	if model.usernameInput.Focused() {
-		model.usernameInput, _ = model.usernameInput.Update(msg)
+	if screen.usernameInput.Focused() {
+		screen.usernameInput, _ = screen.usernameInput.Update(msg)
 	}
 
-	if model.passwordInput.Focused() {
-		model.passwordInput, _ = model.passwordInput.Update(msg)
+	if screen.passwordInput.Focused() {
+		screen.passwordInput, _ = screen.passwordInput.Update(msg)
 	}
 
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		// Remove error (if any) if the user input box is not empty
-		if model.usernameInput.Value() != "" {
-			model.usernameError = nil
+		if screen.usernameInput.Value() != "" {
+			screen.usernameError = nil
 		}
 
 		switch {
@@ -118,32 +119,38 @@ func (model CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			manager.PopScreen()
 
 		case key.Matches(msgType, createUserKeys.Tab):
-			if model.usernameInput.Focused() {
-				model.usernameInput.Blur()
-				model.passwordInput.Focus()
+			if screen.usernameInput.Focused() {
+				screen.usernameInput.Blur()
+				screen.passwordInput.Focus()
 			} else {
-				model.usernameInput.Focus()
-				model.passwordInput.Blur()
+				screen.usernameInput.Focus()
+				screen.passwordInput.Blur()
 			}
 
 		case key.Matches(msgType, createUserKeys.Create):
-			if model.usernameInput.Value() == "" {
-				model.usernameError = &USERNAME_EMPTY
+			if screen.usernameInput.Value() == "" {
+				screen.usernameError = &USERNAME_EMPTY
 			}
+
+			// Create new user
+			vault := screen.context.Core.AddNewUser(screen.usernameInput.Value(), screen.passwordInput.Value())
+
+			// Move to dashboard screen
+			manager.PushScreen(dashboard.InitializeDashboardScreen(vault))
 		}
 	}
 
-	return model, cmd
+	return screen, cmd
 }
 
 // View
-func (model CreateUserScreen) View() string {
+func (screen CreateUserScreen) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
 		tlockstyles.Styles.Title.Render(createUserAsciiArt), "",
 		tlockstyles.Styles.SubText.Render("Create a new user"), "",
-		components.InputGroup("Username", "Choose an awesome username, like Komaru!", model.usernameError, model.usernameInput),
-		components.InputGroup("Password", "Choose a super strong password, or keep it empty if you don't want any password", nil, model.passwordInput),
-		model.help.View(createUserKeys),
+		components.InputGroup("Username", "Choose an awesome username, like Komaru!", screen.usernameError, screen.usernameInput),
+		components.InputGroup("Password", "Choose a super strong password, or keep it empty if you don't want any password", nil, screen.passwordInput),
+		screen.help.View(createUserKeys),
 	)
 }
