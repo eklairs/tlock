@@ -95,5 +95,5 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 
 // View
 func (folders Folders) View() string {
-	return ""
+	return folders.listview.View()
 }
