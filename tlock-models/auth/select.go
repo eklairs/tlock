@@ -169,7 +169,7 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 			if err != nil {
 				// It is encrypted with a password, require password
-				manager.PushScreen(InitializeEnterPassScreen(screen.context, screen.context.Core.Users[screen.listview.Index()]))
+				manager.PushScreen(InitializeEnterPassScreen(screen.context, user))
 			} else {
 				// YAY!
 				manager.PushScreen(dashboard.InitializeDashboardScreen(*vault))

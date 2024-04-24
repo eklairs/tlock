@@ -60,6 +60,12 @@ type TLockStyles struct {
 
 	// Error
 	Error lipgloss.Style
+
+	// Folder active list item
+	FolderItemActive lipgloss.Style
+
+	// Folder inactive list item
+	FolderItemInactive lipgloss.Style
 }
 
 // Initializes the styles
@@ -72,15 +78,22 @@ func InitializeStyles(theme Theme) {
 
 	// Initialize styles
 	Styles = TLockStyles{
-		Base:             with(base),
-		Title:            with(base).Foreground(theme.Accent).Bold(true),
-		SubText:          with(base).Foreground(theme.Sub),
-		SubAltBg:         with(base).Background(theme.SubAlt),
-		Placeholder:      with(base).Background(theme.SubAlt).Foreground(theme.Sub),
-		Error:            with(base).Foreground(theme.Error).Bold(true),
-		Input:            with(paddedItem).Background(theme.SubAlt),
-		ListItemActive:   with(paddedItem).Background(theme.SubAlt),
-		ListItemInactive: with(paddedItem),
+		Base:               with(base),
+		Title:              with(base).Foreground(theme.Accent).Bold(true),
+		SubText:            with(base).Foreground(theme.Sub),
+		SubAltBg:           with(base).Background(theme.SubAlt),
+		Placeholder:        with(base).Background(theme.SubAlt).Foreground(theme.Sub),
+		Error:              with(base).Foreground(theme.Error).Bold(true),
+		Input:              with(paddedItem).Background(theme.SubAlt),
+		ListItemActive:     with(paddedItem).Background(theme.SubAlt),
+		ListItemInactive:   with(paddedItem),
+		FolderItemInactive: with(paddedItem),
+		FolderItemActive: with(paddedItem).
+			Padding(1, 2).
+			Background(theme.SubAlt).
+			Border(lipgloss.OuterHalfBlockBorder()).
+			BorderLeft(true).
+			BorderForeground(theme.Accent),
 	}
 }
 
