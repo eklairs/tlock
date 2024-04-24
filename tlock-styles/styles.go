@@ -45,6 +45,9 @@ type TLockStyles struct {
 
 	// Style for inactive list item
 	ListItemInactive lipgloss.Style
+
+	// Style for items over SubAltBg
+	SubAltBg lipgloss.Style
 }
 
 // Initializes the styles
@@ -59,6 +62,7 @@ func InitializeStyles(theme Theme) {
 	Styles = TLockStyles{
 		Title:            with(base).Foreground(theme.Accent).Bold(true),
 		SubText:          with(base).Foreground(theme.Sub),
+		SubAltBg:         with(base).Background(theme.SubAlt),
 		ListItemActive:   with(paddedItem).Background(theme.SubAlt),
 		ListItemInactive: with(paddedItem),
 	}

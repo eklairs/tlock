@@ -10,6 +10,7 @@ func ListViewSimple(items []list.Item, delegate list.ItemDelegate, width, height
 	listview.SetShowTitle(false)
 	listview.SetShowFilter(false)
 	listview.SetShowStatusBar(false)
+	listview.SetShowPagination(false)
 	listview.DisableQuitKeybindings()
 
 	return listview

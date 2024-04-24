@@ -1,16 +1,24 @@
 package auth
 
 import (
+	"fmt"
 	"io"
 
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
+
+var selectUserAsciiArt = `
+█   █▀█ █▀▀ █ █▄ █
+█▄▄ █▄█ █▄█ █ █ ▀█`
 
 // Width of select user
 var SELECT_USER_WIDTH = 65
@@ -42,7 +50,20 @@ func (d selectUserDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd {
 
 // Render
 func (d selectUserDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	item, ok := listItem.(selectUserListItem)
 
+	if !ok {
+		return
+	}
+
+	// Decide the renderer based on focused index
+	renderer := components.ListItemInactive
+	if index == m.Index() {
+		renderer = components.ListItemActive
+	}
+
+	// Render
+	fmt.Fprint(w, renderer(SELECT_USER_WIDTH, string(item), "›"))
 }
 
 // Select user key map
@@ -95,6 +116,9 @@ type SelectUserScreen struct {
 
 	// List view
 	listview list.Model
+
+	// Help
+	help help.Model
 }
 
 // New instance of select user
@@ -107,11 +131,12 @@ func InitializeSelectUserScreen(context context.Context) SelectUserScreen {
 	}
 
 	// Build listview
-	listview := components.ListViewSimple(usersItem, selectUserDelegate{}, SELECT_USER_WIDTH, 30)
+	listview := components.ListViewSimple(usersItem, selectUserDelegate{}, SELECT_USER_WIDTH, 13)
 
 	return SelectUserScreen{
 		context:  context,
 		listview: listview,
+		help:     components.BuildHelp(),
 	}
 }
 
@@ -135,5 +160,11 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 // View
 func (screen SelectUserScreen) View() string {
-	return screen.listview.View()
+	return lipgloss.JoinVertical(
+		lipgloss.Center,
+		tlockstyles.Styles.Title.Render(selectUserAsciiArt), "",
+		tlockstyles.Styles.SubText.Render("Select a user to login as"), "",
+		screen.listview.View(),
+		screen.help.View(selectUserKeys),
+	)
 }
