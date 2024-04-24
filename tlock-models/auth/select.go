@@ -152,6 +152,15 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 	// List of cmds to send
 	cmds := make([]tea.Cmd, 0)
 
+	// Handle key presses
+	switch msgType := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msgType, selectUserKeys.New):
+			manager.PushScreen(InitializeCreateUserScreen(screen.context))
+		}
+	}
+
 	screen.listview, cmd = screen.listview.Update(msg)
 	cmds = append(cmds, cmd)
 

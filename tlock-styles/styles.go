@@ -34,6 +34,9 @@ type Theme struct {
 
 // Styles used by tlock
 type TLockStyles struct {
+	// Base
+	Base lipgloss.Style
+
 	// Title
 	Title lipgloss.Style
 
@@ -48,21 +51,34 @@ type TLockStyles struct {
 
 	// Style for items over SubAltBg
 	SubAltBg lipgloss.Style
+
+	// Style for placeholder
+	Placeholder lipgloss.Style
+
+	// Style for input
+	Input lipgloss.Style
+
+	// Error
+	Error lipgloss.Style
 }
 
 // Initializes the styles
 func InitializeStyles(theme Theme) {
 	// Base that every style must copy from
-	base := lipgloss.NewStyle()
+	base := lipgloss.NewStyle().Foreground(theme.Text)
 
 	// Base for padded items
 	paddedItem := with(base).Padding(1, 3)
 
 	// Initialize styles
 	Styles = TLockStyles{
+		Base:             with(base),
 		Title:            with(base).Foreground(theme.Accent).Bold(true),
 		SubText:          with(base).Foreground(theme.Sub),
 		SubAltBg:         with(base).Background(theme.SubAlt),
+		Placeholder:      with(base).Background(theme.SubAlt).Foreground(theme.Sub),
+		Error:            with(base).Foreground(theme.Error).Bold(true),
+		Input:            with(paddedItem).Background(theme.SubAlt),
 		ListItemActive:   with(paddedItem).Background(theme.SubAlt),
 		ListItemInactive: with(paddedItem),
 	}
