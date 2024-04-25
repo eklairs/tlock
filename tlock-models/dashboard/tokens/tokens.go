@@ -137,6 +137,8 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 		switch msgType.String() {
 		case "a":
 			manager.PushScreen(InitializeAddTokenScreen())
+		case "s":
+			manager.PushScreen(InitializeTokenFromScreen())
 		}
 	}
 

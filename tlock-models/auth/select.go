@@ -23,7 +23,7 @@ var selectUserAsciiArt = `
 █▄▄ █▄█ █▄█ █ █ ▀█`
 
 // Width of select user
-var SELECT_USER_WIDTH = 75
+var SELECT_USER_WIDTH = 65
 
 // select user list item
 type selectUserListItem string

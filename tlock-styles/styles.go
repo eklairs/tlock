@@ -79,6 +79,9 @@ type TLockStyles struct {
 
 	// SubText Bg Item
 	SubTextBgItem lipgloss.Style
+
+	// Mock screen
+	MockScreen lipgloss.Style
 }
 
 // Initializes the styles
@@ -108,6 +111,7 @@ func InitializeStyles(theme Theme) {
 		ListItemActive:     with(paddedItem).Background(theme.SubAlt),
 		ListItemInactive:   with(paddedItem),
 		FolderItemInactive: with(paddedItem).Width(foldersWidth),
+		MockScreen:         with(base).Background(theme.SubAlt).Align(lipgloss.Center, lipgloss.Center).Width(27).Height(9),
 		FolderItemActive: with(paddedItem).
 			Padding(1, 2).
 			Background(theme.SubAlt).

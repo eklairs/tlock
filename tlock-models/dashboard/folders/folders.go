@@ -96,7 +96,7 @@ func buildListViewForFolders(vault *tlockvault.TLockVault) list.Model {
 	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
 	// Build listview
-	listview := components.ListViewSimple(buildFolderListItems(vault), folderListDelegate{}, 75, height-2) // -2 is for the title
+	listview := components.ListViewSimple(buildFolderListItems(vault), folderListDelegate{}, 65, height-2) // -2 is for the title
 
 	// Use custom keys
 	listview.KeyMap.CursorDown = key.NewBinding(
