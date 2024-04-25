@@ -1,20 +1,26 @@
 package tokens
 
 import (
+	"fmt"
+	"io"
 	"math"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/hotp"
 	"github.com/pquerna/otp/totp"
+	"golang.design/x/clipboard"
 	"golang.org/x/term"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/components"
+	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-models/dashboard/folders"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
@@ -57,6 +63,10 @@ func InitializeTokenListItem(token tlockvault.Token) tokensListItem {
 	}
 }
 
+func (item tokensListItem) FilterValue() string {
+	return ""
+}
+
 // Tokens key map
 type tokenKeyMap struct {
 	Manual key.Binding
@@ -95,6 +105,79 @@ var EmptyAsciiArt = `
  \(__)|
 `
 
+// Tokens list delegate
+type tokensListDelegate struct{}
+
+// Height
+func (d tokensListDelegate) Height() int {
+	return 4
+}
+
+// Spacing
+func (d tokensListDelegate) Spacing() int {
+	return 0
+}
+
+// Update
+func (d tokensListDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd {
+	return nil
+}
+
+// Render
+func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	item := listItem.(tokensListItem)
+
+	// Decide renderer function
+	render_fn := components.ListItemInactive
+
+	if index == m.Index() {
+		render_fn = components.ListItemActive
+	}
+
+	key, _ := otp.NewKeyFromURL(item.Token.URI)
+
+	// Build key info
+	info := lipgloss.JoinHorizontal(
+		lipgloss.Center,
+		tlockstyles.Styles.Title.Render(key.AccountName()),
+		tlockstyles.Styles.SubAltBgItem.Render("•"),
+		tlockstyles.Styles.SubAltBg.Render(key.Issuer()),
+	)
+
+	// Render it differently if it is not the current token
+	if index != m.Index() {
+		info = lipgloss.JoinHorizontal(
+			lipgloss.Center,
+			tlockstyles.Styles.SubText.Render(key.AccountName()),
+			tlockstyles.Styles.SubText.Render(" • "),
+			tlockstyles.Styles.SubText.Render(key.Issuer()),
+		)
+	}
+
+	// Current code renderable
+	current_code := strings.Join(strings.Split(item.CurrentCode, ""), "   ")
+
+	if key.Type() == "totp" {
+		timeToRefresh := key.Period() - uint64(time.Now().Unix())%key.Period()
+
+		timeLeftRenderable := tlockstyles.Styles.SubAltBg.Render(fmt.Sprintf("   ⏲  %d", timeToRefresh))
+
+		if index != m.Index() {
+			timeLeftRenderable = tlockstyles.Styles.SubText.Render(fmt.Sprintf("   ⏲  %d", timeToRefresh))
+		}
+
+		suffix := lipgloss.JoinHorizontal(
+			lipgloss.Center,
+			current_code,
+			timeLeftRenderable,
+		)
+
+		fmt.Fprint(w, render_fn(m.Width()-9, info, suffix))
+	} else {
+		fmt.Fprint(w, render_fn(m.Width()-9, info, current_code))
+	}
+}
+
 // Tokens
 type Tokens struct {
 	// Vault
@@ -107,15 +190,30 @@ type Tokens struct {
 	help help.Model
 
 	// Tokens
-	tokens []tlockvault.Token
+	tokensListView *list.Model
+
+	// Context
+	context context.Context
+}
+
+// Builds the tokens list view
+func buildTokensListView(tokens []tlockvault.Token) list.Model {
+	items := make([]list.Item, len(tokens))
+
+	for index, token := range tokens {
+		items[index] = InitializeTokenListItem(token)
+	}
+
+	return components.ListViewSimple(items, tokensListDelegate{}, 20, 10)
 }
 
 // Initializes a new instance of folders
-func InitializeTokens(vault *tlockvault.TLockVault) Tokens {
+func InitializeTokens(vault *tlockvault.TLockVault, context context.Context) Tokens {
 	return Tokens{
-		vault:  vault,
-		folder: nil,
-		help:   components.BuildHelp(),
+		vault:   vault,
+		folder:  nil,
+		help:    components.BuildHelp(),
+		context: context,
 	}
 }
 
@@ -131,16 +229,33 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 	switch msgType := msg.(type) {
 	case folders.FolderChangedMsg:
 		tokens.folder = &msgType.Folder
-		tokens.tokens = tokens.vault.GetTokens(msgType.Folder)
+
+		tokenListView := buildTokensListView(tokens.vault.GetTokens(msgType.Folder))
+
+		tokens.tokensListView = &tokenListView
 
 	case tea.KeyMsg:
 		switch msgType.String() {
 		case "a":
-			manager.PushScreen(InitializeAddTokenScreen())
+			cmds = append(cmds, manager.PushScreen(InitializeAddTokenScreen()))
 		case "s":
-			manager.PushScreen(InitializeTokenFromScreen())
+			cmds = append(cmds, manager.PushScreen(InitializeTokenFromScreen()))
+		case "c":
+			if tokens.context.ClipboardAvailability {
+				item := tokens.tokensListView.Items()[tokens.tokensListView.Index()].(tokensListItem)
+
+				clipboard.Write(clipboard.FmtText, []byte(item.CurrentCode))
+			}
+		}
+
+	case AddTokenMessage:
+		if tokens.folder != nil {
+			tokens.vault.AddToken(*tokens.folder, msgType.Token)
 		}
 	}
+
+	listview, _ := tokens.tokensListView.Update(msg)
+	tokens.tokensListView = &listview
 
 	return tea.Batch(cmds...)
 }
@@ -151,10 +266,10 @@ func (tokens Tokens) View() string {
 	width, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
 	// Width
-	tokensWidth := width - int(math.Floor((1.0/5.0)*float64(width)))
+	tokensWidth := width - int(math.Floor((1.0/5.0)*float64(width))) - 2
 
 	// If no tokens, render placeholder
-	if len(tokens.tokens) == 0 {
+	if tokens.tokensListView == nil || len(tokens.tokensListView.Items()) == 0 {
 		style := lipgloss.NewStyle().
 			Height(height-3).
 			Width(tokensWidth).
@@ -170,5 +285,18 @@ func (tokens Tokens) View() string {
 		return style.Render(ui)
 	}
 
-	return ""
+	tokens.tokensListView.SetWidth(tokensWidth)
+
+	// Build UI
+	ui := lipgloss.JoinVertical(
+		lipgloss.Left,
+		tlockstyles.Styles.AccentBgItem.Render("TOKENS"), "",
+		tokens.tokensListView.View(),
+	)
+
+	// Style
+	style := lipgloss.NewStyle().Height(height).Width(tokensWidth)
+
+	// Render
+	return style.Render(ui)
 }

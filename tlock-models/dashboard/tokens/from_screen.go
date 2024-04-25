@@ -121,7 +121,7 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 				manager.PopScreen()
 			}
 
-		case key.Matches(msgType, fromScreenKeys.Start):
+		case key.Matches(msgType, fromScreenKeys.Start) && screen.state == stateTake:
 			if image, err := screenshot.CaptureRect(screenshot.GetDisplayBounds(0)); err == nil {
 				if bmp, err := gozxing.NewBinaryBitmapFromImage(image); err == nil {
 					qrReader := qrcode.NewQRCodeReader()
@@ -139,8 +139,8 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			if screen.state == stateConfirm {
 				screen.state = stateTake
 			}
-		case key.Matches(msgType, confirmScreenKeys.Continue):
-			if screen.state == stateConfirm && screen.token != nil {
+		case key.Matches(msgType, confirmScreenKeys.Continue) && screen.state == stateConfirm:
+			if screen.token != nil {
 				cmd = func() tea.Msg {
 					return AddTokenMessage{
 						Token: *screen.token,

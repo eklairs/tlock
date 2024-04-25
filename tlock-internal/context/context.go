@@ -9,6 +9,7 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/config"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvendor "github.com/eklairs/tlock/tlock-vendor"
+	"golang.design/x/clipboard"
 )
 
 // Context contains all the themes, config etc for the app
@@ -21,11 +22,16 @@ type Context struct {
 
 	// Core
 	Core tlockcore.TLockCore
+
+	// If the clipboard is available
+	ClipboardAvailability bool
 }
 
 // Initializes a new instance of the context
 // It is recommended to call this at a one place and then pass around the context
 func InitializeContext() Context {
+	err := clipboard.Init()
+
 	themes := make([]tlockstyles.Theme, 0)
 
 	// Parse themes
@@ -33,9 +39,10 @@ func InitializeContext() Context {
 
 	// Return
 	return Context{
-		Themes: themes,
-		Core:   tlockcore.New(),
-		Config: config.GetConfig(),
+		Themes:                themes,
+		Core:                  tlockcore.New(),
+		Config:                config.GetConfig(),
+		ClipboardAvailability: err == nil,
 	}
 }
 

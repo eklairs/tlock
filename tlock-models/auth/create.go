@@ -135,7 +135,7 @@ func (screen CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 				vault := screen.context.Core.AddNewUser(screen.usernameInput.Value(), screen.passwordInput.Value())
 
 				// Move to dashboard screen
-				manager.PushScreen(dashboard.InitializeDashboardScreen(vault))
+				cmd = manager.PushScreen(dashboard.InitializeDashboardScreen(vault, screen.context))
 			}
 		}
 	}

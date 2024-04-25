@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/components"
+	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-models/dashboard/folders"
 	"github.com/eklairs/tlock/tlock-models/dashboard/tokens"
@@ -76,11 +77,11 @@ type DashboardScreen struct {
 }
 
 // Initializes a new instance of dashboard screen
-func InitializeDashboardScreen(vault tlockvault.TLockVault) DashboardScreen {
+func InitializeDashboardScreen(vault tlockvault.TLockVault, context context.Context) DashboardScreen {
 	return DashboardScreen{
 		vault:   &vault,
 		help:    components.BuildHelp(),
-		tokens:  tokens.InitializeTokens(&vault),
+		tokens:  tokens.InitializeTokens(&vault, context),
 		folders: folders.InitializeFolders(&vault),
 	}
 }
@@ -124,7 +125,7 @@ func (screen DashboardScreen) View() string {
 
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
-		screen.folders.View(),
+		screen.folders.View(), "  ",
 		screen.tokens.View(),
 	)
 }

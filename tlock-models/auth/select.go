@@ -159,7 +159,7 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msgType, selectUserKeys.New):
-			manager.PushScreen(InitializeCreateUserScreen(screen.context))
+			cmds = append(cmds, manager.PushScreen(InitializeCreateUserScreen(screen.context)))
 		case key.Matches(msgType, selectUserKeys.Enter):
 			// User
 			user := screen.context.Core.Users[screen.listview.Index()]
@@ -169,10 +169,10 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 			if err != nil {
 				// It is encrypted with a password, require password
-				manager.PushScreen(InitializeEnterPassScreen(screen.context, user))
+				cmds = append(cmds, manager.PushScreen(InitializeEnterPassScreen(screen.context, user)))
 			} else {
 				// YAY!
-				manager.PushScreen(dashboard.InitializeDashboardScreen(*vault))
+				cmds = append(cmds, manager.PushScreen(dashboard.InitializeDashboardScreen(*vault, screen.context)))
 			}
 		}
 	}

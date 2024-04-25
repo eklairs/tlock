@@ -142,14 +142,14 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 	case tea.KeyMsg:
 		switch msgType.String() {
 		case "A":
-			manager.PushScreen(InitializeAddFolderScreen())
+			cmds = append(cmds, manager.PushScreen(InitializeAddFolderScreen()))
 		case "E":
 			if focused, err := folders.Focused(); err == nil {
-				manager.PushScreen(InitializeEditFolderScreen(focused.Name))
+				cmds = append(cmds, manager.PushScreen(InitializeEditFolderScreen(focused.Name)))
 			}
 		case "X":
 			if focused, err := folders.Focused(); err == nil {
-				manager.PushScreen(InitializeDeleteFolderScreen(focused.Name))
+				cmds = append(cmds, manager.PushScreen(InitializeDeleteFolderScreen(focused.Name)))
 			}
 		}
 
@@ -175,7 +175,20 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		cmds = append(cmds, folders.listview.SetItems(buildFolderListItems(folders.vault)))
 	}
 
+	// Update listview
+	previousFocusedIndex := folders.listview.Index()
+
 	folders.listview, _ = folders.listview.Update(msg)
+
+	if previousFocusedIndex != folders.listview.Index() {
+		if focused, err := folders.Focused(); err == nil {
+			cmds = append(cmds, func() tea.Msg {
+				return FolderChangedMsg{
+					Folder: focused.Name,
+				}
+			})
+		}
+	}
 
 	return tea.Batch(cmds...)
 }

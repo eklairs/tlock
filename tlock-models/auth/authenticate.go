@@ -114,7 +114,7 @@ func (screen EnterPassScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			if err != nil {
 				screen.errorMessage = &ERROR_PASSWORD_WRONG
 			} else {
-				manager.PushScreen(dashboard.InitializeDashboardScreen(*vault))
+				cmd = manager.PushScreen(dashboard.InitializeDashboardScreen(*vault, screen.context))
 			}
 		}
 	}
