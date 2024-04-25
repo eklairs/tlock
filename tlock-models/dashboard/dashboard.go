@@ -88,15 +88,17 @@ func InitializeDashboardScreen(vault tlockvault.TLockVault, context context.Cont
 
 // Init
 func (screen DashboardScreen) Init() tea.Cmd {
+	var cmd tea.Cmd
+
 	if len(screen.vault.Data.Folders) != 0 {
-		return func() tea.Msg {
+		cmd = func() tea.Msg {
 			return folders.FolderChangedMsg{
 				Folder: screen.vault.Data.Folders[0].Name,
 			}
 		}
 	}
 
-	return nil
+	return tea.Batch(cmd, screen.tokens.Init())
 }
 
 // Update

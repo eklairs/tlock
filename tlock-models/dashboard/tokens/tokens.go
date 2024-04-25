@@ -40,6 +40,8 @@ func getCurrentCode(key *otp.Key, usageCounter int) string {
 	return code
 }
 
+type secondPassedMsg struct{}
+
 // Token list item
 type tokensListItem struct {
 	// Type of token
@@ -50,16 +52,42 @@ type tokensListItem struct {
 
 	// URI string
 	Token tlockvault.Token
+
+	// Time remaining before the otp is updated
+	// Only in case of totp tokens
+	time *int
+}
+
+// Refreshes the token
+func (item *tokensListItem) Refresh() {
+	tokenKey, _ := otp.NewKeyFromURL(item.Token.URI)
+
+	if tokenKey.Type() == "totp" {
+		timeToRefresh := int(tokenKey.Period() - uint64(time.Now().Unix())%tokenKey.Period())
+
+		item.time = &timeToRefresh
+	}
+
+	item.CurrentCode = getCurrentCode(tokenKey, item.Token.UsageCounter)
 }
 
 // Initializes a new instance of the tokens list item
 func InitializeTokenListItem(token tlockvault.Token) tokensListItem {
 	tokenKey, _ := otp.NewKeyFromURL(token.URI)
 
+	var ttr *int
+
+	if tokenKey.Type() == "totp" {
+		timeToRefresh := int(tokenKey.Period() - uint64(time.Now().Unix())%tokenKey.Period())
+
+		ttr = &timeToRefresh
+	}
+
 	return tokensListItem{
 		TokenType:   tokenKey.Type(),
 		CurrentCode: getCurrentCode(tokenKey, token.UsageCounter),
 		Token:       token,
+		time:        ttr,
 	}
 }
 
@@ -158,12 +186,10 @@ func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	current_code := strings.Join(strings.Split(item.CurrentCode, ""), "   ")
 
 	if key.Type() == "totp" {
-		timeToRefresh := key.Period() - uint64(time.Now().Unix())%key.Period()
-
-		timeLeftRenderable := tlockstyles.Styles.SubAltBg.Render(fmt.Sprintf("   ⏲  %d", timeToRefresh))
+		timeLeftRenderable := tlockstyles.Styles.SubAltBg.Render(fmt.Sprintf("   ⏲  %d", *item.time))
 
 		if index != m.Index() {
-			timeLeftRenderable = tlockstyles.Styles.SubText.Render(fmt.Sprintf("   ⏲  %d", timeToRefresh))
+			timeLeftRenderable = tlockstyles.Styles.SubText.Render(fmt.Sprintf("   ⏲  %d", *item.time))
 		}
 
 		suffix := lipgloss.JoinHorizontal(
@@ -217,9 +243,19 @@ func InitializeTokens(vault *tlockvault.TLockVault, context context.Context) Tok
 	}
 }
 
+func notifySecondPassed() tea.Msg {
+	currentTime := time.Now()
+	nextSecond := currentTime.Truncate(time.Second).Add(time.Second)
+	duration := nextSecond.Sub(currentTime)
+
+	time.Sleep(duration)
+
+	return secondPassedMsg{}
+}
+
 // Init
 func (tokens *Tokens) Init() tea.Cmd {
-	return nil
+	return notifySecondPassed
 }
 
 // Handles update messages
@@ -247,6 +283,17 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 				clipboard.Write(clipboard.FmtText, []byte(item.CurrentCode))
 			}
 		}
+	case secondPassedMsg:
+		items := make([]list.Item, len(tokens.tokensListView.Items()))
+
+		for index, item := range tokens.tokensListView.Items() {
+			tokenItem := item.(tokensListItem)
+			tokenItem.Refresh()
+
+			items[index] = tokenItem
+		}
+
+		cmds = append(cmds, tokens.tokensListView.SetItems(items), notifySecondPassed)
 
 	case AddTokenMessage:
 		if tokens.folder != nil {
