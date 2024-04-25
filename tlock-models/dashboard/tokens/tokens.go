@@ -277,6 +277,18 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 
 				clipboard.Write(clipboard.FmtText, []byte(item.CurrentCode))
 			}
+        case "m":
+            if tokens.folder != nil {
+                item := tokens.tokensListView.Items()[tokens.tokensListView.Index()].(tokensListItem)
+
+                cmds = append(cmds, manager.PushScreen(InitializeMoveTokenScreen(tokens.vault, *tokens.folder, item.Token.URI)))
+            }
+        case "d":
+            if tokens.folder != nil {
+                item := tokens.tokensListView.Items()[tokens.tokensListView.Index()].(tokensListItem)
+
+                cmds = append(cmds, manager.PushScreen(InitializeDeleteTokenScreen(*tokens.folder, item.Token.URI)))
+            }
 		}
 	case secondPassedMsg:
 		if tokens.tokensListView != nil {
