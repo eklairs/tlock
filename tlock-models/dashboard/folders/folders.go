@@ -3,12 +3,16 @@ package folders
 import (
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
+	"golang.org/x/term"
 )
 
 type folderListItem struct {
@@ -65,10 +69,25 @@ type Folders struct {
 	listview list.Model
 }
 
+// Builds the listview for the given list of folders
+func buildListViewForFolders(vault *tlockvault.TLockVault) list.Model {
+	items := make([]list.Item, len(vault.Data.Folders))
+
+	for index, folder := range vault.Data.Folders {
+		items[index] = folderListItem{
+			Name:        folder.Name,
+			TokensCount: len(folder.Uris),
+		}
+	}
+
+	return components.ListViewSimple(items, folderListDelegate{}, 65, 10)
+}
+
 // Initializes a new instance of folders
 func InitializeFolders(vault *tlockvault.TLockVault) Folders {
 	return Folders{
-		vault: vault,
+		vault:    vault,
+		listview: buildListViewForFolders(vault),
 	}
 }
 
@@ -90,10 +109,25 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		}
 	}
 
+	folders.listview, _ = folders.listview.Update(msg)
+
 	return tea.Batch(cmds...)
 }
 
 // View
 func (folders Folders) View() string {
-	return folders.listview.View()
+	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
+
+	// Build UI
+	ui := lipgloss.JoinVertical(
+		lipgloss.Left,
+		tlockstyles.Styles.TitleBar.Render("FOLDERS"), "",
+		folders.listview.View(),
+	)
+
+	// Style
+	style := lipgloss.NewStyle().Height(height)
+
+	// Render
+	return style.Render(ui)
 }

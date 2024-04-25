@@ -1,7 +1,11 @@
 package tlockstyles
 
 import (
+	"math"
+	"os"
+
 	"github.com/charmbracelet/lipgloss"
+	"golang.org/x/term"
 )
 
 // Instance of the styles
@@ -66,10 +70,17 @@ type TLockStyles struct {
 
 	// Folder inactive list item
 	FolderItemInactive lipgloss.Style
+
+	// Tilte Bar
+	TitleBar lipgloss.Style
 }
 
 // Initializes the styles
 func InitializeStyles(theme Theme) {
+	// Use 1/4 of the screen afor folder width
+	width, _, _ := term.GetSize(int(os.Stdout.Fd()))
+	foldersWidth := int(math.Floor((1.0 / 5.0) * float64(width)))
+
 	// Base that every style must copy from
 	base := lipgloss.NewStyle().Foreground(theme.Text)
 
@@ -84,15 +95,17 @@ func InitializeStyles(theme Theme) {
 		SubAltBg:           with(base).Background(theme.SubAlt),
 		Placeholder:        with(base).Background(theme.SubAlt).Foreground(theme.Sub),
 		Error:              with(base).Foreground(theme.Error).Bold(true),
+		TitleBar:           with(base).Padding(0, 1).Background(theme.Accent).Foreground(theme.Background),
 		Input:              with(paddedItem).Background(theme.SubAlt),
 		ListItemActive:     with(paddedItem).Background(theme.SubAlt),
 		ListItemInactive:   with(paddedItem),
-		FolderItemInactive: with(paddedItem),
+		FolderItemInactive: with(paddedItem).Width(foldersWidth),
 		FolderItemActive: with(paddedItem).
 			Padding(1, 2).
 			Background(theme.SubAlt).
-			Border(lipgloss.OuterHalfBlockBorder()).
-			BorderLeft(true).
+			Width(foldersWidth).
+			Border(lipgloss.OuterHalfBlockBorder(), false, false, false, true).
+			BorderBackground(theme.SubAlt).
 			BorderForeground(theme.Accent),
 	}
 }
