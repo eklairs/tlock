@@ -110,7 +110,7 @@ func InitializeStyles(theme Theme) {
 		AccentBgItem:       with(base).Padding(0, 1).Background(theme.Accent).Foreground(theme.Background),
 		SubTextBgItem:      with(base).Padding(0, 1).Foreground(theme.Sub),
 		SubAltBgItem:       with(base).Padding(0, 1).Background(theme.SubAlt).Foreground(theme.Sub),
-		Input:              with(paddedItem).Background(theme.SubAlt),
+		Input:              with(paddedItem).Width(65).Background(theme.SubAlt),
 		ListItemActive:     with(paddedItem).Background(theme.SubAlt),
 		ListItemInactive:   with(paddedItem),
 		FolderItemInactive: with(paddedItem).Width(foldersWidth),

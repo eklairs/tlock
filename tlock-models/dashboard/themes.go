@@ -152,8 +152,14 @@ func (screen ThemesScreen) Update(msg tea.Msg, manager *modelmanager.ModelManage
     switch msgType := msg.(type) {
     case tea.KeyMsg:
         switch {
+        case key.Matches(msgType, themesKeys.Esc):
+            manager.PopScreen()
         case key.Matches(msgType, themesKeys.Up) || key.Matches(msgType, themesKeys.Down):
         case key.Matches(msgType, themesKeys.Save):
+            if len(screen.listview.Items()) < 0 {
+                break
+            }
+
             newTheme := screen.listview.Items()[screen.listview.Index()].(themeItem)
 
             screen.context.SetTheme(newTheme.Name)
@@ -178,7 +184,7 @@ func (screen ThemesScreen) Update(msg tea.Msg, manager *modelmanager.ModelManage
     previousIndex := screen.listview.Index()
 	screen.listview, _ = screen.listview.Update(msg)
 
-    if previousIndex != screen.listview.Index() || previousFilterValue != screen.filter.Value() {
+    if (previousIndex != screen.listview.Index() || previousFilterValue != screen.filter.Value()) && len(screen.listview.Items()) > 0 {
         // Get new theme
         newTheme := screen.listview.Items()[screen.listview.Index()].(themeItem)
 
@@ -189,6 +195,8 @@ func (screen ThemesScreen) Update(msg tea.Msg, manager *modelmanager.ModelManage
 
         // Reinitialize styles
         tlockstyles.InitializeStyles(tlockstyles.Theme(newTheme))
+
+        screen.filter.PlaceholderStyle = tlockstyles.Styles.Placeholder
     }
 
 	return screen, tea.Batch(cmds...)
