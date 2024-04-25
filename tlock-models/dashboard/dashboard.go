@@ -103,6 +103,14 @@ func (screen DashboardScreen) Init() tea.Cmd {
 
 // Update
 func (screen DashboardScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
+	switch msgType := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msgType, dashboardKeys.Help):
+			manager.PushScreen(InitializeHelpScreen())
+		}
+	}
+
 	return screen, tea.Batch(screen.folders.Update(msg, manager), screen.tokens.Update(msg, manager))
 }
 
