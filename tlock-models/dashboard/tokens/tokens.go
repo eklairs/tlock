@@ -284,16 +284,20 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 			}
 		}
 	case secondPassedMsg:
-		items := make([]list.Item, len(tokens.tokensListView.Items()))
+		if tokens.tokensListView != nil {
+			items := make([]list.Item, len(tokens.tokensListView.Items()))
 
-		for index, item := range tokens.tokensListView.Items() {
-			tokenItem := item.(tokensListItem)
-			tokenItem.Refresh()
+			for index, item := range tokens.tokensListView.Items() {
+				tokenItem := item.(tokensListItem)
+				tokenItem.Refresh()
 
-			items[index] = tokenItem
+				items[index] = tokenItem
+			}
+
+			cmds = append(cmds, tokens.tokensListView.SetItems(items))
 		}
 
-		cmds = append(cmds, tokens.tokensListView.SetItems(items), notifySecondPassed)
+		cmds = append(cmds, notifySecondPassed)
 
 	case AddTokenMessage:
 		if tokens.folder != nil {
@@ -301,8 +305,10 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 		}
 	}
 
-	listview, _ := tokens.tokensListView.Update(msg)
-	tokens.tokensListView = &listview
+	if tokens.tokensListView != nil {
+		listview, _ := tokens.tokensListView.Update(msg)
+		tokens.tokensListView = &listview
+	}
 
 	return tea.Batch(cmds...)
 }
