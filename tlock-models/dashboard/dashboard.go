@@ -74,6 +74,9 @@ type DashboardScreen struct {
 
 	// Help
 	help help.Model
+
+    // Context
+    context context.Context
 }
 
 // Initializes a new instance of dashboard screen
@@ -83,6 +86,7 @@ func InitializeDashboardScreen(vault tlockvault.TLockVault, context context.Cont
 		help:    components.BuildHelp(),
 		tokens:  tokens.InitializeTokens(&vault, context),
 		folders: folders.InitializeFolders(&vault),
+        context: context,
 	}
 }
 
@@ -108,6 +112,8 @@ func (screen DashboardScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 		switch {
 		case key.Matches(msgType, dashboardKeys.Help):
 			manager.PushScreen(InitializeHelpScreen())
+        case key.Matches(msgType, dashboardKeys.ChangeTheme):
+            manager.PushScreen(InitializeThemesScreen(screen.context))
 		}
 	}
 

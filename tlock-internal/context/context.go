@@ -64,3 +64,10 @@ func (context Context) GetCurrentTheme() tlockstyles.Theme {
 	// Return
 	return context.Themes[theme_index]
 }
+
+// Sets the theme
+func (context *Context) SetTheme(theme string) {
+    context.Config.CurrentTheme = theme
+
+    context.Config.Write()
+}

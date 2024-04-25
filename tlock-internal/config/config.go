@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/adrg/xdg"
 )
@@ -12,7 +13,7 @@ import (
 var DEFAULT_THEME = "catppuccin"
 
 // Path to the config file
-var CONFIG_PATH = path.Join(xdg.ConfigHome, "tlock", "tlock.yaml")
+var CONFIG_PATH = path.Join(xdg.ConfigHome, "tlock", "tlock.json")
 
 // Represents the tlock config
 type Config struct {
@@ -48,3 +49,22 @@ func GetConfig() Config {
 	// Return
 	return default_config
 }
+
+// Writes the config
+func (config Config) Write() {
+    // Make directory
+    os.MkdirAll(filepath.Dir(CONFIG_PATH), os.ModePerm)
+
+    // Marshal
+    data, _ := json.Marshal(config)
+
+    // Write
+    file, err := os.Create(CONFIG_PATH)
+
+    if err == nil {
+        file.Write(data)
+    } else {
+        panic(err)
+    }
+}
+
