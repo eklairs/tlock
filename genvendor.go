@@ -106,13 +106,13 @@ func main() {
 
 						switch previousCustomName {
 						case "--bg-color":
-							theme.Background = hex_color
+							theme.SubAlt = hex_color
 						case "--main-color":
 							theme.Accent = hex_color
 						case "--sub-color":
 							theme.Sub = hex_color
 						case "--sub-alt-color":
-							theme.SubAlt = hex_color
+							theme.Background = hex_color
 						case "--text-color":
 							theme.Text = hex_color
 						case "--error-color":
