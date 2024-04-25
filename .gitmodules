@@ -1,0 +1,3 @@
+[submodule "bubbletea"]
+	path = bubbletea
+	url = https://github.com/eklairs/bubbletea
