@@ -72,7 +72,13 @@ type TLockStyles struct {
 	FolderItemInactive lipgloss.Style
 
 	// Tilte Bar
-	TitleBar lipgloss.Style
+	AccentBgItem lipgloss.Style
+
+	// Sub Alt Bg
+	SubAltBgItem lipgloss.Style
+
+	// SubText Bg Item
+	SubTextBgItem lipgloss.Style
 }
 
 // Initializes the styles
@@ -95,7 +101,9 @@ func InitializeStyles(theme Theme) {
 		SubAltBg:           with(base).Background(theme.SubAlt),
 		Placeholder:        with(base).Background(theme.SubAlt).Foreground(theme.Sub),
 		Error:              with(base).Foreground(theme.Error).Bold(true),
-		TitleBar:           with(base).Padding(0, 1).Background(theme.Accent).Foreground(theme.Background),
+		AccentBgItem:       with(base).Padding(0, 1).Background(theme.Accent).Foreground(theme.Background),
+		SubTextBgItem:      with(base).Padding(0, 1).Foreground(theme.Sub),
+		SubAltBgItem:       with(base).Padding(0, 1).Background(theme.SubAlt).Foreground(theme.Sub),
 		Input:              with(paddedItem).Background(theme.SubAlt),
 		ListItemActive:     with(paddedItem).Background(theme.SubAlt),
 		ListItemInactive:   with(paddedItem),

@@ -17,6 +17,11 @@ import (
 	"golang.org/x/term"
 )
 
+// Folder changed message
+type FolderChangedMsg struct {
+	Folder string
+}
+
 type folderListItem struct {
 	// Name of the folder
 	Name string
@@ -91,7 +96,7 @@ func buildListViewForFolders(vault *tlockvault.TLockVault) list.Model {
 	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
 	// Build listview
-	listview := components.ListViewSimple(buildFolderListItems(vault), folderListDelegate{}, 65, height-2) // -2 is for the title
+	listview := components.ListViewSimple(buildFolderListItems(vault), folderListDelegate{}, 75, height-2) // -2 is for the title
 
 	// Use custom keys
 	listview.KeyMap.CursorDown = key.NewBinding(
@@ -182,7 +187,7 @@ func (folders Folders) View() string {
 	// Build UI
 	ui := lipgloss.JoinVertical(
 		lipgloss.Left,
-		tlockstyles.Styles.TitleBar.Render("FOLDERS"), "",
+		tlockstyles.Styles.AccentBgItem.Render("FOLDERS"), "",
 		folders.listview.View(),
 	)
 

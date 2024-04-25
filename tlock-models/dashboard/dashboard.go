@@ -10,6 +10,7 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-models/dashboard/folders"
+	"github.com/eklairs/tlock/tlock-models/dashboard/tokens"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"golang.org/x/term"
@@ -67,6 +68,9 @@ type DashboardScreen struct {
 	// Folders
 	folders folders.Folders
 
+	// Tokens
+	tokens tokens.Tokens
+
 	// Help
 	help help.Model
 }
@@ -76,18 +80,27 @@ func InitializeDashboardScreen(vault tlockvault.TLockVault) DashboardScreen {
 	return DashboardScreen{
 		vault:   &vault,
 		help:    components.BuildHelp(),
+		tokens:  tokens.InitializeTokens(&vault),
 		folders: folders.InitializeFolders(&vault),
 	}
 }
 
 // Init
 func (screen DashboardScreen) Init() tea.Cmd {
+	if len(screen.vault.Data.Folders) != 0 {
+		return func() tea.Msg {
+			return folders.FolderChangedMsg{
+				Folder: screen.vault.Data.Folders[0].Name,
+			}
+		}
+	}
+
 	return nil
 }
 
 // Update
 func (screen DashboardScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
-	return screen, tea.Batch(screen.folders.Update(msg, manager))
+	return screen, tea.Batch(screen.folders.Update(msg, manager), screen.tokens.Update(msg, manager))
 }
 
 // View
@@ -112,5 +125,6 @@ func (screen DashboardScreen) View() string {
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		screen.folders.View(),
+		screen.tokens.View(),
 	)
 }
