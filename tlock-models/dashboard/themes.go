@@ -5,7 +5,6 @@ import (
 	"io"
 	"strings"
 
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -113,9 +112,6 @@ type ThemesScreen struct {
 	// List
 	listview list.Model
 
-	// Help
-	help help.Model
-
 	// State
 	state int
 
@@ -137,7 +133,6 @@ func InitializeThemesScreen(context context.Context) ThemesScreen {
 	return ThemesScreen{
 		context:  context,
 		listview: components.ListViewSimple(themeItems, themeListDelegate{}, 65, 18),
-		help:     components.BuildHelp(),
 		state:    stateChoosing,
 		filter:   filter,
 	}
@@ -207,6 +202,6 @@ func (screen ThemesScreen) View() string {
 		tlockstyles.Styles.SubText.Render("Choose a theme for tlock"), "",
         tlockstyles.Styles.Input.Render(screen.filter.View()), "",
 		screen.listview.View(), "",
-		screen.help.View(themesKeys),
+		tlockstyles.Help.View(themesKeys),
 	)
 }

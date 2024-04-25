@@ -4,9 +4,12 @@ import (
 	"math"
 	"os"
 
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/lipgloss"
 	"golang.org/x/term"
 )
+
+var Help help.Model
 
 // Instance of the styles
 // Must call `InitializeStyles()` to initialize these styles
@@ -120,6 +123,14 @@ func InitializeStyles(theme Theme) {
 			BorderBackground(theme.SubAlt).
 			BorderForeground(theme.Accent),
 	}
+
+	// Help menu
+	Help = help.New()
+
+	// Comply help menu styles to themes
+	Help.Styles.ShortKey = Styles.Title
+	Help.Styles.ShortDesc = Styles.SubText
+	Help.Styles.ShortSeparator = Styles.SubText
 }
 
 // Utility to copy a style

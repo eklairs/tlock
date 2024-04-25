@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/lipgloss"
@@ -118,9 +117,6 @@ type SelectUserScreen struct {
 
 	// List view
 	listview list.Model
-
-	// Help
-	help help.Model
 }
 
 // New instance of select user
@@ -138,7 +134,6 @@ func InitializeSelectUserScreen(context context.Context) SelectUserScreen {
 	return SelectUserScreen{
 		context:  context,
 		listview: listview,
-		help:     components.BuildHelp(),
 	}
 }
 
@@ -190,6 +185,6 @@ func (screen SelectUserScreen) View() string {
 		tlockstyles.Styles.Title.Render(selectUserAsciiArt), "",
 		tlockstyles.Styles.SubText.Render("Select a user to login as"), "",
 		screen.listview.View(), "",
-		screen.help.View(selectUserKeys),
+		tlockstyles.Help.View(selectUserKeys),
 	)
 }

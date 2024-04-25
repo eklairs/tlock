@@ -3,11 +3,9 @@ package dashboard
 import (
 	"os"
 
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-models/dashboard/folders"
@@ -72,9 +70,6 @@ type DashboardScreen struct {
 	// Tokens
 	tokens tokens.Tokens
 
-	// Help
-	help help.Model
-
     // Context
     context context.Context
 }
@@ -83,7 +78,6 @@ type DashboardScreen struct {
 func InitializeDashboardScreen(vault tlockvault.TLockVault, context context.Context) DashboardScreen {
 	return DashboardScreen{
 		vault:   &vault,
-		help:    components.BuildHelp(),
 		tokens:  tokens.InitializeTokens(&vault, context),
 		folders: folders.InitializeFolders(&vault),
         context: context,
@@ -133,7 +127,7 @@ func (screen DashboardScreen) View() string {
 			lipgloss.Center,
 			tlockstyles.Styles.Title.Render(EmptyAsciiArt),
 			tlockstyles.Styles.SubText.Render("So empty! How about adding a new folder?"), "",
-			screen.help.View(dashboardKeys),
+			tlockstyles.Help.View(dashboardKeys),
 		)
 
 		return style.Render(ui)

@@ -3,7 +3,6 @@ package auth
 import (
 	"fmt"
 
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -62,9 +61,6 @@ type EnterPassScreen struct {
 	// Password input
 	passInput textinput.Model
 
-	// Help
-	help help.Model
-
 	// User spec
 	user tlockcore.UserSpec
 
@@ -80,7 +76,6 @@ func InitializeEnterPassScreen(context context.Context, user tlockcore.UserSpec)
 
 	return EnterPassScreen{
 		context:   context,
-		help:      components.BuildHelp(),
 		user:      user,
 		passInput: passwordInput,
 	}
@@ -129,7 +124,7 @@ func (screen EnterPassScreen) View() string {
 		tlockstyles.Styles.Title.Render(enterPassAsciiArt), "",
 		tlockstyles.Styles.SubText.Render(fmt.Sprintf("Login in as %s", screen.user.Username)), "",
 		components.InputGroup("Password", "Enter the super secret password", screen.errorMessage, screen.passInput),
-		screen.help.View(enterPassKeys),
+		tlockstyles.Help.View(enterPassKeys),
 	}
 
 	return lipgloss.JoinVertical(

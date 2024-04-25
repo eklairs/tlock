@@ -14,7 +14,6 @@ import (
 	"golang.design/x/clipboard"
 	"golang.org/x/term"
 
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -212,9 +211,6 @@ type Tokens struct {
 	// Folder
 	folder *string
 
-	// Help
-	help help.Model
-
 	// Tokens
 	tokensListView *list.Model
 
@@ -238,7 +234,6 @@ func InitializeTokens(vault *tlockvault.TLockVault, context context.Context) Tok
 	return Tokens{
 		vault:   vault,
 		folder:  nil,
-		help:    components.BuildHelp(),
 		context: context,
 	}
 }
@@ -332,7 +327,7 @@ func (tokens Tokens) View() string {
 			lipgloss.Center,
 			tlockstyles.Styles.Title.Render(EmptyAsciiArt),
 			tlockstyles.Styles.SubText.Render("So empty! How about adding a new token?"), "",
-			tokens.help.View(tokenKeys),
+			tlockstyles.Help.View(tokenKeys),
 		)
 
 		return style.Render(ui)

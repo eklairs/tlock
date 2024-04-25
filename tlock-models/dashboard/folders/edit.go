@@ -1,7 +1,6 @@
 package folders
 
 import (
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
@@ -57,9 +56,6 @@ type EditFolderScreen struct {
 	// Folder name input
 	name textinput.Model
 
-	// Help
-	help help.Model
-
 	// Original name
 	oldName string
 
@@ -77,7 +73,6 @@ func InitializeEditFolderScreen(oldName string) EditFolderScreen {
 	// Return
 	return EditFolderScreen{
 		name:    name,
-		help:    components.BuildHelp(),
 		oldName: oldName,
 	}
 }
@@ -125,6 +120,6 @@ func (screen EditFolderScreen) View() string {
 		tlockstyles.Styles.Title.Render(editFolderAscii), "",
 		tlockstyles.Styles.SubText.Render("Rename the folder to a new name"), "",
 		components.InputGroup("Name", "Choose the new name for your folder", screen.errorMessage, screen.name),
-		screen.help.View(editFolderKeys),
+		tlockstyles.Help.View(editFolderKeys),
 	)
 }

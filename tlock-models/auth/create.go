@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -62,9 +61,6 @@ type CreateUserScreen struct {
 	// Context
 	context context.Context
 
-	// Help
-	help help.Model
-
 	// Username input
 	usernameInput textinput.Model
 
@@ -83,7 +79,6 @@ func InitializeCreateUserScreen(context context.Context) CreateUserScreen {
 
 	return CreateUserScreen{
 		context:       context,
-		help:          components.BuildHelp(),
 		usernameInput: usernameInput,
 		passwordInput: components.InitializeInputBox("Your password goes here..."),
 	}
@@ -151,6 +146,6 @@ func (screen CreateUserScreen) View() string {
 		tlockstyles.Styles.SubText.Render("Create a new user"), "",
 		components.InputGroup("Username", "Choose an awesome username, like Komaru!", screen.usernameError, screen.usernameInput),
 		components.InputGroup("Password", "Choose a super strong password, or keep it empty if you don't want any password", nil, screen.passwordInput),
-		screen.help.View(createUserKeys),
+		tlockstyles.Help.View(createUserKeys),
 	)
 }

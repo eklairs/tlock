@@ -1,11 +1,9 @@
 package folders
 
 import (
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 )
@@ -53,9 +51,6 @@ var deleteFolderKeys = deleteFolderKeyMap{
 type DeleteFolderScreen struct {
 	// Folder to delete
 	folder string
-
-	// Help
-	help help.Model
 }
 
 // Initialize root model
@@ -63,7 +58,6 @@ func InitializeDeleteFolderScreen(folder string) DeleteFolderScreen {
 	// Return
 	return DeleteFolderScreen{
 		folder: folder,
-		help:   components.BuildHelp(),
 	}
 }
 
@@ -108,6 +102,6 @@ func (screen DeleteFolderScreen) View() string {
 			tlockstyles.Styles.Title.Render(screen.folder),
 			tlockstyles.Styles.SubText.Render("?"),
 		), "",
-		screen.help.View(deleteFolderKeys),
+		tlockstyles.Help.View(deleteFolderKeys),
 	)
 }

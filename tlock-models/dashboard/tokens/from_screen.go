@@ -3,11 +3,9 @@ package tokens
 import (
 	"fmt"
 
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	"github.com/pquerna/otp"
@@ -86,9 +84,6 @@ var confirmScreenKeys = confirmScreenKeyMap{
 }
 
 type TokenFromScreen struct {
-	// Help
-	help help.Model
-
 	// State
 	state int
 
@@ -99,7 +94,6 @@ type TokenFromScreen struct {
 // Initializes a new instance of fromScreen from screen
 func InitializeTokenFromScreen() TokenFromScreen {
 	return TokenFromScreen{
-		help:  components.BuildHelp(),
 		state: stateTake,
 	}
 }
@@ -168,7 +162,7 @@ func (screen TokenFromScreen) View() string {
 				tlockstyles.Styles.MockScreen.Render("TLock"), "   ",
 				tlockstyles.Styles.MockScreen.Render("QRCode Window"),
 			), "",
-			screen.help.View(fromScreenKeys),
+			tlockstyles.Help.View(fromScreenKeys),
 		)
 	case stateConfirm:
 		items := []string{
@@ -189,7 +183,7 @@ func (screen TokenFromScreen) View() string {
 		}
 
 		// Add help
-		items = append(items, "", screen.help.View(confirmScreenKeys))
+		items = append(items, "", tlockstyles.Help.View(confirmScreenKeys))
 
 		return lipgloss.JoinVertical(
 			lipgloss.Center,

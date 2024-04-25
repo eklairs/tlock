@@ -1,7 +1,6 @@
 package folders
 
 import (
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
@@ -59,9 +58,6 @@ type AddFolderScreen struct {
 	// Folder name input
 	name textinput.Model
 
-	// Help
-	help help.Model
-
 	// Error
 	errorMessage *string
 }
@@ -75,7 +71,6 @@ func InitializeAddFolderScreen() AddFolderScreen {
 	// Return
 	return AddFolderScreen{
 		name: name,
-		help: components.BuildHelp(),
 	}
 }
 
@@ -121,6 +116,6 @@ func (screen AddFolderScreen) View() string {
 		tlockstyles.Styles.Title.Render(addFolderAscii), "",
 		tlockstyles.Styles.SubText.Render("Add a new folder"), "",
 		components.InputGroup("Name", "Choose a name for your folder, like Socials!", screen.errorMessage, screen.name),
-		screen.help.View(addFolderKeys),
+		tlockstyles.Help.View(addFolderKeys),
 	)
 }

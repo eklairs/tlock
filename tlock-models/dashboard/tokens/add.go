@@ -1,7 +1,6 @@
 package tokens
 
 import (
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -216,9 +215,6 @@ type AddTokenScreen struct {
 
 	// Focused index
 	focused_index int
-
-	// Help menu
-	help help.Model
 }
 
 // Initializes a new instance of the add token screen
@@ -268,7 +264,6 @@ func InitializeAddTokenScreen() AddTokenScreen {
 				input:       components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24),
 			},
 		},
-		help: components.BuildHelp(),
 	}
 }
 
@@ -366,7 +361,7 @@ func (screen AddTokenScreen) View() string {
 	}
 
 	// Add help
-	items = append(items, screen.help.View(addTokenKeys))
+	items = append(items, tlockstyles.Help.View(addTokenKeys))
 
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
