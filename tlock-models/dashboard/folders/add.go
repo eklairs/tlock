@@ -57,8 +57,8 @@ type AddFolderScreen struct {
 	// Error
 	errorMessage *string
 
-    // Vault
-    vault *tlockvault.Vault
+	// Vault
+	vault *tlockvault.Vault
 }
 
 // Initialize add folder scree
@@ -69,8 +69,8 @@ func InitializeAddFolderScreen(vault *tlockvault.Vault) AddFolderScreen {
 
 	// Return
 	return AddFolderScreen{
-		name: name,
-        vault: vault,
+		name:  name,
+		vault: vault,
 	}
 }
 
@@ -90,28 +90,28 @@ func (screen AddFolderScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			manager.PopScreen()
 
 		case key.Matches(msgType, addFolderKeys.Enter):
-            // If it is empty, show error message
+			// If it is empty, show error message
 			if screen.name.Value() == "" {
 				screen.errorMessage = &ERROR_EMPTY_FOLDER_NAME
 
-                break
+				break
 			}
 
-            // Add the folder
-            screen.vault.AddFolder(screen.name.Value())
+			// Add the folder
+			screen.vault.AddFolder(screen.name.Value())
 
-            // Request folders refresh
-            cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
+			// Request folders refresh
+			cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
 
-            // Pop
-            manager.PopScreen()
+			// Pop
+			manager.PopScreen()
 		}
 	}
 
-    // Send the value to input box
+	// Send the value to input box
 	screen.name, _ = screen.name.Update(msg)
 
-    // Return
+	// Return
 	return screen, tea.Batch(cmds...)
 }
 

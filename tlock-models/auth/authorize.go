@@ -81,7 +81,6 @@ func InitializeEnterPassScreen(context context.Context, user tlockcore.User) Ent
 	}
 }
 
-
 // Init
 func (screen EnterPassScreen) Init() tea.Cmd {
 	return nil
@@ -128,4 +127,3 @@ func (screen EnterPassScreen) View() string {
 		tlockstyles.Help.View(enterPassKeys),
 	)
 }
-

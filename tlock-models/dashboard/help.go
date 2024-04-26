@@ -180,4 +180,3 @@ func (screen HelpScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager)
 func (screen HelpScreen) View() string {
 	return screen.viewport.View()
 }
-

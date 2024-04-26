@@ -85,4 +85,3 @@ func (users TLockCore) write() {
 	// Write
 	file.Write(data)
 }
-

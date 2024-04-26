@@ -50,15 +50,15 @@ type DeleteFolderScreen struct {
 	// Folder to delete
 	folder tlockvault.Folder
 
-    // Vault
-    vault *tlockvault.Vault
+	// Vault
+	vault *tlockvault.Vault
 }
 
 // Initialize root model
 func InitializeDeleteFolderScreen(folder tlockvault.Folder, vault *tlockvault.Vault) DeleteFolderScreen {
 	return DeleteFolderScreen{
 		folder: folder,
-        vault: vault,
+		vault:  vault,
 	}
 }
 
@@ -77,20 +77,19 @@ func (screen DeleteFolderScreen) Update(msg tea.Msg, manager *modelmanager.Model
 		case key.Matches(msgType, deleteFolderKeys.GoBack):
 			manager.PopScreen()
 		case key.Matches(msgType, deleteFolderKeys.Delete):
-            // Delete the folder
-            screen.vault.DeleteFolder(screen.folder.ID)
+			// Delete the folder
+			screen.vault.DeleteFolder(screen.folder.ID)
 
-            // Request folders refresh
-            cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
+			// Request folders refresh
+			cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
 
-            // Pop
-            manager.PopScreen()
+			// Pop
+			manager.PopScreen()
 		}
 	}
 
 	return screen, tea.Batch(cmds...)
 }
-
 
 // View
 func (screen DeleteFolderScreen) View() string {

@@ -12,19 +12,18 @@ import (
 
 // TLock go brrr
 func main() {
-    // Initialize context
-    context := context.InitializeContext()
-    background := termenv.RGBColor(context.GetCurrentTheme().Background)
+	// Initialize context
+	context := context.InitializeContext()
+	background := termenv.RGBColor(context.GetCurrentTheme().Background)
 
-    // Initialize styles
-    tlockstyles.InitializeStyles(context.GetCurrentTheme())
+	// Initialize styles
+	tlockstyles.InitializeStyles(context.GetCurrentTheme())
 
-    // New bubbletea program
-    program := tea.NewProgram(tlockmodels.InitializeRootModel(context), tea.WithAltScreen(), tea.WithBackgroundColor(background))
+	// New bubbletea program
+	program := tea.NewProgram(tlockmodels.InitializeRootModel(context), tea.WithAltScreen(), tea.WithBackgroundColor(background))
 
-    // Run
-    if _, err := program.Run(); err != nil {
-        log.Fatal().Err(err).Msg("[tlock] Error while running tlock program")
-    }
+	// Run
+	if _, err := program.Run(); err != nil {
+		log.Fatal().Err(err).Msg("[tlock] Error while running tlock program")
+	}
 }
-

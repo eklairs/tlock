@@ -22,7 +22,6 @@ var selectUserAscii = `
 █   █▀█ █▀▀ █ █▄ █
 █▄▄ █▄█ █▄█ █ █ ▀█`
 
-
 // select user list item
 type selectUserListItem string
 
@@ -120,13 +119,13 @@ type SelectUserScreen struct {
 
 // New instance of select user
 func InitializeSelectUserScreen(context context.Context) SelectUserScreen {
-    // Renderable list of users
-    usersList := tlockinternal.Map(context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user.Username) })
+	// Renderable list of users
+	usersList := tlockinternal.Map(context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user.Username) })
 
-    // Return instance
+	// Return instance
 	return SelectUserScreen{
 		context:  context,
-        listview: components.ListViewSimple(usersList, selectUserDelegate{}, 65, min(12, len(usersList) * 3)),
+		listview: components.ListViewSimple(usersList, selectUserDelegate{}, 65, min(12, len(usersList)*3)),
 	}
 }
 
@@ -134,7 +133,6 @@ func InitializeSelectUserScreen(context context.Context) SelectUserScreen {
 func (screen SelectUserScreen) Init() tea.Cmd {
 	return nil
 }
-
 
 // Update
 func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
@@ -144,12 +142,12 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 	cmds := make([]tea.Cmd, 0)
 
 	// Handle key presses
-    switch msgType := msg.(type) {
+	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-        case key.Matches(msgType, selectUserKeys.New):
-            manager.PushScreen(InitializeCreateUserScreen(screen.context))
-        case key.Matches(msgType, selectUserKeys.Enter):
+		case key.Matches(msgType, selectUserKeys.New):
+			manager.PushScreen(InitializeCreateUserScreen(screen.context))
+		case key.Matches(msgType, selectUserKeys.Enter):
 			// User
 			user := screen.context.Core.Users[screen.listview.Index()]
 
@@ -166,57 +164,57 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 		}
 	}
 
-    // Update listview
+	// Update listview
 	screen.listview, cmd = screen.listview.Update(msg)
 	cmds = append(cmds, cmd)
 
-    // Return
+	// Return
 	return screen, tea.Batch(cmds...)
 }
 
 // View
 func (screen SelectUserScreen) View() string {
-    // List of items to render
-    items := []string {
-        // Ascii art
-        tlockstyles.Styles.Title.Render(selectUserAscii), "",
+	// List of items to render
+	items := []string{
+		// Ascii art
+		tlockstyles.Styles.Title.Render(selectUserAscii), "",
 
-        // Some little description
+		// Some little description
 		tlockstyles.Styles.SubText.Render("Select a user to login as"), "",
 
-        // List of users
-        screen.listview.View(),
-    }
+		// List of users
+		screen.listview.View(),
+	}
 
-    // Total pages
-    totalPages := screen.listview.Paginator.TotalPages
+	// Total pages
+	totalPages := screen.listview.Paginator.TotalPages
 
-    // Add paginator if needed
-    if totalPages > 1 {
-        // Paginator items
-        paginatorItems := make([]string, totalPages)
+	// Add paginator if needed
+	if totalPages > 1 {
+		// Paginator items
+		paginatorItems := make([]string, totalPages)
 
-        // Add paginator dots
-        for index := 0; index < totalPages; index++ {
-            renderer := tlockstyles.Styles.SubText.Copy().Bold(true).Render
+		// Add paginator dots
+		for index := 0; index < totalPages; index++ {
+			renderer := tlockstyles.Styles.SubText.Copy().Bold(true).Render
 
-            if index == screen.listview.Paginator.Page {
-                renderer = tlockstyles.Styles.Title.Render
-            }
+			if index == screen.listview.Paginator.Page {
+				renderer = tlockstyles.Styles.Title.Render
+			}
 
-            paginatorItems = append(paginatorItems, renderer("•"))
-        }
+			paginatorItems = append(paginatorItems, renderer("•"))
+		}
 
-        // Add to ui
-        items = append(items, lipgloss.JoinHorizontal(lipgloss.Center, paginatorItems...), "")
-    }
+		// Add to ui
+		items = append(items, lipgloss.JoinHorizontal(lipgloss.Center, paginatorItems...), "")
+	}
 
-    // Add help
-    items = append(items, tlockstyles.Help.View(selectUserKeys))
+	// Add help
+	items = append(items, tlockstyles.Help.View(selectUserKeys))
 
-    // Return
+	// Return
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
-        items...
+		items...,
 	)
 }

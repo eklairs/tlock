@@ -38,7 +38,6 @@ func ListItemInactive(width int, title, suffix string) string {
 	return tlockstyles.Styles.ListItemInactive.Render(ui)
 }
 
-
 // Builds a listview model devoid of every feature
 func ListViewSimple(items []list.Item, delegate list.ItemDelegate, width, height int) list.Model {
 	listview := list.New(items, delegate, width, height)
@@ -70,7 +69,6 @@ func InputGroup(title, description string, error *string, input textinput.Model)
 
 	return lipgloss.JoinVertical(lipgloss.Center, items...)
 }
-
 
 // Creates a new input box
 func InitializeInputBox(placeholder string) textinput.Model {
@@ -106,4 +104,3 @@ func InactiveFolderListItem(name string, tokensCount int) string {
 
 	return tlockstyles.Styles.FolderItemInactive.Render(strings.Join(items, "\n"))
 }
-

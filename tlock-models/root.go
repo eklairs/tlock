@@ -9,26 +9,26 @@ import (
 
 // Root model
 type RootModel struct {
-    manager modelmanager.ModelManager
+	manager modelmanager.ModelManager
 }
 
 // Initializes a new instance of the root model
 func InitializeRootModel(context context.Context) RootModel {
-    return RootModel{
-        manager: modelmanager.New(auth.InitializeSelectUserScreen(context)),
-    }
+	return RootModel{
+		manager: modelmanager.New(auth.InitializeSelectUserScreen(context)),
+	}
 }
 
 // Init
 func (model RootModel) Init() tea.Cmd {
-    return nil
+	return nil
 }
 
 // Update
 func (model RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-    cmds := make([]tea.Cmd, 0)
+	cmds := make([]tea.Cmd, 0)
 
-    switch msg := msg.(type) {
+	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "ctrl+q":
@@ -36,15 +36,14 @@ func (model RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-    // Update model manager
-    cmds = append(cmds, model.manager.Update(msg))
+	// Update model manager
+	cmds = append(cmds, model.manager.Update(msg))
 
-    // Return
-    return model, tea.Batch(cmds...)
+	// Return
+	return model, tea.Batch(cmds...)
 }
 
 // View
 func (model RootModel) View() string {
-    return model.manager.View()
+	return model.manager.View()
 }
-

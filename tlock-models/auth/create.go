@@ -127,11 +127,11 @@ func (screen CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 			if screen.usernameInput.Value() == "" {
 				screen.usernameError = &USERNAME_EMPTY
 			} else {
-                // Add new user
-                vault := screen.context.Core.AddNewUser(screen.usernameInput.Value(), screen.passwordInput.Value())
+				// Add new user
+				vault := screen.context.Core.AddNewUser(screen.usernameInput.Value(), screen.passwordInput.Value())
 
-                // Push dashboard screen
-                manager.PushScreen(dashboard.InitializeDashboardScreen(vault, screen.context))
+				// Push dashboard screen
+				manager.PushScreen(dashboard.InitializeDashboardScreen(vault, screen.context))
 			}
 		}
 	}

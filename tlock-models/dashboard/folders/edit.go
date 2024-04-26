@@ -52,14 +52,14 @@ type EditFolderScreen struct {
 	// Folder name input
 	name textinput.Model
 
-    // Foldet to be edited
-    folder tlockvault.Folder
+	// Foldet to be edited
+	folder tlockvault.Folder
 
 	// Error message
 	errorMessage *string
 
-    // Vault
-    vault *tlockvault.Vault
+	// Vault
+	vault *tlockvault.Vault
 }
 
 // Initialize edit folder screen
@@ -71,9 +71,9 @@ func InitializeEditFolderScreen(folder tlockvault.Folder, vault *tlockvault.Vaul
 
 	// Return
 	return EditFolderScreen{
-		name:    name,
-        folder: folder,
-        vault: vault,
+		name:   name,
+		folder: folder,
+		vault:  vault,
 	}
 }
 
@@ -93,27 +93,27 @@ func (screen EditFolderScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 			manager.PopScreen()
 
 		case key.Matches(msgType, editFolderKeys.Enter):
-            // If it is empty, then show error
+			// If it is empty, then show error
 			if screen.name.Value() == "" {
 				screen.errorMessage = &ERROR_EMPTY_FOLDER_NAME
-                break
+				break
 			}
 
-            // Update the folder
-            screen.vault.RenameFolder(screen.folder.ID, screen.name.Value())
+			// Update the folder
+			screen.vault.RenameFolder(screen.folder.ID, screen.name.Value())
 
-            // Request folders refresh
-            cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
+			// Request folders refresh
+			cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
 
-            // Pop
-            manager.PopScreen()
+			// Pop
+			manager.PopScreen()
 		}
 	}
 
-    // Update input box
+	// Update input box
 	screen.name, _ = screen.name.Update(msg)
 
-    // Return
+	// Return
 	return screen, tea.Batch(cmds...)
 }
 
@@ -127,4 +127,3 @@ func (screen EditFolderScreen) View() string {
 		tlockstyles.Help.View(editFolderKeys),
 	)
 }
-

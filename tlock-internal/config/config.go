@@ -39,16 +39,16 @@ func GetConfig() Config {
 
 	// If error, just return the default config
 	if err != nil {
-        // Log
-        log.Debug().Msg("[config] No config file found, returning the default config")
+		// Log
+		log.Debug().Msg("[config] No config file found, returning the default config")
 
 		return default_config
 	}
 
 	// Parse
 	if err := json.Unmarshal(config_raw, &default_config); err != nil {
-        // Log
-        log.Error().Err(err).Msg("[config] Failed to parse config, syntax error possibly?")
+		// Log
+		log.Error().Err(err).Msg("[config] Failed to parse config, syntax error possibly?")
 
 		return default_config
 	}
@@ -59,21 +59,20 @@ func GetConfig() Config {
 
 // Writes the config
 func (config Config) Write() {
-    // Make directory
-    os.MkdirAll(filepath.Dir(CONFIG_PATH), os.ModePerm)
+	// Make directory
+	os.MkdirAll(filepath.Dir(CONFIG_PATH), os.ModePerm)
 
-    // Marshal
-    data, _ := json.Marshal(config)
+	// Marshal
+	data, _ := json.Marshal(config)
 
-    // Write
-    file, err := os.Create(CONFIG_PATH)
+	// Write
+	file, err := os.Create(CONFIG_PATH)
 
-    // If no error, write to file
-    if err == nil {
-        file.Write(data)
-    } else {
-        // Log
-        log.Error().Err(err).Msg("[config] Failed to write to config")
-    }
+	// If no error, write to file
+	if err == nil {
+		file.Write(data)
+	} else {
+		// Log
+		log.Error().Err(err).Msg("[config] Failed to write to config")
+	}
 }
-

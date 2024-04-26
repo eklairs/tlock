@@ -64,47 +64,46 @@ type DashboardScreen struct {
 	// Vault
 	vault *tlockvault.Vault
 
-    // Context
-    context context.Context
+	// Context
+	context context.Context
 
-    // Folders
-    folders folders.Folders
+	// Folders
+	folders folders.Folders
 }
 
 // Initializes a new instance of dashboard screen
 func InitializeDashboardScreen(vault tlockvault.Vault, context context.Context) DashboardScreen {
 	return DashboardScreen{
 		vault:   &vault,
-        context: context,
-        folders: folders.InitializeFolders(&vault),
+		context: context,
+		folders: folders.InitializeFolders(&vault),
 	}
 }
 
 // Init
 func (screen DashboardScreen) Init() tea.Cmd {
-    return nil
+	return nil
 }
 
 // Update
 func (screen DashboardScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
-    switch msgType := msg.(type) {
-    case tea.KeyMsg:
-        switch {
-        case key.Matches(msgType, dashboardKeys.Help):
-            manager.PushScreen(InitializeHelpScreen())
-        }
-    }
+	switch msgType := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msgType, dashboardKeys.Help):
+			manager.PushScreen(InitializeHelpScreen())
+		}
+	}
 
-    return screen, tea.Batch(screen.folders.Update(msg, manager))
+	return screen, tea.Batch(screen.folders.Update(msg, manager))
 }
-
 
 // View
 func (screen DashboardScreen) View() string {
-    // Get the size of the terminal
+	// Get the size of the terminal
 	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
-    if len(screen.vault.Folders) == 0 {
+	if len(screen.vault.Folders) == 0 {
 		style := lipgloss.NewStyle().
 			Height(height).
 			Align(lipgloss.Center, lipgloss.Center)
@@ -119,8 +118,8 @@ func (screen DashboardScreen) View() string {
 		return style.Render(ui)
 	}
 
-    return lipgloss.JoinHorizontal(
-        lipgloss.Left,
-        screen.folders.View(),
-    )
+	return lipgloss.JoinHorizontal(
+		lipgloss.Left,
+		screen.folders.View(),
+	)
 }

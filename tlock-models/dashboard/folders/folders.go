@@ -67,12 +67,12 @@ type Folders struct {
 
 // Returns the folders in the form of list item
 func buildFolderListItems(vault *tlockvault.Vault) []list.Item {
-    // Mapper function
-    mapper := func(folder tlockvault.Folder) list.Item {
-        return folderListItem(folder)
-    }
+	// Mapper function
+	mapper := func(folder tlockvault.Folder) list.Item {
+		return folderListItem(folder)
+	}
 
-    // Map folders
+	// Map folders
 	return tlockinternal.Map(vault.Folders, mapper)
 }
 
@@ -108,75 +108,75 @@ func InitializeFolders(vault *tlockvault.Vault) Folders {
 
 // Returns the focused folder item
 func (folders Folders) Focused() *tlockvault.Folder {
-    // If there are no items, return nil
-    if len(folders.listview.Items()) == 0 {
-        return nil
-    }
+	// If there are no items, return nil
+	if len(folders.listview.Items()) == 0 {
+		return nil
+	}
 
-    // Get the focused item
-    focusedItem := tlockvault.Folder(folders.listview.Items()[folders.listview.Index()].(folderListItem))
+	// Get the focused item
+	focusedItem := tlockvault.Folder(folders.listview.Items()[folders.listview.Index()].(folderListItem))
 
-    // Return
-    return &focusedItem
+	// Return
+	return &focusedItem
 }
 
 // Handles update messages
 func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) tea.Cmd {
 	cmds := make([]tea.Cmd, 0)
 
-    switch msgType := msg.(type) {
-    case tea.KeyMsg:
-        switch msgType.String() {
-        // Add new folder
-        case "A":
-            cmds = append(cmds, manager.PushScreen(InitializeAddFolderScreen(folders.vault)))
+	switch msgType := msg.(type) {
+	case tea.KeyMsg:
+		switch msgType.String() {
+		// Add new folder
+		case "A":
+			cmds = append(cmds, manager.PushScreen(InitializeAddFolderScreen(folders.vault)))
 
-        // Edit focused token
-        case "E":
-            if focused := folders.Focused(); focused != nil {
-                cmds = append(cmds, manager.PushScreen(InitializeEditFolderScreen(*focused, folders.vault)))
-            }
+		// Edit focused token
+		case "E":
+			if focused := folders.Focused(); focused != nil {
+				cmds = append(cmds, manager.PushScreen(InitializeEditFolderScreen(*focused, folders.vault)))
+			}
 
-        // Delete focused token
-        case "D":
-            if focused := folders.Focused(); focused != nil {
-                cmds = append(cmds, manager.PushScreen(InitializeDeleteFolderScreen(*focused, folders.vault)))
-            }
+		// Delete focused token
+		case "D":
+			if focused := folders.Focused(); focused != nil {
+				cmds = append(cmds, manager.PushScreen(InitializeDeleteFolderScreen(*focused, folders.vault)))
+			}
 
-        // Move folder down
-        case "ctrl+up":
-            if focused := folders.Focused(); focused != nil {
-                if folders.vault.MoveFolderUp(focused.ID) {
-                    // Refresh
-                    cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
+		// Move folder down
+		case "ctrl+up":
+			if focused := folders.Focused(); focused != nil {
+				if folders.vault.MoveFolderUp(focused.ID) {
+					// Refresh
+					cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
 
-                    // Move cursor up
-                    folders.listview.CursorUp()
-                }
-            }
+					// Move cursor up
+					folders.listview.CursorUp()
+				}
+			}
 
-        // Move folder down
-        case "ctrl+down":
-            if focused := folders.Focused(); focused != nil {
-                if folders.vault.MoveFolderDown(focused.ID) {
-                    // Refresh
-                    cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
+		// Move folder down
+		case "ctrl+down":
+			if focused := folders.Focused(); focused != nil {
+				if folders.vault.MoveFolderDown(focused.ID) {
+					// Refresh
+					cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
 
-                    // Move cursor down
-                    folders.listview.CursorDown()
-                }
-            }
-        }
+					// Move cursor down
+					folders.listview.CursorDown()
+				}
+			}
+		}
 
-    // Update items on refresh folders message
-    case tlockinternal.RefreshFoldersMsg:
-        cmds = append(cmds, folders.listview.SetItems(buildFolderListItems(folders.vault)))
-    }
+	// Update items on refresh folders message
+	case tlockinternal.RefreshFoldersMsg:
+		cmds = append(cmds, folders.listview.SetItems(buildFolderListItems(folders.vault)))
+	}
 
-    // Update list
-    folders.listview, _ = folders.listview.Update(msg)
+	// Update list
+	folders.listview, _ = folders.listview.Update(msg)
 
-    // Return
+	// Return
 	return tea.Batch(cmds...)
 }
 
@@ -197,4 +197,3 @@ func (folders Folders) View() string {
 	// Render
 	return style.Render(ui)
 }
-
