@@ -5,6 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/eklairs/tlock/tlock-models/dashboard/folders"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"golang.org/x/term"
@@ -65,6 +66,9 @@ type DashboardScreen struct {
 
     // Context
     context context.Context
+
+    // Folders
+    folders folders.Folders
 }
 
 // Initializes a new instance of dashboard screen
@@ -72,6 +76,7 @@ func InitializeDashboardScreen(vault tlockvault.Vault, context context.Context) 
 	return DashboardScreen{
 		vault:   &vault,
         context: context,
+        folders: folders.InitializeFolders(&vault),
 	}
 }
 
@@ -90,7 +95,7 @@ func (screen DashboardScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
         }
     }
 
-    return screen, nil
+    return screen, tea.Batch(screen.folders.Update(msg, manager))
 }
 
 
@@ -114,5 +119,8 @@ func (screen DashboardScreen) View() string {
 		return style.Render(ui)
 	}
 
-    return ""
+    return lipgloss.JoinHorizontal(
+        lipgloss.Left,
+        screen.folders.View(),
+    )
 }

@@ -200,6 +200,46 @@ func (vault *Vault) DeleteFolder(id string) {
 	vault.write()
 }
 
+// Moves the folder up
+func (vault *Vault) MoveFolderUp(folderId string) bool {
+    // Find folder index
+	folder_index := vault.find_folder(folderId)
+
+	// If is folder is already at top, just return; we dont need to do anything
+	if folder_index == 0 {
+		return false
+	}
+
+    // Swap
+    vault.Folders = tlockinternal.Swap(vault.Folders, folder_index, folder_index - 1)
+
+    // Wrap
+	vault.write()
+
+    // Return
+	return true
+}
+
+// Moves the folder down
+func (vault *Vault) MoveFolderDown(folderId string) bool {
+    // Find folder index
+	folder_index := vault.find_folder(folderId)
+
+	// If is folder is already at top, just return; we dont need to do anything
+	if folder_index == len(vault.Folders) - 1 {
+		return false
+	}
+
+    // Swap
+    vault.Folders = tlockinternal.Swap(vault.Folders, folder_index, folder_index + 1)
+
+    // Wrap
+	vault.write()
+
+    // Return
+	return true
+}
+
 // Find a folder index by its uuid
 func (vault *Vault) find_folder(id string) int {
 	return slices.IndexFunc(vault.Folders, func(folder Folder) bool { return folder.ID == id })
