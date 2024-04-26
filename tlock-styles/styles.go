@@ -53,6 +53,9 @@ type TLockStyles struct {
 
 	// Background Over
 	BackgroundOver lipgloss.Style
+
+	// Sub text item
+	SubTextItem lipgloss.Style
 }
 
 // Initializes the styles
@@ -67,7 +70,8 @@ func InitializeStyles(theme context.Theme) {
 	Styles = TLockStyles{
 		Title:              with(base).Foreground(theme.Accent).Bold(true),
 		SubText:            with(base).Foreground(theme.SubText),
-		SubAltBg:           with(base).Background(theme.BackgroundOver),
+		SubTextItem:        with(base).Foreground(theme.SubText).Padding(0, 1),
+		SubAltBg:           with(base).Background(theme.BackgroundOver).Padding(0, 1),
 		Error:              with(base).Foreground(theme.Error).Bold(true),
 		Input:              with(paddedItem).Width(65).Background(theme.BackgroundOver),
 		Placeholder:        with(base).Background(theme.BackgroundOver).Foreground(theme.SubText),

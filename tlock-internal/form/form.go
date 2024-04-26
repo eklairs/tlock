@@ -22,6 +22,9 @@ type FormItem interface {
 
 	// Unfocus
 	Unfocus() FormItem
+
+	// Returns the value
+	Value() string
 }
 
 // ==== Form Item Input Box Start ====
@@ -29,47 +32,49 @@ type FormItem interface {
 // Form item for input boxes
 type FormItemInputBox struct {
 	// Title
-	title string
+	Title string
 
 	// Description
-	description string
+	Description string
 
 	// Input box
-	input textinput.Model
+	Input textinput.Model
 
 	// Error message
-	errorMessage *string
-
-	// Width
-	width int
+	ErrorMessage *string
 }
 
 // Update
 func (item FormItemInputBox) Update(msg tea.Msg) (FormItem, tea.Cmd) {
 	var cmd tea.Cmd
 
-	item.input, cmd = item.input.Update(msg)
+	item.Input, cmd = item.Input.Update(msg)
 
 	return item, cmd
 }
 
 // Focus
 func (item FormItemInputBox) Focus() FormItem {
-	item.input.Focus()
+	item.Input.Focus()
 
 	return item
 }
 
 // Unfocus
 func (item FormItemInputBox) Unfocus() FormItem {
-	item.input.Blur()
+	item.Input.Blur()
 
 	return item
 }
 
 // View
 func (item FormItemInputBox) View() string {
-	return components.InputGroup(item.title, item.description, item.errorMessage, item.input)
+	return components.InputGroup(item.Title, item.Description, item.ErrorMessage, item.Input)
+}
+
+// Value
+func (item FormItemInputBox) Value() string {
+	return item.Input.Value()
 }
 
 // ==== Form Item Input Box End ====
@@ -79,23 +84,23 @@ func (item FormItemInputBox) View() string {
 // Form item for option box
 type FormItemOptionBox struct {
 	// Title
-	title string
+	Title string
 
 	// Description
-	description string
+	Description string
 
 	// Input box
-	values []string
+	Values []string
 
 	// Selected value
-	selectedIndex int
+	SelectedIndex int
 
 	// Error message
-	focused bool
+	Focused bool
 }
 
-func (item FormItemOptionBox) SelectedValue() string {
-	return item.values[item.selectedIndex]
+func (item FormItemOptionBox) Value() string {
+	return item.Values[item.SelectedIndex]
 }
 
 // Update
@@ -104,13 +109,13 @@ func (item FormItemOptionBox) Update(msg tea.Msg) (FormItem, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msgType.String() {
 		case "right":
-			if item.selectedIndex != len(item.values)-1 {
-				item.selectedIndex += 1
+			if item.SelectedIndex != len(item.Values)-1 {
+				item.SelectedIndex += 1
 			}
 
 		case "left":
-			if item.selectedIndex != 0 {
-				item.selectedIndex -= 1
+			if item.SelectedIndex != 0 {
+				item.SelectedIndex -= 1
 			}
 		}
 	}
@@ -120,31 +125,31 @@ func (item FormItemOptionBox) Update(msg tea.Msg) (FormItem, tea.Cmd) {
 
 // Focus
 func (item FormItemOptionBox) Focus() FormItem {
-	item.focused = true
+	item.Focused = true
 
 	return item
 }
 
 // Unfocus
 func (item FormItemOptionBox) Unfocus() FormItem {
-	item.focused = false
+	item.Focused = false
 
 	return item
 }
 
 // View
 func (item FormItemOptionBox) View() string {
-	renderables := make([]string, len(item.values))
+	renderables := make([]string, len(item.Values))
 
-	for index, option := range item.values {
-		if index == item.selectedIndex {
-			if item.focused {
+	for index, option := range item.Values {
+		if index == item.SelectedIndex {
+			if item.Focused {
 				renderables[index] = tlockstyles.Styles.AccentBgItem.Render(option)
 			} else {
 				renderables[index] = tlockstyles.Styles.SubAltBg.Render(option)
 			}
 		} else {
-			renderables[index] = tlockstyles.Styles.SubText.Render(option)
+			renderables[index] = tlockstyles.Styles.SubTextItem.Render(option)
 		}
 
 		renderables[index] += " "
@@ -152,8 +157,8 @@ func (item FormItemOptionBox) View() string {
 
 	ui := lipgloss.JoinVertical(
 		lipgloss.Left,
-		tlockstyles.Styles.Title.Render(item.title),
-		tlockstyles.Styles.SubText.Render(item.description), "",
+		tlockstyles.Styles.Title.Render(item.Title),
+		tlockstyles.Styles.SubText.Render(item.Description), "",
 		lipgloss.JoinHorizontal(lipgloss.Left, renderables...),
 	)
 
@@ -184,9 +189,15 @@ func New(items []FormItem) Form {
 	wrapped := tlockinternal.Map(items, func(item FormItem) FormItemWrapped { return FormItemWrapped{FormItem: item, Enabled: true} })
 
 	// Return instance
-	return Form{
+	form := Form{
 		Items: wrapped,
 	}
+
+	// Focus first item
+	form.Items[0].FormItem = form.Items[0].FormItem.Focus()
+
+	// Return
+	return form
 }
 
 // Switches focus from one index to another
@@ -210,7 +221,7 @@ func (form *Form) Update(msg tea.Msg) {
 				next := form.FocusedIndex + 1
 
 				// If the next is disabled, then switch to its next
-				if !form.Items[next].Enabled && len(form.Items)-1 != next+1 {
+				if !form.Items[next].Enabled {
 					next += 1
 				}
 

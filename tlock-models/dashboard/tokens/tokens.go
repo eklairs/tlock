@@ -267,6 +267,9 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 				clipboard.Write(clipboard.FmtText, []byte(focused.CurrentCode))
 			}
 
+		case msgType.String() == "a":
+			manager.PushScreen(InitializeAddTokenScreen(tokens.vault))
+
 		case key.Matches(msgType, tokenKeys.Screen):
 			if tokens.folder != nil {
 				manager.PushScreen(InitializeTokenFromScreen(tokens.vault, *tokens.folder))
