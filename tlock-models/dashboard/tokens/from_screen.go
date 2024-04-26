@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	tlockmessages "github.com/eklairs/tlock/tlock-internal/tlock-messages"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"github.com/kbinani/screenshot"
@@ -118,7 +119,7 @@ func (screen TokenFromScreen) Init() tea.Cmd {
 
 // Update
 func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
-	var cmd tea.Cmd
+	cmds := make([]tea.Cmd, 0)
 
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
@@ -149,14 +150,22 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 		case key.Matches(msgType, confirmScreenKeys.Continue) && screen.state == stateConfirm:
 			// Add the token
 			if screen.token != nil {
+				// Add token
 				screen.vault.AddToken(screen.folder.ID, *screen.token)
+
+				// Require refresh of folders and tokens list
+				cmds = append(
+					cmds,
+					func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
+					func() tea.Msg { return tlockmessages.RefreshTokensMsg{} },
+				)
 			}
 
 			manager.PopScreen()
 		}
 	}
 
-	return screen, cmd
+	return screen, tea.Batch(cmds...)
 }
 
 // View

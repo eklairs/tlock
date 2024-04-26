@@ -296,6 +296,11 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 	case tea.WindowSizeMsg:
 		tokens.listview.SetWidth(tokensWidth(msgType.Width))
 		tokens.listview.SetHeight(msgType.Height - 3)
+
+	case tlockmessages.RefreshTokensMsg:
+		if tokens.folder != nil {
+			cmds = append(cmds, tokens.listview.SetItems(buildTokensItems(tokens.vault.GetTokens(tokens.folder.ID))))
+		}
 	}
 
 	// Update listview
