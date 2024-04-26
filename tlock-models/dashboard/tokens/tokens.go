@@ -268,7 +268,9 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 			}
 
 		case msgType.String() == "a":
-			manager.PushScreen(InitializeAddTokenScreen(tokens.vault))
+			if tokens.folder != nil {
+				manager.PushScreen(InitializeAddTokenScreen(*tokens.folder, tokens.vault))
+			}
 
 		case key.Matches(msgType, tokenKeys.Screen):
 			if tokens.folder != nil {

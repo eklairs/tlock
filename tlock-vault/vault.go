@@ -259,6 +259,11 @@ func (vault *Vault) AddToken(folderId string, uri string) {
 		UsageCounter:     0,
 	}
 
+	vault.AddTokenFromToken(folderId, token)
+}
+
+// Adds a new token to the given folder
+func (vault *Vault) AddTokenFromToken(folderId string, token Token) {
 	// Add
 	vault.Folders[vault.find_folder(folderId)].Tokens = append(vault.Folders[vault.find_folder(folderId)].Tokens, token)
 
