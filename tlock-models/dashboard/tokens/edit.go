@@ -252,6 +252,9 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 
 			// Pop
 			manager.PopScreen()
+
+		case key.Matches(msgType, editTokenKeys.GoBack):
+			manager.PopScreen()
 		}
 	}
 
