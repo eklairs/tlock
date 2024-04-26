@@ -1,13 +1,25 @@
 package dashboard
 
 import (
+	"os"
+
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
+	"golang.org/x/term"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 )
+
+var EmptyAsciiArt = `
+\    /\
+ )  ( ')
+(  /  )
+ \(__)|
+`
 
 // Dashboard key map
 type dashboardKeyMap struct {
@@ -70,11 +82,37 @@ func (screen DashboardScreen) Init() tea.Cmd {
 
 // Update
 func (screen DashboardScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
+    switch msgType := msg.(type) {
+    case tea.KeyMsg:
+        switch {
+        case key.Matches(msgType, dashboardKeys.Help):
+            manager.PushScreen(InitializeHelpScreen())
+        }
+    }
+
     return screen, nil
 }
 
 
 // View
 func (screen DashboardScreen) View() string {
+    // Get the size of the terminal
+	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
+
+    if len(screen.vault.Folders) == 0 {
+		style := lipgloss.NewStyle().
+			Height(height).
+			Align(lipgloss.Center, lipgloss.Center)
+
+		ui := lipgloss.JoinVertical(
+			lipgloss.Center,
+			tlockstyles.Styles.Title.Render(EmptyAsciiArt),
+			tlockstyles.Styles.SubText.Render("So empty! How about adding a new folder?"), "",
+			tlockstyles.Help.View(dashboardKeys),
+		)
+
+		return style.Render(ui)
+	}
+
     return ""
 }
