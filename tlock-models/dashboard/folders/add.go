@@ -5,9 +5,9 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	tlockmessages "github.com/eklairs/tlock/tlock-internal/tlock-messages"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
@@ -101,7 +101,7 @@ func (screen AddFolderScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			screen.vault.AddFolder(screen.name.Value())
 
 			// Request folders refresh
-			cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
+			cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })
 
 			// Pop
 			manager.PopScreen()

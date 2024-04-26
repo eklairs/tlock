@@ -146,7 +146,7 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msgType, selectUserKeys.New):
-			manager.PushScreen(InitializeCreateUserScreen(screen.context))
+			cmds = append(cmds, manager.PushScreen(InitializeCreateUserScreen(screen.context)))
 		case key.Matches(msgType, selectUserKeys.Enter):
 			// User
 			user := screen.context.Core.Users[screen.listview.Index()]

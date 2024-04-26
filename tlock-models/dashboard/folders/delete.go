@@ -4,8 +4,8 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	tlockmessages "github.com/eklairs/tlock/tlock-internal/tlock-messages"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
@@ -81,7 +81,7 @@ func (screen DeleteFolderScreen) Update(msg tea.Msg, manager *modelmanager.Model
 			screen.vault.DeleteFolder(screen.folder.ID)
 
 			// Request folders refresh
-			cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
+			cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })
 
 			// Pop
 			manager.PopScreen()

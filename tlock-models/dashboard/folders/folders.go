@@ -12,6 +12,7 @@ import (
 	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	tlockmessages "github.com/eklairs/tlock/tlock-internal/tlock-messages"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"golang.org/x/term"
@@ -148,7 +149,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 			if focused := folders.Focused(); focused != nil {
 				if folders.vault.MoveFolderUp(focused.ID) {
 					// Refresh
-					cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
+					cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })
 
 					// Move cursor up
 					folders.listview.CursorUp()
@@ -160,7 +161,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 			if focused := folders.Focused(); focused != nil {
 				if folders.vault.MoveFolderDown(focused.ID) {
 					// Refresh
-					cmds = append(cmds, func() tea.Msg { return tlockinternal.RefreshFoldersMsg{} })
+					cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })
 
 					// Move cursor down
 					folders.listview.CursorDown()
@@ -169,7 +170,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		}
 
 	// Update items on refresh folders message
-	case tlockinternal.RefreshFoldersMsg:
+	case tlockmessages.RefreshFoldersMsg:
 		cmds = append(cmds, folders.listview.SetItems(buildFolderListItems(folders.vault)))
 	}
 

@@ -6,6 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-models/dashboard/folders"
+	"github.com/eklairs/tlock/tlock-models/dashboard/tokens"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"golang.org/x/term"
@@ -13,6 +14,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	tlockmessages "github.com/eklairs/tlock/tlock-internal/tlock-messages"
 )
 
 var EmptyAsciiArt = `
@@ -69,6 +71,9 @@ type DashboardScreen struct {
 
 	// Folders
 	folders folders.Folders
+
+	// Tokens
+	tokens tokens.Tokens
 }
 
 // Initializes a new instance of dashboard screen
@@ -77,25 +82,38 @@ func InitializeDashboardScreen(vault tlockvault.Vault, context context.Context) 
 		vault:   &vault,
 		context: context,
 		folders: folders.InitializeFolders(&vault),
+		tokens:  tokens.InitializeTokens(&vault),
 	}
 }
 
 // Init
 func (screen DashboardScreen) Init() tea.Cmd {
-	return nil
+	var cmd tea.Cmd
+
+	if len(screen.vault.Folders) != 0 {
+		cmd = func() tea.Msg {
+			return tlockmessages.FolderChanged{
+				Folder: screen.vault.Folders[0],
+			}
+		}
+	}
+
+	return cmd
 }
 
 // Update
 func (screen DashboardScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
+	var cmd tea.Cmd
+
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msgType, dashboardKeys.Help):
-			manager.PushScreen(InitializeHelpScreen())
+			cmd = manager.PushScreen(InitializeHelpScreen())
 		}
 	}
 
-	return screen, tea.Batch(screen.folders.Update(msg, manager))
+	return screen, tea.Batch(screen.folders.Update(msg, manager), screen.tokens.Update(msg, manager), cmd)
 }
 
 // View
@@ -121,5 +139,6 @@ func (screen DashboardScreen) View() string {
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		screen.folders.View(),
+		screen.tokens.View(),
 	)
 }
