@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	tlockcore "github.com/eklairs/tlock/tlock-core"
 	"github.com/eklairs/tlock/tlock-internal/config"
 	tlockvendor "github.com/eklairs/tlock/tlock-vendor"
 	"golang.design/x/clipboard"
@@ -13,49 +14,51 @@ import (
 
 // Represents a theme
 type Theme struct {
-    // Name
-    Name string
+	// Name
+	Name string
 
-    // Background
-    Background lipgloss.Color
+	// Background
+	Background lipgloss.Color
 
-    // Background over
-    BackgroundOver lipgloss.Color
+	// Background over
+	BackgroundOver lipgloss.Color
 
-    // Sub text
-    SubText lipgloss.Color
+	// Sub text
+	SubText lipgloss.Color
 
-    // Accent
-    Accent lipgloss.Color
+	// Accent
+	Accent lipgloss.Color
 
-    // Foreground
-    Foreground lipgloss.Color
+	// Foreground
+	Foreground lipgloss.Color
 
-    // Error
-    Error lipgloss.Color
+	// Error
+	Error lipgloss.Color
 }
 
 // Represents a context
 type Context struct {
-    // All the themes available
-    // Fetched from vendor
-    Themes []Theme
+	// All the themes available
+	// Fetched from vendor
+	Themes []Theme
 
-    // Config
-    Config config.Config
+	// Config
+	Config config.Config
 
-    // If the clipboard is available
+	// Core
+	Core tlockcore.TLockCore
+
+	// If the clipboard is available
 	ClipboardAvailability bool
 }
-
 
 // Initializes a new instance of the context
 // It is recommended to call this at a one place and then pass around the context
 func InitializeContext() Context {
-    // Init clipboard
-    err := clipboard.Init()
+	// Init clipboard
+	err := clipboard.Init()
 
-    // Themes
+	// Themes
 	var themes []Theme
 
 	// Parse themes
@@ -64,11 +67,11 @@ func InitializeContext() Context {
 	// Return
 	return Context{
 		Themes:                themes,
+		Core:                  tlockcore.New(),
 		Config:                config.GetConfig(),
 		ClipboardAvailability: err == nil,
 	}
 }
-
 
 // Finds the index of the theme
 func (context Context) findTheme(name string) int {
@@ -91,7 +94,7 @@ func (context Context) GetCurrentTheme() Theme {
 
 // Sets the theme
 func (context *Context) SetTheme(theme string) {
-    context.Config.CurrentTheme = theme
+	context.Config.CurrentTheme = theme
 
-    context.Config.Write()
+	context.Config.Write()
 }
