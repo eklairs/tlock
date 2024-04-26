@@ -165,7 +165,7 @@ func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 		lipgloss.Center,
 		tlockstyles.Styles.Title.Render(item.Token.Account),
 		tlockstyles.Styles.BackgroundOver.Render(" • "),
-		tlockstyles.Styles.SubAltBg.Render(item.Token.Issuer),
+		tlockstyles.Styles.BackgroundOver.Render(item.Token.Issuer),
 	)
 
 	// Render it differently if it is not the current token

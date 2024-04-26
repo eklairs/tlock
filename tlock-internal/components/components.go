@@ -17,8 +17,8 @@ func ListItemActive(width int, title, suffix string) string {
 	ui := lipgloss.JoinHorizontal(
 		lipgloss.Center,
 		tlockstyles.Styles.Title.Render(title),
-		tlockstyles.Styles.SubAltBg.Render(strings.Repeat(" ", space_width)),
-		tlockstyles.Styles.SubAltBg.Render(tlockstyles.Styles.Title.Render(suffix)),
+		tlockstyles.Styles.BackgroundOver.Render(strings.Repeat(" ", space_width)),
+		tlockstyles.Styles.BackgroundOver.Render(tlockstyles.Styles.Title.Render(suffix)),
 	)
 
 	return tlockstyles.Styles.ListItemActive.Render(ui)
