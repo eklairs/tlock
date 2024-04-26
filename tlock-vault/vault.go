@@ -283,6 +283,38 @@ func (vault *Vault) ReplaceToken(folderId, tokenId string, newToken Token) {
 	vault.write()
 }
 
+// Deletes a token in the given folder
+func (vault *Vault) DeleteToken(folderId, tokenId string) {
+	// Get folder index
+	folderIndex := vault.find_folder(folderId)
+
+	// Replace
+	vault.Folders[folderIndex].Tokens = tlockinternal.Remove(vault.Folders[folderIndex].Tokens, vault.find_token(folderIndex, tokenId))
+
+	// Write
+	vault.write()
+}
+
+// Move a token to the given folder
+func (vault *Vault) MoveToken(tokenId, fromFolderId, toFolderId string) {
+	// Get folder index
+	fromFolderIndex := vault.find_folder(fromFolderId)
+	toFolderIndex := vault.find_folder(toFolderId)
+
+	// Token to move
+	tokenToMoveIndex := vault.find_token(fromFolderIndex, tokenId)
+	tokenToMove := vault.Folders[fromFolderIndex].Tokens[tokenToMoveIndex]
+
+	// Remove from exists
+	vault.Folders[fromFolderIndex].Tokens = tlockinternal.Remove(vault.Folders[fromFolderIndex].Tokens, tokenToMoveIndex)
+
+	// Add to the new folder index
+	vault.Folders[toFolderIndex].Tokens = append(vault.Folders[toFolderIndex].Tokens, tokenToMove)
+
+	// Write
+	vault.write()
+}
+
 // Find a folder index by its uuid
 func (vault *Vault) find_folder(id string) int {
 	return slices.IndexFunc(vault.Folders, func(folder Folder) bool { return folder.ID == id })

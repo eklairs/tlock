@@ -277,6 +277,16 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 				manager.PushScreen(InitializeEditTokenScreen(*tokens.folder, focused.Token, tokens.vault))
 			}
 
+		case msgType.String() == "m":
+			if focused := tokens.Focused(); focused != nil {
+				manager.PushScreen(InitializeMoveTokenScreen(tokens.vault, *tokens.folder, focused.Token))
+			}
+
+		case msgType.String() == "d":
+			if focused := tokens.Focused(); focused != nil {
+				manager.PushScreen(InitializeDeleteTokenScreen(tokens.vault, *tokens.folder, focused.Token))
+			}
+
 		case key.Matches(msgType, tokenKeys.Screen):
 			if tokens.folder != nil {
 				manager.PushScreen(InitializeTokenFromScreen(tokens.vault, *tokens.folder))
