@@ -271,9 +271,26 @@ func (vault *Vault) AddTokenFromToken(folderId string, token Token) {
 	vault.write()
 }
 
+// Replace a token in the given folder
+func (vault *Vault) ReplaceToken(folderId, tokenId string, newToken Token) {
+	// Get folder index
+	folderIndex := vault.find_folder(folderId)
+
+	// Replace
+	vault.Folders[folderIndex].Tokens[vault.find_token(folderIndex, tokenId)] = newToken
+
+	// Write
+	vault.write()
+}
+
 // Find a folder index by its uuid
 func (vault *Vault) find_folder(id string) int {
 	return slices.IndexFunc(vault.Folders, func(folder Folder) bool { return folder.ID == id })
+}
+
+// Find a token index by its uuid
+func (vault *Vault) find_token(folderIndex int, id string) int {
+	return slices.IndexFunc(vault.Folders[folderIndex].Tokens, func(token Token) bool { return token.ID == id })
 }
 
 // Converts `totp` or `hotp` to TokenType

@@ -272,6 +272,11 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 				manager.PushScreen(InitializeAddTokenScreen(*tokens.folder, tokens.vault))
 			}
 
+		case msgType.String() == "e":
+			if focused := tokens.Focused(); focused != nil {
+				manager.PushScreen(InitializeEditTokenScreen(*tokens.folder, focused.Token, tokens.vault))
+			}
+
 		case key.Matches(msgType, tokenKeys.Screen):
 			if tokens.folder != nil {
 				manager.PushScreen(InitializeTokenFromScreen(tokens.vault, *tokens.folder))

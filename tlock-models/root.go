@@ -15,8 +15,16 @@ type RootModel struct {
 
 // Initializes a new instance of the root model
 func InitializeRootModel(context context.Context) RootModel {
+	var screen modelmanager.Screen
+
+	if len(context.Core.Users) == 0 {
+		screen = auth.InitializeCreateUserScreen(context)
+	} else {
+		screen = auth.InitializeSelectUserScreen(context)
+	}
+
 	return RootModel{
-		manager: modelmanager.New(auth.InitializeSelectUserScreen(context)),
+		manager: modelmanager.New(screen),
 	}
 }
 
