@@ -22,6 +22,9 @@ type Theme struct {
     // Background over
     BackgroundOver lipgloss.Color
 
+    // Sub text
+    SubText lipgloss.Color
+
     // Accent
     Accent lipgloss.Color
 

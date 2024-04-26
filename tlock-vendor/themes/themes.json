@@ -3,6 +3,7 @@
         "name": "Catppuccin",
         "background": "#181825",
         "backgroundOver": "#1e1e2e",
+        "subText": "#6c7086",
         "accent": "#b4befe",
         "foreground": "#cdd6f4",
         "error": "#f38ba8"
