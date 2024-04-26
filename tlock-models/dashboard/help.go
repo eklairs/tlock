@@ -168,6 +168,8 @@ func (screen HelpScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager)
 		case "esc":
 			manager.PopScreen()
 		}
+	case tea.WindowSizeMsg:
+		screen.viewport.Height = msgType.Height
 	}
 
 	// Update viewport

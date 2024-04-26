@@ -3,6 +3,7 @@ package folders
 import (
 	"fmt"
 	"io"
+	"math"
 	"os"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -17,6 +18,11 @@ import (
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"golang.org/x/term"
 )
+
+// Returns the folders width based on the given screen's width
+func foldersWidth(width int) int {
+	return int(math.Floor((1.0 / 5.0) * float64(width)))
+}
 
 type folderListItem tlockvault.Folder
 
@@ -54,7 +60,7 @@ func (d folderListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	}
 
 	// Print
-	fmt.Fprint(w, render_fn(item.Name, len(item.Tokens)))
+	fmt.Fprint(w, render_fn(m.Width(), item.Name, len(item.Tokens)))
 }
 
 // Folders
@@ -80,10 +86,10 @@ func buildFolderListItems(vault *tlockvault.Vault) []list.Item {
 // Builds the listview for the given list of folders
 func buildListViewForFolders(vault *tlockvault.Vault) list.Model {
 	// Get size
-	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
+	width, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
 	// Build listview
-	listview := components.ListViewSimple(buildFolderListItems(vault), folderListDelegate{}, 65, height-2) // -2 is for the title
+	listview := components.ListViewSimple(buildFolderListItems(vault), folderListDelegate{}, foldersWidth(width), height-3) // -3 is for the title
 
 	// Use custom keys
 	listview.KeyMap.CursorDown = key.NewBinding(
@@ -172,6 +178,10 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 	// Update items on refresh folders message
 	case tlockmessages.RefreshFoldersMsg:
 		cmds = append(cmds, folders.listview.SetItems(buildFolderListItems(folders.vault)))
+
+	case tea.WindowSizeMsg:
+		folders.listview.SetWidth(foldersWidth(msgType.Width))
+		folders.listview.SetHeight(msgType.Height - 3)
 	}
 
 	// Update list

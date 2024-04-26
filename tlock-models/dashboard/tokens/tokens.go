@@ -23,6 +23,11 @@ import (
 	"golang.org/x/term"
 )
 
+// Returns the width for the tokens listview for the given window wdith
+func tokensWidth(width int) int {
+	return width - int(math.Floor((1.0/5.0)*float64(width)))
+}
+
 // Returns the remaining time
 func getRemainingTime(token tlockvault.Token) int {
 	return int(token.Period - int(time.Now().Unix())%token.Period)
@@ -219,10 +224,7 @@ func buildTokensListView(tokens []tlockvault.Token) list.Model {
 	// Get terminal size
 	width, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
-	// Calculate width
-	tokensWidth := width - int(math.Floor((1.0/5.0)*float64(width)))
-
-	return components.ListViewSimple(buildTokensItems(tokens), tokensListDelegate{}, tokensWidth, height-3)
+	return components.ListViewSimple(buildTokensItems(tokens), tokensListDelegate{}, tokensWidth(width), height-3)
 }
 
 // Initializes a new instance of folders
@@ -265,6 +267,10 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 		}
 
 		cmds = append(cmds, tokens.tokensListView.SetItems(items))
+
+	case tea.WindowSizeMsg:
+		tokens.tokensListView.SetWidth(tokensWidth(msgType.Width))
+		tokens.tokensListView.SetHeight(msgType.Height - 3)
 	}
 
 	// Update listview
