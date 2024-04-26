@@ -287,6 +287,16 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 				manager.PushScreen(InitializeDeleteTokenScreen(tokens.vault, *tokens.folder, focused.Token))
 			}
 
+		case msgType.String() == "n":
+			if focused := tokens.Focused(); focused != nil {
+				if focused.Token.Type == tlockvault.TokenTypeHOTP {
+					tokens.vault.IncreaseCounter(tokens.folder.ID, focused.Token.ID)
+
+					// Refresh tokens
+					cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshTokensMsg{} })
+				}
+			}
+
 		case key.Matches(msgType, tokenKeys.Screen):
 			if tokens.folder != nil {
 				manager.PushScreen(InitializeTokenFromScreen(tokens.vault, *tokens.folder))

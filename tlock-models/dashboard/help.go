@@ -76,6 +76,10 @@ var helpKeys = helpKeyBindings{
 			Desc: "Move the current focused token to another folder",
 		},
 		{
+			Key:  "n",
+			Desc: "Generates the token for the next counter [only of HOTP tokens]",
+		},
+		{
 			Key:  "c",
 			Desc: "Copy the current code for the focused token",
 		},
@@ -88,8 +92,8 @@ var helpKeys = helpKeyBindings{
 			Desc: "Move the focused token down",
 		},
 		{
-			Key:  "D",
-			Desc: "Delete the current focused tokens",
+			Key:  "d",
+			Desc: "Delete the current focused token",
 		},
 	},
 	Others: []HelpKeyBindingSpec{

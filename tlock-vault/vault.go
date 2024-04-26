@@ -315,6 +315,19 @@ func (vault *Vault) MoveToken(tokenId, fromFolderId, toFolderId string) {
 	vault.write()
 }
 
+// Move a token to the given folder
+func (vault *Vault) IncreaseCounter(folderId, tokenId string) {
+	// Get folder and token idnex
+	folderIndex := vault.find_folder(folderId)
+	tokenIndex := vault.find_token(folderIndex, tokenId)
+
+	// Increase counter
+	vault.Folders[folderIndex].Tokens[tokenIndex].UsageCounter++
+
+	// Write
+	vault.write()
+}
+
 // Find a folder index by its uuid
 func (vault *Vault) find_folder(id string) int {
 	return slices.IndexFunc(vault.Folders, func(folder Folder) bool { return folder.ID == id })
