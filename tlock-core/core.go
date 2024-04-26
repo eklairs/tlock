@@ -8,7 +8,7 @@ import (
 	"github.com/kelindar/binary"
 	"github.com/rs/zerolog/log"
 
-	tlockutils "github.com/eklairs/tlock/tlock-utils"
+	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
 
@@ -75,7 +75,7 @@ func (users TLockCore) write() {
 	data, _ := binary.Marshal(users)
 
 	// Create file
-	file, err := tlockutils.EnsureExists(USERS_PATH)
+	file, err := tlockinternal.EnsureExists(USERS_PATH)
 
 	// Check for errors
 	if err != nil {

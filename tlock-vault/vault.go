@@ -7,11 +7,12 @@ import (
 	"slices"
 
 	"github.com/adrg/xdg"
-	tlockutils "github.com/eklairs/tlock/tlock-utils"
 	"github.com/google/uuid"
 	"github.com/kelindar/binary"
 	"github.com/pquerna/otp"
 	"github.com/rs/zerolog/log"
+
+	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 )
 
 // Token types
@@ -115,8 +116,8 @@ func (vault Vault) write() {
 	// Encrypt
 	encrypted := Encrypt(vault.password, serialized)
 
-	// Write
-	file, err := tlockutils.EnsureExists(vault.Path)
+    // Create parent dir
+	file, err := tlockinternal.EnsureExists(vault.Path)
 
 	// Check for errors
 	if err != nil {
@@ -193,7 +194,7 @@ func (vault *Vault) GetTokens(id string) []Token {
 // Deletes a folder by its id
 func (vault *Vault) DeleteFolder(id string) {
 	// Remove folder
-	vault.Folders = tlockutils.Remove(vault.Folders, vault.find_folder(id))
+	vault.Folders = tlockinternal.Remove(vault.Folders, vault.find_folder(id))
 
 	// Write
 	vault.write()
