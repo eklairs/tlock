@@ -64,6 +64,10 @@ var helpKeys = helpKeyBindings{
 			Desc: "Add a new token in the current focused folder",
 		},
 		{
+			Key:  "s",
+			Desc: "Add a new token from the screen",
+		},
+		{
 			Key:  "e",
 			Desc: "Edit the current focused token",
 		},
