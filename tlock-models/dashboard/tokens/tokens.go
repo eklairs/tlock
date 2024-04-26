@@ -282,20 +282,24 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 		tokens.folder = &msgType.Folder
 
 	case tlockmessages.RefreshTokensValue:
-		items := make([]list.Item, len(tokens.listview.Items()))
+		if tokens.listview != nil {
+			items := make([]list.Item, len(tokens.listview.Items()))
 
-		for index, item := range tokens.listview.Items() {
-			tokenItem := item.(tokensListItem)
-			tokenItem.Refresh()
+			for index, item := range tokens.listview.Items() {
+				tokenItem := item.(tokensListItem)
+				tokenItem.Refresh()
 
-			items[index] = tokenItem
+				items[index] = tokenItem
+			}
+
+			cmds = append(cmds, tokens.listview.SetItems(items))
 		}
 
-		cmds = append(cmds, tokens.listview.SetItems(items))
-
 	case tea.WindowSizeMsg:
-		tokens.listview.SetWidth(tokensWidth(msgType.Width))
-		tokens.listview.SetHeight(msgType.Height - 3)
+		if tokens.listview != nil {
+			tokens.listview.SetWidth(tokensWidth(msgType.Width))
+			tokens.listview.SetHeight(msgType.Height - 3)
+		}
 
 	case tlockmessages.RefreshTokensMsg:
 		if tokens.folder != nil {
