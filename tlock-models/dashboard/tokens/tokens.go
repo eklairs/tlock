@@ -235,6 +235,8 @@ func InitializeTokens(vault *tlockvault.Vault) Tokens {
 
 // Handles update messages
 func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) tea.Cmd {
+	cmds := make([]tea.Cmd, 0)
+
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -251,6 +253,18 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 		// Update listview
 		tokens.tokensListView = &listview
 		tokens.folder = &msgType.Folder
+
+	case tlockmessages.RefreshTokensValue:
+		items := make([]list.Item, len(tokens.tokensListView.Items()))
+
+		for index, item := range tokens.tokensListView.Items() {
+			tokenItem := item.(tokensListItem)
+			tokenItem.Refresh()
+
+			items[index] = tokenItem
+		}
+
+		cmds = append(cmds, tokens.tokensListView.SetItems(items))
 	}
 
 	// Update listview
@@ -259,7 +273,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 		tokens.tokensListView = &updatedListView
 	}
 
-	return nil
+	return tea.Batch(cmds...)
 }
 
 // View
