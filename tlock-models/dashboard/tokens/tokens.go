@@ -14,12 +14,14 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	"github.com/eklairs/tlock/tlock-internal/components"
+	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/tlock-messages"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"github.com/pquerna/otp/hotp"
 	"github.com/pquerna/otp/totp"
+	"golang.design/x/clipboard"
 	"golang.org/x/term"
 )
 
@@ -195,7 +197,7 @@ func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	}
 
 	// Render
-	fmt.Fprint(w, render_fn(m.Width()-12, info, suffix))
+	fmt.Fprint(w, render_fn(m.Width()-9, info, suffix))
 }
 
 // Tokens
@@ -207,7 +209,24 @@ type Tokens struct {
 	folder *tlockvault.Folder
 
 	// Tokens
-	tokensListView *list.Model
+	listview *list.Model
+
+	// Context
+	context context.Context
+}
+
+// Returns the focused folder item
+func (tokens Tokens) Focused() *tokensListItem {
+	// If there are no items, return nil
+	if len(tokens.listview.Items()) == 0 {
+		return nil
+	}
+
+	// Get the focused item
+	focusedToken := tokens.listview.Items()[tokens.listview.Index()].(tokensListItem)
+
+	// Return
+	return &focusedToken
 }
 
 // Builds the token list view items
@@ -228,10 +247,11 @@ func buildTokensListView(tokens []tlockvault.Token) list.Model {
 }
 
 // Initializes a new instance of folders
-func InitializeTokens(vault *tlockvault.Vault) Tokens {
+func InitializeTokens(vault *tlockvault.Vault, context context.Context) Tokens {
 	return Tokens{
-		vault:  vault,
-		folder: nil,
+		vault:   vault,
+		folder:  nil,
+		context: context,
 	}
 }
 
@@ -242,6 +262,11 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
+		case msgType.String() == "c":
+			if focused := tokens.Focused(); focused != nil && tokens.context.ClipboardAvailability {
+				clipboard.Write(clipboard.FmtText, []byte(focused.CurrentCode))
+			}
+
 		case key.Matches(msgType, tokenKeys.Screen):
 			if tokens.folder != nil {
 				manager.PushScreen(InitializeTokenFromScreen(tokens.vault, *tokens.folder))
@@ -253,30 +278,30 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 		listview := buildTokensListView(tokens.vault.GetTokens(msgType.Folder.ID))
 
 		// Update listview
-		tokens.tokensListView = &listview
+		tokens.listview = &listview
 		tokens.folder = &msgType.Folder
 
 	case tlockmessages.RefreshTokensValue:
-		items := make([]list.Item, len(tokens.tokensListView.Items()))
+		items := make([]list.Item, len(tokens.listview.Items()))
 
-		for index, item := range tokens.tokensListView.Items() {
+		for index, item := range tokens.listview.Items() {
 			tokenItem := item.(tokensListItem)
 			tokenItem.Refresh()
 
 			items[index] = tokenItem
 		}
 
-		cmds = append(cmds, tokens.tokensListView.SetItems(items))
+		cmds = append(cmds, tokens.listview.SetItems(items))
 
 	case tea.WindowSizeMsg:
-		tokens.tokensListView.SetWidth(tokensWidth(msgType.Width))
-		tokens.tokensListView.SetHeight(msgType.Height - 3)
+		tokens.listview.SetWidth(tokensWidth(msgType.Width))
+		tokens.listview.SetHeight(msgType.Height - 3)
 	}
 
 	// Update listview
-	if tokens.tokensListView != nil {
-		updatedListView, _ := tokens.tokensListView.Update(msg)
-		tokens.tokensListView = &updatedListView
+	if tokens.listview != nil {
+		updatedListView, _ := tokens.listview.Update(msg)
+		tokens.listview = &updatedListView
 	}
 
 	return tea.Batch(cmds...)
@@ -290,10 +315,10 @@ func (tokens Tokens) View() string {
 	}
 
 	// Render placeholder for no tokens
-	if len(tokens.tokensListView.Items()) == 0 {
+	if len(tokens.listview.Items()) == 0 {
 		style := lipgloss.NewStyle().
-			Height(tokens.tokensListView.Height()).
-			Width(tokens.tokensListView.Width()).
+			Height(tokens.listview.Height()).
+			Width(tokens.listview.Width()).
 			Align(lipgloss.Center, lipgloss.Center)
 
 		ui := lipgloss.JoinVertical(
@@ -309,6 +334,6 @@ func (tokens Tokens) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		tlockstyles.Styles.AccentBgItem.Render("TOKENS"), "",
-		tokens.tokensListView.View(),
+		tokens.listview.View(),
 	)
 }

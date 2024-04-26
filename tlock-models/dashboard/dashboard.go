@@ -82,7 +82,7 @@ func InitializeDashboardScreen(vault tlockvault.Vault, context context.Context) 
 		vault:   &vault,
 		context: context,
 		folders: folders.InitializeFolders(&vault),
-		tokens:  tokens.InitializeTokens(&vault),
+		tokens:  tokens.InitializeTokens(&vault, context),
 	}
 }
 

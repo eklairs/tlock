@@ -70,6 +70,10 @@ type Folders struct {
 
 	// List view
 	listview list.Model
+
+	// Last focused index of the listview
+	// Used for calculating if the list item focus has been changed
+	lastFocused int
 }
 
 // Returns the folders in the form of list item
@@ -107,9 +111,16 @@ func buildListViewForFolders(vault *tlockvault.Vault) list.Model {
 
 // Initializes a new instance of folders
 func InitializeFolders(vault *tlockvault.Vault) Folders {
+	lastFocused := -1
+
+	if len(vault.Folders) != 0 {
+		lastFocused = 0
+	}
+
 	return Folders{
-		vault:    vault,
-		listview: buildListViewForFolders(vault),
+		vault:       vault,
+		listview:    buildListViewForFolders(vault),
+		lastFocused: lastFocused,
 	}
 }
 
@@ -129,6 +140,8 @@ func (folders Folders) Focused() *tlockvault.Folder {
 
 // Handles update messages
 func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) tea.Cmd {
+	var cmd tea.Cmd
+
 	cmds := make([]tea.Cmd, 0)
 
 	switch msgType := msg.(type) {
@@ -179,13 +192,30 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 	case tlockmessages.RefreshFoldersMsg:
 		cmds = append(cmds, folders.listview.SetItems(buildFolderListItems(folders.vault)))
 
+		// Handle terminal resizes
 	case tea.WindowSizeMsg:
 		folders.listview.SetWidth(foldersWidth(msgType.Width))
 		folders.listview.SetHeight(msgType.Height - 3)
 	}
 
 	// Update list
-	folders.listview, _ = folders.listview.Update(msg)
+	folders.listview, cmd = folders.listview.Update(msg)
+	cmds = append(cmds, cmd)
+
+	// Check if the focused has been changed
+	if folders.listview.Index() != folders.lastFocused {
+		// New focused item
+		if focused := folders.Focused(); focused != nil {
+			cmds = append(cmds, func() tea.Msg {
+				return tlockmessages.FolderChanged{
+					Folder: *focused,
+				}
+			})
+		}
+
+		// Change
+		folders.lastFocused = folders.listview.Index()
+	}
 
 	// Return
 	return tea.Batch(cmds...)
