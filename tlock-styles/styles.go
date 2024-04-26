@@ -51,6 +51,12 @@ type TLockStyles struct {
 
 	// Tilte Bar
 	AccentBgItem lipgloss.Style
+
+	// Mock screen
+	MockScreen lipgloss.Style
+
+	// Background Over
+	BackgroundOver lipgloss.Style
 }
 
 // Initializes the styles
@@ -74,7 +80,9 @@ func InitializeStyles(theme context.Theme) {
 		Placeholder:        with(base).Background(theme.BackgroundOver).Foreground(theme.SubText),
 		ListItemActive:     with(paddedItem).Background(theme.BackgroundOver),
 		AccentBgItem:       with(base).Padding(0, 1).Background(theme.Accent).Foreground(theme.Background),
+		BackgroundOver:     with(base).Background(theme.BackgroundOver),
 		FolderItemInactive: with(paddedItem).Width(foldersWidth),
+		MockScreen:         with(base).Background(theme.BackgroundOver).Align(lipgloss.Center, lipgloss.Center).Width(27).Height(9),
 		FolderItemActive: with(paddedItem).
 			Padding(1, 2).
 			Background(theme.BackgroundOver).

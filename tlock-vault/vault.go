@@ -240,7 +240,42 @@ func (vault *Vault) MoveFolderDown(folderId string) bool {
 	return true
 }
 
+// Adds a new token to the given folder
+func (vault *Vault) AddToken(folderId string, uri string) {
+	// Generate key
+	key, _ := otp.NewKeyFromURL(uri)
+
+	// Generate token
+	token := Token{
+		ID:               uuid.NewString(),
+		Type:             toType(key.Type()),
+		Issuer:           key.Issuer(),
+		Account:          key.AccountName(),
+		Secret:           key.Secret(),
+		InitialCounter:   0,
+		Period:           int(key.Period()),
+		Digits:           key.Digits().Length(),
+		HashingAlgorithm: key.Algorithm(),
+		UsageCounter:     0,
+	}
+
+	// Add
+	vault.Folders[vault.find_folder(folderId)].Tokens = append(vault.Folders[vault.find_folder(folderId)].Tokens, token)
+
+	// Write
+	vault.write()
+}
+
 // Find a folder index by its uuid
 func (vault *Vault) find_folder(id string) int {
 	return slices.IndexFunc(vault.Folders, func(folder Folder) bool { return folder.ID == id })
+}
+
+// Converts `totp` or `hotp` to TokenType
+func toType(type_ string) TokenType {
+	if type_ == "hotp" {
+		return TokenTypeHOTP
+	}
+
+	return TokenTypeTOTP
 }

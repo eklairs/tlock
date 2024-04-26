@@ -138,7 +138,7 @@ func (screen DashboardScreen) View() string {
 
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
-		screen.folders.View(),
+		screen.folders.View(), "  ",
 		screen.tokens.View(),
 	)
 }
