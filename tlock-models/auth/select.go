@@ -183,7 +183,7 @@ func (screen SelectUserScreen) View() string {
 		tlockstyles.Styles.SubText.Render("Select a user to login as"), "",
 
 		// List of users
-		screen.listview.View(),
+		screen.listview.View(), "",
 	}
 
 	// Total pages
@@ -207,8 +207,6 @@ func (screen SelectUserScreen) View() string {
 
 		// Add to ui
 		items = append(items, lipgloss.JoinHorizontal(lipgloss.Center, paginatorItems...), "")
-	} else {
-		items = append(items, "")
 	}
 
 	// Add help

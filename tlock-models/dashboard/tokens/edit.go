@@ -189,6 +189,17 @@ func InitializeEditTokenScreen(folder tlockvault.Folder, token tlockvault.Token,
 	viewport := viewport.New(85, min(height, lipgloss.Height(content)))
 	viewport.SetContent(content)
 
+	// Restrict to arrow keys to move viewport up and down to prevent conflict when the user is typing
+	viewport.KeyMap.Up = key.NewBinding(
+		key.WithKeys("up"),
+		key.WithHelp("↑", "up"),
+	)
+
+	viewport.KeyMap.Down = key.NewBinding(
+		key.WithKeys("down"),
+		key.WithHelp("↓", "down"),
+	)
+
 	return EditTokenScreen{
 		form:     form,
 		token:    token,
