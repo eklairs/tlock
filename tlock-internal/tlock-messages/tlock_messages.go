@@ -18,6 +18,9 @@ type FolderChanged struct {
 	Folder tlockvault.Folder
 }
 
+// Requests to post folder changed message
+type RequestFolderChanged struct{}
+
 // Notification to update the tokens
 // This is sent after every second after the dashboard has been loaded
 type RefreshTokensValue struct{}

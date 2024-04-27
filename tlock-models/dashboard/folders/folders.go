@@ -97,13 +97,13 @@ func buildListViewForFolders(vault *tlockvault.Vault) list.Model {
 
 	// Use custom keys
 	listview.KeyMap.CursorDown = key.NewBinding(
-		key.WithKeys("J"),
-		key.WithHelp("J", "down"),
+		key.WithKeys("tab"),
+		key.WithHelp("tab", "down"),
 	)
 
 	listview.KeyMap.CursorUp = key.NewBinding(
-		key.WithKeys("K"),
-		key.WithHelp("K", "up"),
+		key.WithKeys("shift+tab"),
+		key.WithHelp("shift+tab", "up"),
 	)
 
 	return listview
@@ -167,11 +167,15 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		case "ctrl+up":
 			if focused := folders.Focused(); focused != nil {
 				if folders.vault.MoveFolderUp(focused.ID) {
-					// Refresh
-					cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })
-
-					// Move cursor up
+					// Move cursor down
 					folders.listview.CursorUp()
+
+					// Refresh
+					cmds = append(
+						cmds,
+						func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
+						func() tea.Msg { return tlockmessages.RequestFolderChanged{} },
+					)
 				}
 			}
 
@@ -179,11 +183,15 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		case "ctrl+down":
 			if focused := folders.Focused(); focused != nil {
 				if folders.vault.MoveFolderDown(focused.ID) {
-					// Refresh
-					cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })
-
 					// Move cursor down
 					folders.listview.CursorDown()
+
+					// Refresh
+					cmds = append(
+						cmds,
+						func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
+						func() tea.Msg { return tlockmessages.RequestFolderChanged{} },
+					)
 				}
 			}
 		}
@@ -196,6 +204,16 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 	case tea.WindowSizeMsg:
 		folders.listview.SetWidth(foldersWidth(msgType.Width))
 		folders.listview.SetHeight(msgType.Height - 3)
+
+	case tlockmessages.RequestFolderChanged:
+		// New focused item
+		if focused := folders.Focused(); focused != nil {
+			cmds = append(cmds, func() tea.Msg {
+				return tlockmessages.FolderChanged{
+					Folder: *focused,
+				}
+			})
+		}
 	}
 
 	// Update list
@@ -205,13 +223,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 	// Check if the focused has been changed
 	if len(folders.listview.Items()) != 0 && folders.listview.Index() != folders.lastFocused {
 		// New focused item
-		if focused := folders.Focused(); focused != nil {
-			cmds = append(cmds, func() tea.Msg {
-				return tlockmessages.FolderChanged{
-					Folder: *focused,
-				}
-			})
-		}
+		cmds = append(cmds, func() tea.Msg { return tlockmessages.RequestFolderChanged{} })
 
 		// Change
 		folders.lastFocused = folders.listview.Index()
