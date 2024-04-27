@@ -162,17 +162,17 @@ func InitializeEditTokenScreen(folder tlockvault.Folder, token tlockvault.Token,
 		form.FormItemInputBox{
 			Title:       "Period",
 			Description: "Time to refresh the token",
-			Input:       tlockinternal.ValidatorInteger(value(components.InitializeInputBoxCustomWidth("Time in seconds...", 24), fmt.Sprintf("%d", token.Period))),
+			Input:       tlockinternal.ValidatorIntegerNo0(value(components.InitializeInputBoxCustomWidth("Time in seconds...", 24), fmt.Sprintf("%d", token.Period))),
 		},
 		form.FormItemInputBox{
 			Title:       "Usage counter",
 			Description: "Usage counter of HOTP token",
-			Input:       tlockinternal.ValidatorInteger(value(components.InitializeInputBoxCustomWidth("Usage counter", 24), fmt.Sprintf("%d", token.UsageCounter))),
+			Input:       tlockinternal.ValidatorIntegerNo0(value(components.InitializeInputBoxCustomWidth("Usage counter", 24), fmt.Sprintf("%d", token.UsageCounter))),
 		},
 		form.FormItemInputBox{
 			Title:       "Digits",
 			Description: "Number of digits",
-			Input:       tlockinternal.ValidatorInteger(value(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24), fmt.Sprintf("%d", token.Digits))),
+			Input:       tlockinternal.ValidatorIntegerNo0(value(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24), fmt.Sprintf("%d", token.Digits))),
 		},
 	}
 

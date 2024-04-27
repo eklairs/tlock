@@ -121,7 +121,7 @@ func InitializeAddTokenScreen(folder tlockvault.Folder, vault *tlockvault.Vault)
 		form.FormItemInputBox{
 			Title:       "Period",
 			Description: "Time to refresh the token",
-			Input:       tlockinternal.ValidatorInteger(components.InitializeInputBoxCustomWidth("Time in seconds...", 24)),
+			Input:       tlockinternal.ValidatorIntegerNo0(components.InitializeInputBoxCustomWidth("Time in seconds...", 24)),
 		},
 		form.FormItemInputBox{
 			Title:       "Initial counter",
@@ -131,7 +131,7 @@ func InitializeAddTokenScreen(folder tlockvault.Folder, vault *tlockvault.Vault)
 		form.FormItemInputBox{
 			Title:       "Digits",
 			Description: "Number of digits",
-			Input:       tlockinternal.ValidatorInteger(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24)),
+			Input:       tlockinternal.ValidatorIntegerNo0(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24)),
 		},
 	}
 
