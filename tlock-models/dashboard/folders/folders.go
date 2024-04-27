@@ -203,7 +203,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 	cmds = append(cmds, cmd)
 
 	// Check if the focused has been changed
-	if folders.listview.Index() != folders.lastFocused {
+	if len(folders.listview.Items()) != 0 && folders.listview.Index() != folders.lastFocused {
 		// New focused item
 		if focused := folders.Focused(); focused != nil {
 			cmds = append(cmds, func() tea.Msg {
