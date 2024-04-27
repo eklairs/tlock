@@ -165,9 +165,9 @@ func InitializeEditTokenScreen(folder tlockvault.Folder, token tlockvault.Token,
 			Input:       tlockinternal.ValidatorInteger(value(components.InitializeInputBoxCustomWidth("Time in seconds...", 24), fmt.Sprintf("%d", token.Period))),
 		},
 		form.FormItemInputBox{
-			Title:       "Initial counter",
-			Description: "Initial counter for HOTP token",
-			Input:       tlockinternal.ValidatorInteger(components.InitializeInputBoxCustomWidth("Initial counter...", 24)),
+			Title:       "Usage counter",
+			Description: "Usage counter of HOTP token",
+			Input:       tlockinternal.ValidatorInteger(value(components.InitializeInputBoxCustomWidth("Usage counter", 24), fmt.Sprintf("%d", token.UsageCounter))),
 		},
 		form.FormItemInputBox{
 			Title:       "Digits",
@@ -291,10 +291,10 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 				Secret:           formItems[2].FormItem.Value(),
 				Type:             tokenType,
 				HashingAlgorithm: hashFunction,
-				Period:           or(formItems[5].FormItem.Value(), 30),
-				InitialCounter:   or(formItems[6].FormItem.Value(), 0),
-				Digits:           or(formItems[7].FormItem.Value(), 6),
-				UsageCounter:     0,
+				Period:           or(formItems[5].FormItem.Value(), screen.token.Period),
+				InitialCounter:   screen.token.InitialCounter,
+				Digits:           or(formItems[7].FormItem.Value(), screen.token.Digits),
+				UsageCounter:     or(formItems[6].FormItem.Value(), screen.token.UsageCounter),
 			}
 
 			// Replace
