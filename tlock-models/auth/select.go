@@ -207,6 +207,8 @@ func (screen SelectUserScreen) View() string {
 
 		// Add to ui
 		items = append(items, lipgloss.JoinHorizontal(lipgloss.Center, paginatorItems...), "")
+	} else {
+		items = append(items, "")
 	}
 
 	// Add help
