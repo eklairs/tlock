@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"os/user"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -14,7 +16,8 @@ import (
 )
 
 // Errors
-var USERNAME_EMPTY = "Please choose a username"
+var USERNAME_EXISTS = "User with that name already exists"
+var USERNAME_EMPTY = "Please enter a username"
 
 // Create user ascii art
 var createUserAsciiArt = `
@@ -71,12 +74,27 @@ type CreateUserScreen struct {
 
 	// Username error message
 	usernameError *string
+
+	// System user if found
+	systemUser *user.User
 }
 
 // Initializes a new instance of the create user screen
 func InitializeCreateUserScreen(context *context.Context) CreateUserScreen {
+	// Placeholder
+	placeholder := "Your username goes here..."
+
+	// Get current user
+	user, err := user.Current()
+
+	if err == nil {
+		placeholder = user.Username
+	} else {
+		placeholder = "Cannot find your username, please enter one..."
+	}
+
 	// Input box for username
-	usernameInput := components.InitializeInputBox("Your username goes here...")
+	usernameInput := components.InitializeInputBox(placeholder)
 	usernameInput.Focus()
 
 	// Input box for password
@@ -88,6 +106,7 @@ func InitializeCreateUserScreen(context *context.Context) CreateUserScreen {
 		context:       context,
 		usernameInput: usernameInput,
 		passwordInput: passwordInput,
+		systemUser:    user,
 	}
 }
 
@@ -130,14 +149,28 @@ func (screen CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 			}
 
 		case key.Matches(msgType, createUserKeys.Create):
-			if screen.usernameInput.Value() == "" {
-				screen.usernameError = &USERNAME_EMPTY
-			} else {
-				// Add new user
-				vault := screen.context.Core.AddNewUser(screen.usernameInput.Value(), screen.passwordInput.Value())
+			username := screen.usernameInput.Value()
 
+			if username == "" {
+				if screen.systemUser != nil {
+					username = screen.systemUser.Username
+				} else {
+					// Set error
+					screen.usernameError = &USERNAME_EMPTY
+
+					// Break
+					break
+				}
+			}
+
+			// Add new user
+			vault, err := screen.context.Core.AddNewUser(username, screen.passwordInput.Value())
+
+			if err != nil {
+				screen.usernameError = &USERNAME_EXISTS
+			} else {
 				// Push dashboard screen
-				cmd = manager.PushScreen(dashboard.InitializeDashboardScreen(vault, screen.context))
+				cmd = manager.PushScreen(dashboard.InitializeDashboardScreen(*vault, screen.context))
 			}
 		}
 	}
@@ -151,7 +184,7 @@ func (screen CreateUserScreen) View() string {
 		lipgloss.Center,
 		tlockstyles.Styles.Title.Render(createUserAsciiArt), "",
 		tlockstyles.Styles.SubText.Render("Create a new user"), "",
-		components.InputGroup("Username", "Choose an awesome username, like Komaru!", screen.usernameError, screen.usernameInput),
+		components.InputGroup("Username", "Choose an awesome username, or keep it empty to use the current system name", screen.usernameError, screen.usernameInput),
 		components.InputGroup("Password", "Choose a super strong password, or keep it empty if you don't want any password", nil, screen.passwordInput),
 		tlockstyles.Help.View(createUserKeys),
 	)

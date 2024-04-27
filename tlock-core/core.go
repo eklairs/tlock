@@ -1,8 +1,10 @@
 package tlockcore
 
 import (
+	"errors"
 	"os"
 	"path"
+	"slices"
 
 	"github.com/adrg/xdg"
 	"github.com/kelindar/binary"
@@ -55,7 +57,11 @@ func New() TLockCore {
 }
 
 // Adds a new user
-func (users *TLockCore) AddNewUser(username, password string) tlockvault.Vault {
+func (users *TLockCore) AddNewUser(username, password string) (*tlockvault.Vault, error) {
+	if users.exists(username) {
+		return nil, errors.New("User already exists")
+	}
+
 	// Initialize new vault
 	vault := tlockvault.Initialize(password)
 
@@ -66,7 +72,7 @@ func (users *TLockCore) AddNewUser(username, password string) tlockvault.Vault {
 	users.write()
 
 	// Return vault
-	return vault
+	return &vault, nil
 }
 
 // [PRIVATE] Writes the current users value to the file
@@ -84,4 +90,9 @@ func (users TLockCore) write() {
 
 	// Write
 	file.Write(data)
+}
+
+// Checks if a user with the name exists
+func (users TLockCore) exists(username string) bool {
+	return slices.IndexFunc(users.Users, func(user User) bool { return user.Username == username }) != -1
 }
