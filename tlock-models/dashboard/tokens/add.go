@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/form"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
@@ -117,17 +118,17 @@ func InitializeAddTokenScreen(folder tlockvault.Folder, vault *tlockvault.Vault)
 		form.FormItemInputBox{
 			Title:       "Period",
 			Description: "Time to refresh the token",
-			Input:       components.InitializeInputBoxCustomWidth("Time in seconds...", 24),
+			Input:       tlockinternal.ValidatorInteger(components.InitializeInputBoxCustomWidth("Time in seconds...", 24)),
 		},
 		form.FormItemInputBox{
 			Title:       "Initial counter",
 			Description: "Initial counter for HOTP token",
-			Input:       components.InitializeInputBoxCustomWidth("Initial counter...", 24),
+			Input:       tlockinternal.ValidatorInteger(components.InitializeInputBoxCustomWidth("Initial counter...", 24)),
 		},
 		form.FormItemInputBox{
 			Title:       "Digits",
 			Description: "Number of digits",
-			Input:       components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24),
+			Input:       tlockinternal.ValidatorInteger(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24)),
 		},
 	}
 

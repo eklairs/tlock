@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/form"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
@@ -116,17 +117,17 @@ func InitializeEditTokenScreen(folder tlockvault.Folder, token tlockvault.Token,
 		form.FormItemInputBox{
 			Title:       "Period",
 			Description: "Time to refresh the token",
-			Input:       value(components.InitializeInputBoxCustomWidth("Time in seconds...", 24), fmt.Sprintf("%d", token.Period)),
+			Input:       tlockinternal.ValidatorInteger(value(components.InitializeInputBoxCustomWidth("Time in seconds...", 24), fmt.Sprintf("%d", token.Period))),
 		},
 		form.FormItemInputBox{
 			Title:       "Initial counter",
 			Description: "Initial counter for HOTP token",
-			Input:       components.InitializeInputBoxCustomWidth("Initial counter...", 24),
+			Input:       tlockinternal.ValidatorInteger(components.InitializeInputBoxCustomWidth("Initial counter...", 24)),
 		},
 		form.FormItemInputBox{
 			Title:       "Digits",
 			Description: "Number of digits",
-			Input:       value(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24), fmt.Sprintf("%d", token.Digits)),
+			Input:       tlockinternal.ValidatorInteger(value(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24), fmt.Sprintf("%d", token.Digits))),
 		},
 	}
 
