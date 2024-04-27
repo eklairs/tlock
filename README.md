@@ -1,20 +1,19 @@
 <img src="https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white"> <img src="https://img.shields.io/github/stars/eklairs/tlock?style=for-the-badge" />
+
 # TLock
 
-TLock is an open-source Two-Factor Authentication App in Terminal to organize and manage your tokens easily.
-
-It aims to provide a secure way to manage your tokens while making them easy to access.
+TLock is an open-source tool to store and manage your authentication tokens securely. It gives users a centralized solution to generate and maintain time-based one-time passwords (TOTP) and other token types for secure authentication processes. By consolidating multiple authentication tokens into a single application, this 2FA manager streamlines the process of accessing accounts while ensuring high security.
 
 ## Features
 
-- In Terminal
-- Easily traverse through UI with keyboard
-- Proper encryption to secure your tokens at rest
-- Supports TOTP and HOTP-based tokens
-- Easily add tokens manually or from the screen
-- Organize your tokens inside of folders
-- Bunch of themes to sync the tlock theme with your terminal's theme
-- Cool icon of the provider
+- 📺  In Terminal
+- ⌨️  Easily traverse through UI with keyboard
+- 🔒  Proper encryption to secure your tokens at rest
+- ⚡️  Supports Industry Standard TOTP and HOTP-based tokens
+- ➕  Easily add tokens manually or from the screen (QR Code)
+- 📁  Organize your tokens inside of folders
+- 🎨  Themes to personalize tlock
+- 🖼  Icon of the provider
 
 >[!NOTE]
 >For showing the provider's icon, you must have Nerd Fonts installed
@@ -46,6 +45,13 @@ It aims to provide a secure way to manage your tokens while making them easy to 
   ```fish
   go install github.com/eklairs/tlock@latest
   ```
+
+## Screenshots
+
+<img src="/assets/login.png" />
+<img src="/assets/dashboard.png" />
+<img src="/assets/help.png" />
+<img src="/assets/add_token.png" />
 
 ## Running
 
