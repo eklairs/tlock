@@ -160,21 +160,35 @@ func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 		render_fn = components.ListItemActive
 	}
 
+	// Account name
+	account := item.Token.Account
+
+	if account == "" {
+		account = "<no account name>"
+	}
+
+	// Issuer name
+	issuer := item.Token.Issuer
+
+	if issuer == "" {
+		issuer = "<no issuer name>"
+	}
+
 	// Build key info
 	info := lipgloss.JoinHorizontal(
 		lipgloss.Center,
-		tlockstyles.Styles.Title.Render(item.Token.Account),
+		tlockstyles.Styles.Title.Render(account),
 		tlockstyles.Styles.BackgroundOver.Render(" • "),
-		tlockstyles.Styles.BackgroundOver.Render(item.Token.Issuer),
+		tlockstyles.Styles.BackgroundOver.Render(issuer),
 	)
 
 	// Render it differently if it is not the current token
 	if index != m.Index() {
 		info = lipgloss.JoinHorizontal(
 			lipgloss.Center,
-			tlockstyles.Styles.SubText.Render(item.Token.Account),
+			tlockstyles.Styles.SubText.Render(account),
 			tlockstyles.Styles.SubText.Render(" • "),
-			tlockstyles.Styles.SubText.Render(item.Token.Issuer),
+			tlockstyles.Styles.SubText.Render(issuer),
 		)
 	}
 
@@ -274,8 +288,6 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 
 		case msgType.String() == "e":
 			if focused := tokens.Focused(); focused != nil {
-				panic(tokens.listview.Index())
-
 				manager.PushScreen(InitializeEditTokenScreen(*tokens.folder, focused.Token, tokens.vault))
 			}
 
