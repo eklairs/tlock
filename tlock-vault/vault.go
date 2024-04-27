@@ -328,6 +328,48 @@ func (vault *Vault) IncreaseCounter(folderId, tokenId string) {
 	vault.write()
 }
 
+// Moves the token down
+func (vault *Vault) MoveTokenDown(folderId, tokenId string) bool {
+	// Folder and token index
+	folderIndex := vault.find_folder(folderId)
+	tokenIndex := vault.find_token(folderIndex, tokenId)
+
+	// If is folder is already at bottom, just return; we dont need to do anything
+	if tokenIndex == len(vault.Folders[folderIndex].Tokens)-1 {
+		return false
+	}
+
+	// Swap
+	vault.Folders[folderIndex].Tokens = tlockinternal.Swap(vault.Folders[folderIndex].Tokens, tokenIndex, tokenIndex+1)
+
+	// Wrap
+	vault.write()
+
+	// Return
+	return true
+}
+
+// Moves the token up
+func (vault *Vault) MoveTokenUp(folderId, tokenId string) bool {
+	// Folder and token index
+	folderIndex := vault.find_folder(folderId)
+	tokenIndex := vault.find_token(folderIndex, tokenId)
+
+	// If is folder is already at bottom, just return; we dont need to do anything
+	if tokenIndex == 0 {
+		return false
+	}
+
+	// Swap
+	vault.Folders[folderIndex].Tokens = tlockinternal.Swap(vault.Folders[folderIndex].Tokens, tokenIndex, tokenIndex-1)
+
+	// Wrap
+	vault.write()
+
+	// Return
+	return true
+}
+
 // Find a folder index by its uuid
 func (vault *Vault) find_folder(id string) int {
 	return slices.IndexFunc(vault.Folders, func(folder Folder) bool { return folder.ID == id })

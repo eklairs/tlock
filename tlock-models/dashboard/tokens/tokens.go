@@ -301,6 +301,30 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 				manager.PushScreen(InitializeDeleteTokenScreen(tokens.vault, *tokens.folder, focused.Token))
 			}
 
+		case msgType.String() == "J":
+			if focused := tokens.Focused(); focused != nil {
+				// Move token down
+				tokens.vault.MoveTokenDown(tokens.folder.ID, focused.Token.ID)
+
+				// Refresh tokens
+				cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshTokensMsg{} })
+
+				// Move cursor down
+				tokens.listview.CursorDown()
+			}
+
+		case msgType.String() == "K":
+			if focused := tokens.Focused(); focused != nil {
+				// Move token down
+				tokens.vault.MoveTokenUp(tokens.folder.ID, focused.Token.ID)
+
+				// Refresh tokens
+				cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshTokensMsg{} })
+
+				// Move cursor down
+				tokens.listview.CursorUp()
+			}
+
 		case msgType.String() == "n":
 			if focused := tokens.Focused(); focused != nil {
 				if focused.Token.Type == tlockvault.TokenTypeHOTP {
