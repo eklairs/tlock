@@ -20,7 +20,7 @@ func main() {
 	tlockstyles.InitializeStyles(context.GetCurrentTheme())
 
 	// New bubbletea program
-	program := tea.NewProgram(tlockmodels.InitializeRootModel(context), tea.WithAltScreen(), tea.WithBackgroundColor(background))
+	program := tea.NewProgram(tlockmodels.InitializeRootModel(&context), tea.WithAltScreen(), tea.WithBackgroundColor(background))
 
 	// Run
 	if _, err := program.Run(); err != nil {

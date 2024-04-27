@@ -57,7 +57,7 @@ var enterPassKeys = enterPassKeyMap{
 // Enter pass screen
 type EnterPassScreen struct {
 	// Context
-	context context.Context
+	context *context.Context
 
 	// Password input
 	passInput textinput.Model
@@ -70,7 +70,7 @@ type EnterPassScreen struct {
 }
 
 // Initialize root model
-func InitializeEnterPassScreen(context context.Context, user tlockcore.User) EnterPassScreen {
+func InitializeEnterPassScreen(context *context.Context, user tlockcore.User) EnterPassScreen {
 	// Password input
 	passwordInput := components.InitializeInputBox("Your password goes here...")
 	passwordInput.EchoCharacter = constants.CHAR_ECHO

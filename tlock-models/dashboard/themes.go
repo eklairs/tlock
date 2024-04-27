@@ -102,14 +102,14 @@ var themesAsciiArt = `
 // Themes screen
 type ThemesScreen struct {
 	// Context
-	context tlockcontext.Context
+	context *tlockcontext.Context
 
 	// List
 	listview list.Model
 }
 
 // Initializes a new instance of the themes screen
-func InitializeThemesScreen(context tlockcontext.Context) ThemesScreen {
+func InitializeThemesScreen(context *tlockcontext.Context) ThemesScreen {
 	// Theme items
 	themeItems := tlockinternal.Map(context.Themes, func(theme tlockcontext.Theme) list.Item { return themeItem(theme) })
 

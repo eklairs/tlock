@@ -111,14 +111,14 @@ var selectUserKeys = selectUserKeyMap{
 // Select user
 type SelectUserScreen struct {
 	// Context
-	context context.Context
+	context *context.Context
 
 	// List view
 	listview list.Model
 }
 
 // New instance of select user
-func InitializeSelectUserScreen(context context.Context) SelectUserScreen {
+func InitializeSelectUserScreen(context *context.Context) SelectUserScreen {
 	// Renderable list of users
 	usersList := tlockinternal.Map(context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user.Username) })
 

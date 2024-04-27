@@ -61,7 +61,7 @@ var createUserKeys = createUserKeyMap{
 // Create user screen
 type CreateUserScreen struct {
 	// Context
-	context context.Context
+	context *context.Context
 
 	// Username input
 	usernameInput textinput.Model
@@ -74,7 +74,7 @@ type CreateUserScreen struct {
 }
 
 // Initializes a new instance of the create user screen
-func InitializeCreateUserScreen(context context.Context) CreateUserScreen {
+func InitializeCreateUserScreen(context *context.Context) CreateUserScreen {
 	// Input box for username
 	usernameInput := components.InitializeInputBox("Your username goes here...")
 	usernameInput.Focus()

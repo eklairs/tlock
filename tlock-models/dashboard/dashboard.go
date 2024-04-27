@@ -67,7 +67,7 @@ type DashboardScreen struct {
 	vault *tlockvault.Vault
 
 	// Context
-	context context.Context
+	context *context.Context
 
 	// Folders
 	folders folders.Folders
@@ -77,7 +77,7 @@ type DashboardScreen struct {
 }
 
 // Initializes a new instance of dashboard screen
-func InitializeDashboardScreen(vault tlockvault.Vault, context context.Context) DashboardScreen {
+func InitializeDashboardScreen(vault tlockvault.Vault, context *context.Context) DashboardScreen {
 	return DashboardScreen{
 		vault:   &vault,
 		context: context,

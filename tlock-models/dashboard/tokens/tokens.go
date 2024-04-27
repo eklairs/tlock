@@ -212,7 +212,7 @@ type Tokens struct {
 	listview *list.Model
 
 	// Context
-	context context.Context
+	context *context.Context
 }
 
 // Returns the focused folder item
@@ -247,7 +247,7 @@ func buildTokensListView(tokens []tlockvault.Token) list.Model {
 }
 
 // Initializes a new instance of folders
-func InitializeTokens(vault *tlockvault.Vault, context context.Context) Tokens {
+func InitializeTokens(vault *tlockvault.Vault, context *context.Context) Tokens {
 	return Tokens{
 		vault:   vault,
 		folder:  nil,
