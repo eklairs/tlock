@@ -47,7 +47,7 @@ func getCurrentCode(token tlockvault.Token) string {
 			Algorithm: token.HashingAlgorithm,
 		})
 	} else {
-		code, _ = hotp.GenerateCodeCustom(token.Secret, uint64(token.UsageCounter), hotp.ValidateOpts{
+		code, _ = hotp.GenerateCodeCustom(token.Secret, uint64(token.UsageCounter+token.InitialCounter), hotp.ValidateOpts{
 			Digits:    otp.Digits(token.Digits),
 			Algorithm: token.HashingAlgorithm,
 		})
