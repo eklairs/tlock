@@ -46,11 +46,19 @@ var helpKeys = helpKeyBindings{
 			Desc: "Edit the current focused folder",
 		},
 		{
-			Key:  "Shift + Up",
+			Key:  "Tab",
+			Desc: "Switch to next folder",
+		},
+		{
+			Key:  "Shift + Tab",
+			Desc: "Switch to previous folder",
+		},
+		{
+			Key:  "Ctrl + Up",
 			Desc: "Move the focused folder up",
 		},
 		{
-			Key:  "Shift + Down",
+			Key:  "Ctrl + Down",
 			Desc: "Move the focused folder down",
 		},
 		{
@@ -84,11 +92,19 @@ var helpKeys = helpKeyBindings{
 			Desc: "Copy the current code for the focused token",
 		},
 		{
-			Key:  "Ctrl + Up",
+			Key:  "j",
+			Desc: "Move focus to the text token",
+		},
+		{
+			Key:  "k",
+			Desc: "Move focus to the previous token",
+		},
+		{
+			Key:  "K",
 			Desc: "Move the focused token up",
 		},
 		{
-			Key:  "Ctrl + Down",
+			Key:  "J",
 			Desc: "Move the focused token down",
 		},
 		{
