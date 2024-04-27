@@ -1,10 +1,12 @@
 package tokens
 
 import (
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/components"
@@ -16,6 +18,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
+	"golang.org/x/term"
 )
 
 // Error for empty secret
@@ -76,6 +79,9 @@ type AddTokenScreen struct {
 
 	// Folder
 	folder tlockvault.Folder
+
+	// Viewport
+	viewport viewport.Model
 }
 
 // Initializes a new screen of AddTokenScreen
@@ -129,10 +135,21 @@ func InitializeAddTokenScreen(folder tlockvault.Folder, vault *tlockvault.Vault)
 	form := form.New(items)
 	form.Items[6].Enabled = false
 
+	// Get term size
+	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
+
+	// Initialize viewport
+	content := GenerateUI(form)
+
+	viewport := viewport.New(85, min(height, lipgloss.Height(content)))
+	viewport.SetContent(content)
+
+	// Return
 	return AddTokenScreen{
-		form:   form,
-		vault:  vault,
-		folder: folder,
+		form:     form,
+		vault:    vault,
+		folder:   folder,
+		viewport: viewport,
 	}
 }
 
@@ -250,7 +267,23 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 		case key.Matches(msgType, editTokenKeys.GoBack):
 			manager.PopScreen()
 		}
+
+	case tea.WindowSizeMsg:
+		screen.viewport.Height = msgType.Height
 	}
+
+	// Get size
+	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
+
+	// Update viewport
+	screen.viewport, _ = screen.viewport.Update(msg)
+
+	// Generate UI
+	content := GenerateUI(screen.form)
+
+	// Set viewport content
+	screen.viewport.Height = min(lipgloss.Height(content), height)
+	screen.viewport.SetContent(content)
 
 	// Update the form
 	screen.form.Update(msg)
@@ -277,32 +310,37 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 
 // View
 func (screen AddTokenScreen) View() string {
+	return screen.viewport.View()
+}
+
+// Generates the UI
+func GenerateUI(form form.Form) string {
 	// Items
 	items := []string{
 		tlockstyles.Styles.Title.Render(addTokenAscii), "",
 		tlockstyles.Styles.SubText.Render("Add a new token [secret is required, rest are optional]"), "",
-		screen.form.Items[0].FormItem.View(), // Account name input
-		screen.form.Items[1].FormItem.View(), // Issuer name input
-		screen.form.Items[2].FormItem.View(), // Secret value input
+		form.Items[0].FormItem.View(), // Account name input
+		form.Items[1].FormItem.View(), // Issuer name input
+		form.Items[2].FormItem.View(), // Secret value input
 		lipgloss.JoinHorizontal(
 			lipgloss.Left,
-			screen.form.Items[3].FormItem.View(), "   ",
-			screen.form.Items[4].FormItem.View(),
+			form.Items[3].FormItem.View(), "   ",
+			form.Items[4].FormItem.View(),
 		), "",
 	}
 
 	// Render the input boxes based on choosen type
 	inputGroup := lipgloss.JoinHorizontal(
 		lipgloss.Left,
-		screen.form.Items[5].FormItem.View(), "   ",
-		screen.form.Items[7].FormItem.View(),
+		form.Items[5].FormItem.View(), "   ",
+		form.Items[7].FormItem.View(),
 	)
 
-	if screen.form.Items[3].FormItem.Value() == "HOTP" {
+	if form.Items[3].FormItem.Value() == "HOTP" {
 		inputGroup = lipgloss.JoinHorizontal(
 			lipgloss.Left,
-			screen.form.Items[6].FormItem.View(), "   ",
-			screen.form.Items[7].FormItem.View(),
+			form.Items[6].FormItem.View(), "   ",
+			form.Items[7].FormItem.View(),
 		)
 	}
 
@@ -310,8 +348,5 @@ func (screen AddTokenScreen) View() string {
 	items = append(items, inputGroup, "", tlockstyles.Help.View(addTokenKeys))
 
 	// Return!
-	return lipgloss.JoinVertical(
-		lipgloss.Center,
-		items...,
-	)
+	return lipgloss.JoinVertical(lipgloss.Center, items...)
 }
