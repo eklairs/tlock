@@ -2,6 +2,7 @@ package components
 
 import (
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -69,28 +70,47 @@ func tokenItemImpl(width int, account, separator, issuer, code string, spacerSty
 }
 
 // List item active
-func TokenItemActive(width int, account, issuer, code string) string {
-	return tokenItemImpl(
+func TokenItemActive(width int, account, issuer, code string, period int, timeLeft *int) string {
+	style := tlockstyles.Styles.ListItemActive
+
+	if timeLeft != nil {
+		// We display time bar at the bottom!
+		style = style.Copy().UnsetPaddingBottom()
+	}
+
+	ui := tokenItemImpl(
 		width,
 		tlockstyles.Styles.Title.Render(account),
 		tlockstyles.Styles.BackgroundOver.Render(" • "),
 		tlockstyles.Styles.BackgroundOver.Render(issuer),
 		tlockstyles.Styles.BackgroundOver.Render(tlockstyles.Styles.Title.Render(code)),
-		tlockstyles.Styles.BackgroundOver,
-		tlockstyles.Styles.ListItemActive,
+		tlockstyles.Styles.BackgroundOver, style,
 	)
+
+	// Get the number of blocks required to render
+	if timeLeft != nil {
+		// Get the number of blocks to render
+		blocksPerSec := int(math.Floor(float64(width) / float64(period)))
+
+		// Render!
+		renderable := tlockstyles.Styles.Title.Render(strings.Repeat("▁", blocksPerSec**timeLeft))
+
+		// Render!
+		ui = lipgloss.JoinVertical(lipgloss.Left, ui, lipgloss.NewStyle().Inherit(style).UnsetPaddingTop().Width(width+6).Render(renderable))
+	}
+
+	return ui
 }
 
 // List item active
-func TokenItemInactive(width int, account, issuer, code string) string {
+func TokenItemInactive(width int, account, issuer, code string, period int, timeLeft *int) string {
 	return tokenItemImpl(
 		width,
 		tlockstyles.Styles.SubText.Render(account),
 		tlockstyles.Styles.SubText.Render(" • "),
 		tlockstyles.Styles.SubText.Render(issuer),
 		tlockstyles.Styles.SubText.Render(code),
-		tlockstyles.Styles.SubText,
-		tlockstyles.Styles.ListItemInactive,
+		tlockstyles.Styles.SubText, tlockstyles.Styles.ListItemInactive,
 	)
 }
 

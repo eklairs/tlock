@@ -178,7 +178,7 @@ func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	code := strings.Join(strings.Split(item.CurrentCode, ""), "   ")
 
 	// Render
-	fmt.Fprint(w, render_fn(m.Width()-9, account, issuer, code))
+	fmt.Fprint(w, render_fn(m.Width()-9, account, issuer, code, item.Token.Period, item.time))
 }
 
 // Tokens

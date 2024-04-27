@@ -56,6 +56,9 @@ type TLockStyles struct {
 
 	// Sub text item
 	SubTextItem lipgloss.Style
+
+	// Time left for inactive cards
+	TimeLeftInactive lipgloss.Style
 }
 
 // Initializes the styles
@@ -87,6 +90,7 @@ func InitializeStyles(theme context.Theme) {
 			BorderBackground(theme.BackgroundOver).
 			BorderForeground(theme.Accent),
 		ListItemInactive: with(paddedItem),
+		TimeLeftInactive: with(base).Foreground(theme.BackgroundOver),
 	}
 
 	// Initialize help
