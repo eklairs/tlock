@@ -154,10 +154,10 @@ func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	item := listItem.(tokensListItem)
 
 	// Decide renderer function
-	render_fn := components.ListItemInactive
+	render_fn := components.TokenItemInactive
 
 	if index == m.Index() {
-		render_fn = components.ListItemActive
+		render_fn = components.TokenItemActive
 	}
 
 	// Account name
@@ -174,44 +174,11 @@ func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 		issuer = "<no issuer name>"
 	}
 
-	// Build key info
-	info := lipgloss.JoinHorizontal(
-		lipgloss.Center,
-		tlockstyles.Styles.Title.Render(account),
-		tlockstyles.Styles.BackgroundOver.Render(" • "),
-		tlockstyles.Styles.BackgroundOver.Render(issuer),
-	)
-
-	// Render it differently if it is not the current token
-	if index != m.Index() {
-		info = lipgloss.JoinHorizontal(
-			lipgloss.Center,
-			tlockstyles.Styles.SubText.Render(account),
-			tlockstyles.Styles.SubText.Render(" • "),
-			tlockstyles.Styles.SubText.Render(issuer),
-		)
-	}
-
 	// Suffix (current code)
-	suffix := strings.Join(strings.Split(item.CurrentCode, ""), "   ")
-
-	// Add time left info if the token is TOTP
-	if item.Token.Type == tlockvault.TokenTypeTOTP {
-		time_render_fn := tlockstyles.Styles.BackgroundOver
-
-		if index != m.Index() {
-			time_render_fn = tlockstyles.Styles.SubText
-		}
-
-		suffix = lipgloss.JoinHorizontal(
-			lipgloss.Center,
-			suffix,
-			time_render_fn.Render(fmt.Sprintf("   ⏲  %d", *item.time)),
-		)
-	}
+	code := strings.Join(strings.Split(item.CurrentCode, ""), "   ")
 
 	// Render
-	fmt.Fprint(w, render_fn(m.Width()-9, info, suffix))
+	fmt.Fprint(w, render_fn(m.Width()-9, account, issuer, code))
 }
 
 // Tokens

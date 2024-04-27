@@ -38,6 +38,62 @@ func ListItemInactive(width int, title, suffix string) string {
 	return tlockstyles.Styles.ListItemInactive.Render(ui)
 }
 
+// Token list item renderer implementation
+func tokenItemImpl(width int, account, separator, issuer, code string, spacerStyle lipgloss.Style, uiStyle lipgloss.Style) string {
+	space_width := width - lipgloss.Width(account) - lipgloss.Width(separator) - lipgloss.Width(issuer) - lipgloss.Width(code)
+
+	var ui string
+
+	// If the space width is > 0, we have some space for the padding!
+	if space_width >= 0 {
+		ui = lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			account, separator, issuer,
+			spacerStyle.Render(strings.Repeat(" ", space_width)),
+			code,
+		)
+	} else if newSpaceWidth := space_width + lipgloss.Width(issuer) + lipgloss.Width(separator); newSpaceWidth >= 0 {
+		// If the width is not enough; lets drop the issuer name
+		ui = lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			account,
+			spacerStyle.Render(strings.Repeat(" ", newSpaceWidth)),
+			code,
+		)
+	} else {
+		ui = lipgloss.JoinHorizontal(lipgloss.Left, code)
+	}
+
+	// If that doesnt help, then just show the code
+	return uiStyle.Render(ui)
+}
+
+// List item active
+func TokenItemActive(width int, account, issuer, code string) string {
+	return tokenItemImpl(
+		width,
+		tlockstyles.Styles.Title.Render(account),
+		tlockstyles.Styles.BackgroundOver.Render(" • "),
+		tlockstyles.Styles.BackgroundOver.Render(issuer),
+		tlockstyles.Styles.BackgroundOver.Render(tlockstyles.Styles.Title.Render(code)),
+		tlockstyles.Styles.BackgroundOver,
+		tlockstyles.Styles.ListItemActive,
+	)
+}
+
+// List item active
+func TokenItemInactive(width int, account, issuer, code string) string {
+	return tokenItemImpl(
+		width,
+		tlockstyles.Styles.SubText.Render(account),
+		tlockstyles.Styles.SubText.Render(" • "),
+		tlockstyles.Styles.SubText.Render(issuer),
+		tlockstyles.Styles.SubText.Render(code),
+		tlockstyles.Styles.SubText,
+		tlockstyles.Styles.ListItemInactive,
+	)
+}
+
 // Builds a listview model devoid of every feature
 func ListViewSimple(items []list.Item, delegate list.ItemDelegate, width, height int) list.Model {
 	listview := list.New(items, delegate, width, height)
