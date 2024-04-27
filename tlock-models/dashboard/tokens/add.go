@@ -83,6 +83,9 @@ type AddTokenScreen struct {
 
 	// Viewport
 	viewport viewport.Model
+
+	// Viewport content
+	content string
 }
 
 // Initializes a new screen of AddTokenScreen
@@ -150,6 +153,7 @@ func InitializeAddTokenScreen(folder tlockvault.Folder, vault *tlockvault.Vault)
 		form:     form,
 		vault:    vault,
 		folder:   folder,
+		content:  content,
 		viewport: viewport,
 	}
 }
@@ -270,7 +274,7 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 		}
 
 	case tea.WindowSizeMsg:
-		screen.viewport.Height = msgType.Height
+		screen.viewport.Height = min(msgType.Height, lipgloss.Height(screen.content))
 	}
 
 	// Update viewport
@@ -280,10 +284,10 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 	screen.form.Update(msg)
 
 	// Generate UI
-	content := GenerateUI(screen.form)
+	screen.content = GenerateUI(screen.form)
 
 	// Set viewport content
-	screen.viewport.SetContent(content)
+	screen.viewport.SetContent(screen.content)
 
 	// Enable / Disable items based on the choosen type
 	if screen.form.Items[3].FormItem.Value() == "TOTP" {
