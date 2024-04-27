@@ -81,7 +81,11 @@ func (screen DeleteFolderScreen) Update(msg tea.Msg, manager *modelmanager.Model
 			screen.vault.DeleteFolder(screen.folder.ID)
 
 			// Request folders refresh
-			cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })
+			cmds = append(
+				cmds,
+				func() tea.Msg { return tlockmessages.RequestFolderChanged{} },
+				func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
+			)
 
 			// Pop
 			manager.PopScreen()

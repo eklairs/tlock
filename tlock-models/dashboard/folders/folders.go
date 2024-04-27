@@ -163,6 +163,9 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 				cmds = append(cmds, manager.PushScreen(InitializeDeleteFolderScreen(*focused, folders.vault)))
 			}
 
+		case "tab", "shift+tab":
+			cmds = append(cmds, func() tea.Msg { return tlockmessages.RequestFolderChanged{} })
+
 		// Move folder down
 		case "ctrl+up":
 			if focused := folders.Focused(); focused != nil {
@@ -219,15 +222,6 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 	// Update list
 	folders.listview, cmd = folders.listview.Update(msg)
 	cmds = append(cmds, cmd)
-
-	// Check if the focused has been changed
-	if len(folders.listview.Items()) != 0 && folders.listview.Index() != folders.lastFocused {
-		// New focused item
-		cmds = append(cmds, func() tea.Msg { return tlockmessages.RequestFolderChanged{} })
-
-		// Change
-		folders.lastFocused = folders.listview.Index()
-	}
 
 	// Return
 	return tea.Batch(cmds...)
