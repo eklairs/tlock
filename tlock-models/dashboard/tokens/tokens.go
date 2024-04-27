@@ -19,6 +19,7 @@ import (
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/tlock-messages"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
+	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/hotp"
 	"github.com/pquerna/otp/totp"
 	"golang.design/x/clipboard"
@@ -36,13 +37,20 @@ func getRemainingTime(token tlockvault.Token) int {
 }
 
 // Returns the current code
-func getCurrentCode(tokenType tlockvault.TokenType, secret string, usageCounter int) string {
+func getCurrentCode(token tlockvault.Token) string {
 	var code string
 
-	if tokenType == tlockvault.TokenTypeTOTP {
-		code, _ = totp.GenerateCode(secret, time.Now())
+	if token.Type == tlockvault.TokenTypeTOTP {
+		code, _ = totp.GenerateCodeCustom(token.Secret, time.Now(), totp.ValidateOpts{
+			Period:    uint(token.Period),
+			Digits:    otp.Digits(token.Digits),
+			Algorithm: token.HashingAlgorithm,
+		})
 	} else {
-		code, _ = hotp.GenerateCode(secret, uint64(usageCounter))
+		code, _ = hotp.GenerateCodeCustom(token.Secret, uint64(token.UsageCounter), hotp.ValidateOpts{
+			Digits:    otp.Digits(token.Digits),
+			Algorithm: token.HashingAlgorithm,
+		})
 	}
 
 	return code
@@ -74,7 +82,7 @@ func (item *tokensListItem) Refresh() {
 	}
 
 	// Update current code
-	item.CurrentCode = getCurrentCode(item.Token.Type, item.Token.Secret, item.Token.UsageCounter)
+	item.CurrentCode = getCurrentCode(item.Token)
 }
 
 // Initializes a new instance of the tokens list item
@@ -87,7 +95,7 @@ func InitializeTokenListItem(token tlockvault.Token) tokensListItem {
 	}
 
 	return tokensListItem{
-		CurrentCode: getCurrentCode(token.Type, token.Secret, token.UsageCounter),
+		CurrentCode: getCurrentCode(token),
 		Token:       token,
 		time:        ttr,
 	}
