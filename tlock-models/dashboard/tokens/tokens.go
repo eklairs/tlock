@@ -218,7 +218,7 @@ type Tokens struct {
 // Returns the focused folder item
 func (tokens Tokens) Focused() *tokensListItem {
 	// If there are no items, return nil
-	if len(tokens.listview.Items()) == 0 {
+	if tokens.listview == nil || len(tokens.listview.Items()) == 0 {
 		return nil
 	}
 
@@ -274,6 +274,8 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 
 		case msgType.String() == "e":
 			if focused := tokens.Focused(); focused != nil {
+				panic(tokens.listview.Index())
+
 				manager.PushScreen(InitializeEditTokenScreen(*tokens.folder, focused.Token, tokens.vault))
 			}
 
