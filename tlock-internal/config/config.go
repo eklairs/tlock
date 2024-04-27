@@ -11,7 +11,7 @@ import (
 )
 
 // Default theme
-var DEFAULT_THEME = "Dracula"
+var DEFAULT_THEME = "Nord"
 
 // Path to the config file
 var CONFIG_PATH = path.Join(xdg.ConfigHome, "tlock", "tlock.json")

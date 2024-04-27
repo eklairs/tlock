@@ -46,19 +46,19 @@ var helpKeys = helpKeyBindings{
 			Desc: "Edit the current focused folder",
 		},
 		{
-			Key:  "Tab",
+			Key:  "tab",
 			Desc: "Switch to next folder",
 		},
 		{
-			Key:  "Shift + Tab",
+			Key:  "shift + tab",
 			Desc: "Switch to previous folder",
 		},
 		{
-			Key:  "Ctrl + Up",
+			Key:  "ctrl + up",
 			Desc: "Move the focused folder up",
 		},
 		{
-			Key:  "Ctrl + Down",
+			Key:  "ctrl + down",
 			Desc: "Move the focused folder down",
 		},
 		{
@@ -118,11 +118,11 @@ var helpKeys = helpKeyBindings{
 			Desc: "Show this help window",
 		},
 		{
-			Key:  "Ctrl + T",
+			Key:  "ctrl + t",
 			Desc: "Change theme",
 		},
 		{
-			Key:  "Ctrl + C / Ctrl + Q",
+			Key:  "ctrl + c / ctrl + q",
 			Desc: "Exit the application",
 		},
 	},

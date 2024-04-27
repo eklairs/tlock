@@ -57,7 +57,7 @@ var dashboardKeys = dashboardKeyMap{
 	),
 	ChangeTheme: key.NewBinding(
 		key.WithKeys("ctrl+t"),
-		key.WithHelp("Ctrl + T", "change theme"),
+		key.WithHelp("ctrl + t", "change theme"),
 	),
 }
 
@@ -108,8 +108,13 @@ func (screen DashboardScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
+		// Help menu
 		case key.Matches(msgType, dashboardKeys.Help):
 			cmd = manager.PushScreen(InitializeHelpScreen())
+
+		// Themes screen
+		case key.Matches(msgType, dashboardKeys.ChangeTheme):
+			cmd = manager.PushScreen(InitializeThemesScreen(screen.context))
 		}
 	}
 
