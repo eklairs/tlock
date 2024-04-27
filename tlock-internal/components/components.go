@@ -40,16 +40,19 @@ func ListItemInactive(width int, title, suffix string) string {
 }
 
 // Token list item renderer implementation
-func tokenItemImpl(width int, account, separator, issuer, code string, spacerStyle lipgloss.Style, uiStyle lipgloss.Style) string {
-	space_width := width - lipgloss.Width(account) - lipgloss.Width(separator) - lipgloss.Width(issuer) - lipgloss.Width(code)
+func tokenItemImpl(width int, icon, account, separator, issuer, code string, spacerStyle lipgloss.Style, uiStyle lipgloss.Style) string {
+	space_width := width - lipgloss.Width(account) - lipgloss.Width(separator) - lipgloss.Width(issuer) - lipgloss.Width(code) - 3
 
+	icon = spacerStyle.Render(fmt.Sprintf("%s%s", icon, spacerStyle.Render("  ")))
+
+	// Icon renderable
 	var ui string
 
 	// If the space width is > 0, we have some space for the padding!
 	if space_width >= 0 {
 		ui = lipgloss.JoinHorizontal(
 			lipgloss.Left,
-			account, separator, issuer,
+			icon, account, separator, issuer,
 			spacerStyle.Render(strings.Repeat(" ", space_width)),
 			code,
 		)
@@ -57,12 +60,12 @@ func tokenItemImpl(width int, account, separator, issuer, code string, spacerSty
 		// If the width is not enough; lets drop the issuer name
 		ui = lipgloss.JoinHorizontal(
 			lipgloss.Left,
-			account,
+			icon, account,
 			spacerStyle.Render(strings.Repeat(" ", newSpaceWidth)),
 			code,
 		)
 	} else {
-		ui = lipgloss.JoinHorizontal(lipgloss.Left, code)
+		ui = lipgloss.JoinHorizontal(lipgloss.Left, icon, code)
 	}
 
 	// If that doesnt help, then just show the code
@@ -70,7 +73,7 @@ func tokenItemImpl(width int, account, separator, issuer, code string, spacerSty
 }
 
 // List item active
-func TokenItemActive(width int, account, issuer, code string, period int, timeLeft *int) string {
+func TokenItemActive(width int, icon, account, issuer, code string, period int, timeLeft *int) string {
 	style := tlockstyles.Styles.ListItemActive
 
 	if timeLeft != nil {
@@ -79,8 +82,8 @@ func TokenItemActive(width int, account, issuer, code string, period int, timeLe
 	}
 
 	ui := tokenItemImpl(
-		width,
-		tlockstyles.Styles.Title.Render(account),
+		width, icon,
+		tlockstyles.Styles.BackgroundOver.Render(tlockstyles.Styles.Title.Render(account)),
 		tlockstyles.Styles.BackgroundOver.Render(" • "),
 		tlockstyles.Styles.BackgroundOver.Render(issuer),
 		tlockstyles.Styles.BackgroundOver.Render(tlockstyles.Styles.Title.Render(code)),
@@ -103,9 +106,9 @@ func TokenItemActive(width int, account, issuer, code string, period int, timeLe
 }
 
 // List item active
-func TokenItemInactive(width int, account, issuer, code string, period int, timeLeft *int) string {
+func TokenItemInactive(width int, icon, account, issuer, code string, period int, timeLeft *int) string {
 	return tokenItemImpl(
-		width,
+		width, icon,
 		tlockstyles.Styles.SubText.Render(account),
 		tlockstyles.Styles.SubText.Render(" • "),
 		tlockstyles.Styles.SubText.Render(issuer),

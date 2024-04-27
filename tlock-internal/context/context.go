@@ -12,6 +12,11 @@ import (
 	"golang.design/x/clipboard"
 )
 
+type Icon struct {
+	Unicode string
+	Hex     string
+}
+
 // Represents a theme
 type Theme struct {
 	// Name
@@ -42,6 +47,9 @@ type Context struct {
 	// Fetched from vendor
 	Themes []Theme
 
+	// Icons!
+	Icons map[string]Icon
+
 	// Config
 	Config config.Config
 
@@ -60,13 +68,19 @@ func InitializeContext() Context {
 
 	// Themes
 	var themes []Theme
-
-	// Parse themes
 	json.Unmarshal(tlockvendor.ThemesJSON, &themes)
+
+	// Parse icons
+	var icons struct {
+		Icons map[string]Icon
+	}
+
+	json.Unmarshal(tlockvendor.IconsJSON, &icons)
 
 	// Return
 	return Context{
 		Themes:                themes,
+		Icons:                 icons.Icons,
 		Core:                  tlockcore.New(),
 		Config:                config.GetConfig(),
 		ClipboardAvailability: err == nil,

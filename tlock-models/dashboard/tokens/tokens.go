@@ -140,7 +140,9 @@ var EmptyAsciiArt = `
 `
 
 // Tokens list delegate
-type tokensListDelegate struct{}
+type tokensListDelegate struct {
+	context *context.Context
+}
 
 // Height
 func (d tokensListDelegate) Height() int {
@@ -185,8 +187,18 @@ func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	// Suffix (current code)
 	code := strings.Join(strings.Split(item.CurrentCode, ""), "   ")
 
+	var tokenRenderable string
+
+	icon, ok := d.context.Icons[item.Token.Issuer]
+
+	if ok {
+		tokenRenderable = lipgloss.NewStyle().Foreground(lipgloss.Color("#" + icon.Hex)).Render(icon.Unicode)
+	} else {
+		tokenRenderable = tlockstyles.Styles.Title.Render("")
+	}
+
 	// Render
-	fmt.Fprint(w, render_fn(m.Width()-9, account, issuer, code, item.Token.Period, item.time))
+	fmt.Fprint(w, render_fn(m.Width()-9, tokenRenderable, account, issuer, code, item.Token.Period, item.time))
 }
 
 // Tokens
@@ -228,11 +240,11 @@ func buildTokensItems(tokens []tlockvault.Token) []list.Item {
 }
 
 // Builds the tokens list view
-func buildTokensListView(tokens []tlockvault.Token) list.Model {
+func buildTokensListView(tokens []tlockvault.Token, context *context.Context) list.Model {
 	// Get terminal size
 	width, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
-	return components.ListViewSimple(buildTokensItems(tokens), tokensListDelegate{}, tokensWidth(width), height-3)
+	return components.ListViewSimple(buildTokensItems(tokens), tokensListDelegate{context: context}, tokensWidth(width), height-3)
 }
 
 // Initializes a new instance of folders
@@ -318,7 +330,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 
 	case tlockmessages.FolderChanged:
 		// Build listview
-		listview := buildTokensListView(tokens.vault.GetTokens(msgType.Folder.ID))
+		listview := buildTokensListView(tokens.vault.GetTokens(msgType.Folder.ID), tokens.context)
 
 		// Update listview
 		tokens.listview = &listview
