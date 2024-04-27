@@ -7,5 +7,23 @@
         "accent": "#b4befe",
         "foreground": "#cdd6f4",
         "error": "#f38ba8"
+    },
+    {
+        "name": "Nord",
+        "background": "#292E39",
+        "backgroundOver": "#2E3440",
+        "subText": "#929aaa",
+        "accent": "#88c0d0",
+        "foreground": "#d8dee9",
+        "error": "#bf616a"
+    },
+    {
+        "name": "Dracula",
+        "background": "#282A36",
+        "backgroundOver": "#44475A",
+        "subText": "#6272A4",
+        "accent": "#BD93F9",
+        "foreground": "#F8F8F2",
+        "error": "#FF5555"
     }
 ]
