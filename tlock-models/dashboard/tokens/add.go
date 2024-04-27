@@ -272,21 +272,17 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 		screen.viewport.Height = msgType.Height
 	}
 
-	// Get size
-	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
-
 	// Update viewport
 	screen.viewport, _ = screen.viewport.Update(msg)
+
+	// Update the form
+	screen.form.Update(msg)
 
 	// Generate UI
 	content := GenerateUI(screen.form)
 
 	// Set viewport content
-	screen.viewport.Height = min(lipgloss.Height(content), height)
 	screen.viewport.SetContent(content)
-
-	// Update the form
-	screen.form.Update(msg)
 
 	// Enable / Disable items based on the choosen type
 	if screen.form.Items[3].FormItem.Value() == "TOTP" {
