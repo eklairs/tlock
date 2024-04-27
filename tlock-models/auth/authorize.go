@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	tlockcore "github.com/eklairs/tlock/tlock-core"
 	"github.com/eklairs/tlock/tlock-internal/components"
+	"github.com/eklairs/tlock/tlock-internal/constants"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-models/dashboard"
@@ -16,7 +17,7 @@ import (
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
 
-var ERROR_PASSWORD_WRONG = "Wrong password, please try again"
+var ERROR_PASSWORD_WRONG = "Wrong password, please check if it is correct"
 
 var enterPassAsciiArt = `
 █▀█ ▄▀█ █▀ █▀ █ █ █ █▀█ █▀█ █▀▄
@@ -72,6 +73,8 @@ type EnterPassScreen struct {
 func InitializeEnterPassScreen(context context.Context, user tlockcore.User) EnterPassScreen {
 	// Password input
 	passwordInput := components.InitializeInputBox("Your password goes here...")
+	passwordInput.EchoCharacter = constants.CHAR_ECHO
+	passwordInput.EchoMode = textinput.EchoPassword
 	passwordInput.Focus()
 
 	return EnterPassScreen{

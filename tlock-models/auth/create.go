@@ -6,6 +6,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/components"
+	"github.com/eklairs/tlock/tlock-internal/constants"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-models/dashboard"
@@ -78,10 +79,15 @@ func InitializeCreateUserScreen(context context.Context) CreateUserScreen {
 	usernameInput := components.InitializeInputBox("Your username goes here...")
 	usernameInput.Focus()
 
+	// Input box for password
+	passwordInput := components.InitializeInputBox("Your password goes here...")
+	passwordInput.EchoMode = textinput.EchoPassword
+	passwordInput.EchoCharacter = constants.CHAR_ECHO
+
 	return CreateUserScreen{
 		context:       context,
 		usernameInput: usernameInput,
-		passwordInput: components.InitializeInputBox("Your password goes here..."),
+		passwordInput: passwordInput,
 	}
 }
 
