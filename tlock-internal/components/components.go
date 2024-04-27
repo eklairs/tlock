@@ -163,9 +163,21 @@ func InitializeInputBoxCustomWidth(placeholder string, width int) textinput.Mode
 
 // Active folder list item
 func ActiveFolderListItem(width int, name string, tokensCount int) string {
+	bottom := fmt.Sprintf("%d tokens", tokensCount)
+
+	// -5 is for including the padding
+	if len(name) > width-5 {
+		// Ellipsis
+		name = name[:width-6] + "…"
+	}
+
+	if len(bottom) > width-5 {
+		bottom = bottom[:width-6] + "…"
+	}
+
 	items := []string{
 		tlockstyles.Styles.Title.Render(name),
-		tlockstyles.Styles.SubText.Render(fmt.Sprintf("%d tokens", tokensCount)),
+		tlockstyles.Styles.SubText.Render(bottom),
 	}
 
 	return tlockstyles.Styles.FolderItemActive.Copy().Width(width).Render(strings.Join(items, "\n"))
@@ -173,9 +185,21 @@ func ActiveFolderListItem(width int, name string, tokensCount int) string {
 
 // Inactive folder list item
 func InactiveFolderListItem(width int, name string, tokensCount int) string {
+	bottom := fmt.Sprintf("%d tokens", tokensCount)
+
+	// -6 is for including the padding
+	if len(name) > width-6 {
+		// Ellipsis
+		name = name[:width-7] + "…"
+	}
+
+	if len(bottom) > width-5 {
+		bottom = bottom[:width-6] + "…"
+	}
+
 	items := []string{
 		tlockstyles.Styles.SubText.Render(name),
-		tlockstyles.Styles.SubText.Render(fmt.Sprintf("%d tokens", tokensCount)),
+		tlockstyles.Styles.SubText.Render(bottom),
 	}
 
 	return tlockstyles.Styles.FolderItemInactive.Copy().Width(width).Render(strings.Join(items, "\n"))
