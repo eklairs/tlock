@@ -3,6 +3,7 @@ package tokens
 import (
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"time"
 
@@ -95,6 +96,41 @@ type EditTokenScreen struct {
 
 // Initializes a new screen of EditTokenScreen
 func InitializeEditTokenScreen(folder tlockvault.Folder, token tlockvault.Token, vault *tlockvault.Vault) EditTokenScreen {
+	tokenTypes := []string{"TOTP", "HOTP"}
+	hashFunctions := []string{"SHA1", "SHA256", "SHA512", "MD5"}
+
+	typeToString := func(tokenType tlockvault.TokenType) string {
+		if tokenType == tlockvault.TokenTypeTOTP {
+			return "TOTP"
+		}
+
+		if tokenType == tlockvault.TokenTypeHOTP {
+			return "HOTP"
+		}
+
+		return ""
+	}
+
+	hashFunctionToString := func(hashFn otp.Algorithm) string {
+		if hashFn == otp.AlgorithmMD5 {
+			return "MD5"
+		}
+
+		if hashFn == otp.AlgorithmSHA1 {
+			return "SHA1"
+		}
+
+		if hashFn == otp.AlgorithmSHA256 {
+			return "SHA256"
+		}
+
+		if hashFn == otp.AlgorithmSHA512 {
+			return "SHA512"
+		}
+
+		return ""
+	}
+
 	items := []form.FormItem{
 		form.FormItemInputBox{
 			Title:       "Account Name",
@@ -114,14 +150,14 @@ func InitializeEditTokenScreen(folder tlockvault.Folder, token tlockvault.Token,
 		form.FormItemOptionBox{
 			Title:         "Type",
 			Description:   "Time or counter based token",
-			Values:        []string{"TOTP", "HOTP"},
-			SelectedIndex: 0,
+			Values:        tokenTypes,
+			SelectedIndex: slices.Index(tokenTypes, typeToString(token.Type)),
 		},
 		form.FormItemOptionBox{
 			Title:         "Hash function",
 			Description:   "Hash function for the token",
-			Values:        []string{"SHA1", "SHA256", "SHA512", "MD5"},
-			SelectedIndex: 1,
+			Values:        hashFunctions,
+			SelectedIndex: slices.Index(hashFunctions, hashFunctionToString(token.HashingAlgorithm)),
 		},
 		form.FormItemInputBox{
 			Title:       "Period",
