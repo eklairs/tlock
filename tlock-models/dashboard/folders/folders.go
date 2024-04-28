@@ -201,7 +201,13 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 
 	// Update items on refresh folders message
 	case tlockmessages.RefreshFoldersMsg:
+		// Add
 		cmds = append(cmds, folders.listview.SetItems(buildFolderListItems(folders.vault)))
+
+		// If this is the first element, might as well post request for folder changed
+		if len(folders.listview.Items()) == 1 {
+			cmds = append(cmds, func() tea.Msg { return tlockmessages.RequestFolderChanged{} })
+		}
 
 		// Handle terminal resizes
 	case tea.WindowSizeMsg:
