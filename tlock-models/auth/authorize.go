@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -93,9 +94,6 @@ func (screen EnterPassScreen) Init() tea.Cmd {
 func (screen EnterPassScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
 	var cmd tea.Cmd
 
-	// Update input box
-	screen.passInput, _ = screen.passInput.Update(msg)
-
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		if screen.passInput.Value() != "" {
@@ -103,6 +101,8 @@ func (screen EnterPassScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 		}
 
 		switch {
+		case strings.Contains(msgType.String(), "tab"):
+			// We dont want to allow tabs!
 		case key.Matches(msgType, enterPassKeys.Back):
 			manager.PopScreen()
 		case key.Matches(msgType, enterPassKeys.Login):
@@ -114,6 +114,9 @@ func (screen EnterPassScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			} else {
 				cmd = manager.PushScreen(dashboard.InitializeDashboardScreen(*vault, screen.context))
 			}
+		default:
+			// Update input box
+			screen.passInput, _ = screen.passInput.Update(msg)
 		}
 	}
 

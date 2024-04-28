@@ -1,6 +1,8 @@
 package folders
 
 import (
+	"strings"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -89,6 +91,9 @@ func (screen EditFolderScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
+		case strings.Contains(msgType.String(), "tab"):
+			// We ignore tabs (because of bubbletea issue in windows)
+
 		case key.Matches(msgType, editFolderKeys.GoBack):
 			manager.PopScreen()
 
@@ -107,11 +112,12 @@ func (screen EditFolderScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 			// Pop
 			manager.PopScreen()
+
+		default:
+			// Update input box
+			screen.name, _ = screen.name.Update(msg)
 		}
 	}
-
-	// Update input box
-	screen.name, _ = screen.name.Update(msg)
 
 	// Return
 	return screen, tea.Batch(cmds...)

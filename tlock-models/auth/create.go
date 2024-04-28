@@ -119,15 +119,6 @@ func (screen CreateUserScreen) Init() tea.Cmd {
 func (screen CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
 	var cmd tea.Cmd
 
-	// Update input boxes
-	if screen.usernameInput.Focused() {
-		screen.usernameInput, _ = screen.usernameInput.Update(msg)
-	}
-
-	if screen.passwordInput.Focused() {
-		screen.passwordInput, _ = screen.passwordInput.Update(msg)
-	}
-
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		// Remove error (if any) if the user input box is not empty
@@ -171,6 +162,16 @@ func (screen CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 			} else {
 				// Push dashboard screen
 				cmd = manager.PushScreen(dashboard.InitializeDashboardScreen(*vault, screen.context))
+			}
+
+		default:
+			// Update input boxes
+			if screen.usernameInput.Focused() {
+				screen.usernameInput, _ = screen.usernameInput.Update(msg)
+			}
+
+			if screen.passwordInput.Focused() {
+				screen.passwordInput, _ = screen.passwordInput.Update(msg)
 			}
 		}
 	}

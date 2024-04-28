@@ -210,9 +210,6 @@ func (form *Form) switchFocus(old, new int) {
 
 // Updates
 func (form *Form) Update(msg tea.Msg) {
-	// Update the current focused item
-	form.Items[form.FocusedIndex].FormItem, _ = form.Items[form.FocusedIndex].FormItem.Update(msg)
-
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch msgType.String() {
@@ -240,6 +237,8 @@ func (form *Form) Update(msg tea.Msg) {
 				// Change focus
 				form.switchFocus(form.FocusedIndex, next)
 			}
+		default:
+			form.Items[form.FocusedIndex].FormItem, _ = form.Items[form.FocusedIndex].FormItem.Update(msg)
 		}
 	}
 }

@@ -163,8 +163,11 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 				cmds = append(cmds, manager.PushScreen(InitializeDeleteFolderScreen(*focused, folders.vault)))
 			}
 
-		case "tab", "shift+tab":
+		case "tab":
 			cmds = append(cmds, func() tea.Msg { return tlockmessages.RequestFolderChanged{} })
+
+		case "shift+tab":
+			panic("AAAAA")
 
 		// Move folder down
 		case "ctrl+up":
