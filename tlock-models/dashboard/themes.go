@@ -9,10 +9,10 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	tlockcontext "github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	"github.com/muesli/termenv"
 )
@@ -111,7 +111,7 @@ type ThemesScreen struct {
 // Initializes a new instance of the themes screen
 func InitializeThemesScreen(context *tlockcontext.Context) ThemesScreen {
 	// Theme items
-	themeItems := tlockinternal.Map(context.Themes, func(theme tlockcontext.Theme) list.Item { return themeItem(theme) })
+	themeItems := utils.Map(context.Themes, func(theme tlockcontext.Theme) list.Item { return themeItem(theme) })
 
 	// Initialize theme list
 	listview := components.ListViewSimple(themeItems, themeListDelegate{}, 65, min(18, len(context.Themes)*3))

@@ -7,12 +7,11 @@ import (
 	"slices"
 
 	"github.com/adrg/xdg"
+	"github.com/eklairs/tlock/tlock-internal/utils"
 	"github.com/google/uuid"
 	"github.com/kelindar/binary"
 	"github.com/pquerna/otp"
 	"github.com/rs/zerolog/log"
-
-	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 )
 
 // Token types
@@ -117,7 +116,7 @@ func (vault Vault) write() {
 	encrypted := Encrypt(vault.password, serialized)
 
 	// Create parent dir
-	file, err := tlockinternal.EnsureExists(vault.Path)
+	file, err := utils.EnsureExists(vault.Path)
 
 	// Check for errors
 	if err != nil {
@@ -194,7 +193,7 @@ func (vault *Vault) GetTokens(id string) []Token {
 // Deletes a folder by its id
 func (vault *Vault) DeleteFolder(id string) {
 	// Remove folder
-	vault.Folders = tlockinternal.Remove(vault.Folders, vault.find_folder(id))
+	vault.Folders = utils.Remove(vault.Folders, vault.find_folder(id))
 
 	// Write
 	vault.write()
@@ -211,7 +210,7 @@ func (vault *Vault) MoveFolderUp(folderId string) bool {
 	}
 
 	// Swap
-	vault.Folders = tlockinternal.Swap(vault.Folders, folder_index, folder_index-1)
+	vault.Folders = utils.Swap(vault.Folders, folder_index, folder_index-1)
 
 	// Wrap
 	vault.write()
@@ -231,7 +230,7 @@ func (vault *Vault) MoveFolderDown(folderId string) bool {
 	}
 
 	// Swap
-	vault.Folders = tlockinternal.Swap(vault.Folders, folder_index, folder_index+1)
+	vault.Folders = utils.Swap(vault.Folders, folder_index, folder_index+1)
 
 	// Wrap
 	vault.write()
@@ -289,7 +288,7 @@ func (vault *Vault) DeleteToken(folderId, tokenId string) {
 	folderIndex := vault.find_folder(folderId)
 
 	// Replace
-	vault.Folders[folderIndex].Tokens = tlockinternal.Remove(vault.Folders[folderIndex].Tokens, vault.find_token(folderIndex, tokenId))
+	vault.Folders[folderIndex].Tokens = utils.Remove(vault.Folders[folderIndex].Tokens, vault.find_token(folderIndex, tokenId))
 
 	// Write
 	vault.write()
@@ -306,7 +305,7 @@ func (vault *Vault) MoveToken(tokenId, fromFolderId, toFolderId string) {
 	tokenToMove := vault.Folders[fromFolderIndex].Tokens[tokenToMoveIndex]
 
 	// Remove from exists
-	vault.Folders[fromFolderIndex].Tokens = tlockinternal.Remove(vault.Folders[fromFolderIndex].Tokens, tokenToMoveIndex)
+	vault.Folders[fromFolderIndex].Tokens = utils.Remove(vault.Folders[fromFolderIndex].Tokens, tokenToMoveIndex)
 
 	// Add to the new folder index
 	vault.Folders[toFolderIndex].Tokens = append(vault.Folders[toFolderIndex].Tokens, tokenToMove)
@@ -340,7 +339,7 @@ func (vault *Vault) MoveTokenDown(folderId, tokenId string) bool {
 	}
 
 	// Swap
-	vault.Folders[folderIndex].Tokens = tlockinternal.Swap(vault.Folders[folderIndex].Tokens, tokenIndex, tokenIndex+1)
+	vault.Folders[folderIndex].Tokens = utils.Swap(vault.Folders[folderIndex].Tokens, tokenIndex, tokenIndex+1)
 
 	// Wrap
 	vault.write()
@@ -361,7 +360,7 @@ func (vault *Vault) MoveTokenUp(folderId, tokenId string) bool {
 	}
 
 	// Swap
-	vault.Folders[folderIndex].Tokens = tlockinternal.Swap(vault.Folders[folderIndex].Tokens, tokenIndex, tokenIndex-1)
+	vault.Folders[folderIndex].Tokens = utils.Swap(vault.Folders[folderIndex].Tokens, tokenIndex, tokenIndex-1)
 
 	// Wrap
 	vault.write()

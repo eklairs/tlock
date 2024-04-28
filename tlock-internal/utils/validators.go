@@ -1,4 +1,4 @@
-package tlockinternal
+package utils
 
 import (
 	"errors"

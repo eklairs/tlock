@@ -9,10 +9,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	tlockcore "github.com/eklairs/tlock/tlock-core"
-	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	"github.com/eklairs/tlock/tlock-internal/utils"
 	"github.com/eklairs/tlock/tlock-models/dashboard"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
@@ -120,7 +120,7 @@ type SelectUserScreen struct {
 // New instance of select user
 func InitializeSelectUserScreen(context *context.Context) SelectUserScreen {
 	// Renderable list of users
-	usersList := tlockinternal.Map(context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user.Username) })
+	usersList := utils.Map(context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user.Username) })
 
 	// Return instance
 	return SelectUserScreen{

@@ -1,4 +1,4 @@
-package tlockinternal
+package utils
 
 // Removes an index from a slice
 func Remove[T any](slice []T, s int) []T {

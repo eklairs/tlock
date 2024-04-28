@@ -10,8 +10,8 @@ import (
 	"github.com/rs/zerolog/log"
 
 	tea "github.com/charmbracelet/bubbletea"
-	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	"github.com/eklairs/tlock/tlock-internal/context"
+	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockmodels "github.com/eklairs/tlock/tlock-models"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 )
@@ -24,7 +24,7 @@ func setupZeroLog() *os.File {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 
 	// Create the log file
-	file, err := tlockinternal.EnsureExists(LOG_FILE)
+	file, err := utils.EnsureExists(LOG_FILE)
 
 	// If error, disable logs
 	if err != nil {

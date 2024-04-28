@@ -12,11 +12,11 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/context"
+	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
-	tlockmessages "github.com/eklairs/tlock/tlock-internal/tlock-messages"
+	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"github.com/pquerna/otp"
@@ -236,7 +236,7 @@ func buildTokensItems(tokens []tlockvault.Token) []list.Item {
 		return InitializeTokenListItem(token)
 	}
 
-	return tlockinternal.Map(tokens, mapper)
+	return utils.Map(tokens, mapper)
 }
 
 // Builds the tokens list view

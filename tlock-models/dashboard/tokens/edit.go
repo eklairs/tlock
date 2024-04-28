@@ -12,11 +12,11 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/form"
+	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
-	tlockmessages "github.com/eklairs/tlock/tlock-internal/tlock-messages"
+	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"github.com/google/uuid"
@@ -162,17 +162,17 @@ func InitializeEditTokenScreen(folder tlockvault.Folder, token tlockvault.Token,
 		form.FormItemInputBox{
 			Title:       "Period",
 			Description: "Time to refresh the token",
-			Input:       tlockinternal.ValidatorIntegerNo0(value(components.InitializeInputBoxCustomWidth("Time in seconds...", 24), fmt.Sprintf("%d", token.Period))),
+			Input:       utils.ValidatorIntegerNo0(value(components.InitializeInputBoxCustomWidth("Time in seconds...", 24), fmt.Sprintf("%d", token.Period))),
 		},
 		form.FormItemInputBox{
 			Title:       "Usage counter",
 			Description: "Usage counter of HOTP token",
-			Input:       tlockinternal.ValidatorIntegerNo0(value(components.InitializeInputBoxCustomWidth("Usage counter", 24), fmt.Sprintf("%d", token.UsageCounter))),
+			Input:       utils.ValidatorIntegerNo0(value(components.InitializeInputBoxCustomWidth("Usage counter", 24), fmt.Sprintf("%d", token.UsageCounter))),
 		},
 		form.FormItemInputBox{
 			Title:       "Digits",
 			Description: "Number of digits",
-			Input:       tlockinternal.ValidatorIntegerNo0(value(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24), fmt.Sprintf("%d", token.Digits))),
+			Input:       utils.ValidatorIntegerNo0(value(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24), fmt.Sprintf("%d", token.Digits))),
 		},
 	}
 

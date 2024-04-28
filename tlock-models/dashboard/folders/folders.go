@@ -10,10 +10,10 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	"github.com/eklairs/tlock/tlock-internal/components"
+	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
-	tlockmessages "github.com/eklairs/tlock/tlock-internal/tlock-messages"
+	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"golang.org/x/term"
@@ -84,7 +84,7 @@ func buildFolderListItems(vault *tlockvault.Vault) []list.Item {
 	}
 
 	// Map folders
-	return tlockinternal.Map(vault.Folders, mapper)
+	return utils.Map(vault.Folders, mapper)
 }
 
 // Builds the listview for the given list of folders

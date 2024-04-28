@@ -3,8 +3,8 @@ package tlockmodels
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/eklairs/tlock/tlock-internal/context"
+	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
-	tlockmessages "github.com/eklairs/tlock/tlock-internal/tlock-messages"
 	"github.com/eklairs/tlock/tlock-models/auth"
 )
 

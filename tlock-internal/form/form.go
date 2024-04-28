@@ -4,8 +4,8 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	tlockinternal "github.com/eklairs/tlock/tlock-internal"
 	"github.com/eklairs/tlock/tlock-internal/components"
+	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 )
 
@@ -186,7 +186,7 @@ type Form struct {
 // Initializes a new form item
 func New(items []FormItem) Form {
 	// Map
-	wrapped := tlockinternal.Map(items, func(item FormItem) FormItemWrapped { return FormItemWrapped{FormItem: item, Enabled: true} })
+	wrapped := utils.Map(items, func(item FormItem) FormItemWrapped { return FormItemWrapped{FormItem: item, Enabled: true} })
 
 	// Return instance
 	form := Form{
