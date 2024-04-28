@@ -188,28 +188,17 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 			// Get the user secret
 			secret := secretItem.Value()
 
-			// Error if any
-			var error *string
-
+			// Dont allow empty secrets
 			if secret == "" {
-				error = &ERROR_EMPTY_SECRET
+				screen.SetError(2, ERROR_EMPTY_SECRET)
+				break
 			}
 
 			// Try to generate code with the secret
 			_, err := totp.GenerateCode(secret, time.Now())
 
 			if err != nil {
-				error = &ERROR_INVALID_SECRET
-			}
-
-			if error != nil {
-				// Set the error
-				secretItem.ErrorMessage = error
-
-				// Update item
-				screen.form.Items[2].FormItem = secretItem
-
-				// Break
+				screen.SetError(2, ERROR_INVALID_SECRET)
 				break
 			}
 
@@ -323,6 +312,17 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 // View
 func (screen AddTokenScreen) View() string {
 	return screen.viewport.View()
+}
+
+// Sets a custom error message for the given form item index
+func (screen AddTokenScreen) SetError(itemIndex int, error string) {
+	if item, ok := screen.form.Items[itemIndex].FormItem.(form.FormItemInputBox); ok {
+		// Set the error
+		item.ErrorMessage = &error
+
+		// Update item
+		screen.form.Items[2].FormItem = item
+	}
 }
 
 // Generates the UI
