@@ -11,33 +11,41 @@ import (
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 )
 
-// List item active
-func ListItemActive(width int, title, suffix string) string {
+// === List item active ==
+func listItemImpl(width int, title, suffix string, spacerStyle, style lipgloss.Style) string {
+	// Required space
 	space_width := width - lipgloss.Width(title) - lipgloss.Width(suffix)
 
-	ui := lipgloss.JoinHorizontal(
-		lipgloss.Center,
-		tlockstyles.Styles.Title.Render(title),
-		tlockstyles.Styles.BackgroundOver.Render(strings.Repeat(" ", space_width)),
-		tlockstyles.Styles.BackgroundOver.Render(tlockstyles.Styles.Title.Render(suffix)),
-	)
+	// Join
+	ui := lipgloss.JoinHorizontal(lipgloss.Center, title, spacerStyle.Render(strings.Repeat(" ", space_width)), suffix)
 
-	return tlockstyles.Styles.ListItemActive.Render(ui)
+	// Return
+	return style.Render(ui)
+}
+
+// List item active
+func ListItemActive(width int, title, suffix string) string {
+	return listItemImpl(
+		width,
+		tlockstyles.Styles.Title.Render(title),
+		tlockstyles.Styles.BackgroundOver.Render(tlockstyles.Styles.Title.Render(suffix)),
+		tlockstyles.Styles.BackgroundOver, tlockstyles.Styles.ListItemActive,
+	)
 }
 
 // List item active
 func ListItemInactive(width int, title, suffix string) string {
-	space_width := width - lipgloss.Width(title) - lipgloss.Width(suffix)
-
-	ui := lipgloss.JoinHorizontal(
-		lipgloss.Center,
+	return listItemImpl(
+		width,
 		tlockstyles.Styles.SubText.Render(title),
-		strings.Repeat(" ", space_width),
 		tlockstyles.Styles.SubText.Render(suffix),
+		tlockstyles.Styles.SubText, tlockstyles.Styles.ListItemInactive,
 	)
-
-	return tlockstyles.Styles.ListItemInactive.Render(ui)
 }
+
+// === List item active ends ==
+
+// === Token item ==
 
 // Token list item renderer implementation
 func tokenItemImpl(width int, icon, account, separator, issuer, code string, spacerStyle lipgloss.Style, uiStyle lipgloss.Style) string {
@@ -164,30 +172,8 @@ func InitializeInputBoxCustomWidth(placeholder string, width int) textinput.Mode
 	return input
 }
 
-// Active folder list item
-func ActiveFolderListItem(width int, name string, tokensCount int) string {
-	bottom := fmt.Sprintf("%d tokens", tokensCount)
-
-	// -5 is for including the padding
-	if len(name) > width-5 {
-		// Ellipsis
-		name = name[:width-6] + "…"
-	}
-
-	if len(bottom) > width-5 {
-		bottom = bottom[:width-6] + "…"
-	}
-
-	items := []string{
-		tlockstyles.Styles.Title.Render(name),
-		tlockstyles.Styles.SubText.Render(bottom),
-	}
-
-	return tlockstyles.Styles.FolderItemActive.Copy().Width(width).Render(strings.Join(items, "\n"))
-}
-
-// Inactive folder list item
-func InactiveFolderListItem(width int, name string, tokensCount int) string {
+// == Folder list item
+func folderListItem(width int, name string, nameStyle lipgloss.Style, tokensCount int, tokensCountStyle, style lipgloss.Style) string {
 	bottom := fmt.Sprintf("%d tokens", tokensCount)
 
 	// -6 is for including the padding
@@ -196,14 +182,34 @@ func InactiveFolderListItem(width int, name string, tokensCount int) string {
 		name = name[:width-7] + "…"
 	}
 
+	// Wrap the tokens as well
 	if len(bottom) > width-5 {
 		bottom = bottom[:width-6] + "…"
 	}
 
+	// Render
 	items := []string{
-		tlockstyles.Styles.SubText.Render(name),
-		tlockstyles.Styles.SubText.Render(bottom),
+		nameStyle.Render(name),
+		tokensCountStyle.Render(bottom),
 	}
 
-	return tlockstyles.Styles.FolderItemInactive.Copy().Width(width).Render(strings.Join(items, "\n"))
+	return style.Copy().Width(width).Render(strings.Join(items, "\n"))
+}
+
+// Active folder list item
+func ActiveFolderListItem(width int, name string, tokensCount int) string {
+	return folderListItem(
+		width, name, tlockstyles.Styles.Title,
+		tokensCount, tlockstyles.Styles.SubText,
+		tlockstyles.Styles.FolderItemActive,
+	)
+}
+
+// Inactive folder list item
+func InactiveFolderListItem(width int, name string, tokensCount int) string {
+	return folderListItem(
+		width, name, tlockstyles.Styles.SubText,
+		tokensCount, tlockstyles.Styles.SubText,
+		tlockstyles.Styles.FolderItemInactive,
+	)
 }

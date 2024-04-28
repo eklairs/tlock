@@ -2,7 +2,6 @@ package tokens
 
 import (
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -17,10 +16,18 @@ import (
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"github.com/google/uuid"
-	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 	"golang.org/x/term"
 )
+
+// Converts the given string type tok token type
+func toTokenType(value string) tlockvault.TokenType {
+	if value == "HOTP" {
+		return tlockvault.TokenTypeHOTP
+	}
+
+	return tlockvault.TokenTypeTOTP
+}
 
 // Error for empty secret
 var ERROR_EMPTY_SECRET = "Secret is required"
@@ -145,19 +152,9 @@ func InitializeAddTokenScreen(folder tlockvault.Folder, vault *tlockvault.Vault)
 	// Initialize viewport
 	content := GenerateUI(form)
 
-	viewport := viewport.New(85, min(height, lipgloss.Height(content)))
+	// Initialize viewport and disable conflicting keys
+	viewport := utils.DisableViewportKeys(viewport.New(85, min(height, lipgloss.Height(content))))
 	viewport.SetContent(content)
-
-	// Restrict to arrow keys to move viewport up and down to prevent conflict when the user is typing
-	viewport.KeyMap.Up = key.NewBinding(
-		key.WithKeys("up"),
-		key.WithHelp("↑", "up"),
-	)
-
-	viewport.KeyMap.Down = key.NewBinding(
-		key.WithKeys("down"),
-		key.WithHelp("↓", "down"),
-	)
 
 	// Return
 	return AddTokenScreen{
@@ -205,54 +202,17 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 			// Instance of form
 			formItems := screen.form.Items
 
-			// Type of token
-			var tokenType tlockvault.TokenType
-
-			if formItems[3].FormItem.Value() == "TOTP" {
-				tokenType = tlockvault.TokenTypeTOTP
-			} else {
-				tokenType = tlockvault.TokenTypeHOTP
-			}
-
-			// Hashing function
-			hashFunction := otp.AlgorithmSHA256
-
-			switch formItems[4].FormItem.Value() {
-			case "SHA1":
-				hashFunction = otp.AlgorithmSHA1
-			case "SHA512":
-				hashFunction = otp.AlgorithmSHA512
-			case "MD5":
-				hashFunction = otp.AlgorithmMD5
-			}
-
-			// To int
-			toInt := func(str string) int {
-				res, _ := strconv.Atoi(str)
-
-				return res
-			}
-
-			// This or that
-			or := func(left string, right int) int {
-				if left == "" {
-					return right
-				}
-
-				return toInt(left)
-			}
-
 			// Okay its time to add!
 			token := tlockvault.Token{
 				ID:               uuid.NewString(),
 				Account:          formItems[0].FormItem.Value(),
 				Issuer:           formItems[1].FormItem.Value(),
 				Secret:           formItems[2].FormItem.Value(),
-				Type:             tokenType,
-				HashingAlgorithm: hashFunction,
-				Period:           or(formItems[5].FormItem.Value(), 30),
-				InitialCounter:   or(formItems[6].FormItem.Value(), 0),
-				Digits:           or(formItems[7].FormItem.Value(), 6),
+				Type:             toTokenType(formItems[3].FormItem.Value()),
+				HashingAlgorithm: utils.ToHashFunction(formItems[4].FormItem.Value()),
+				Period:           utils.Or(formItems[5].FormItem.Value(), 30),
+				InitialCounter:   utils.Or(formItems[6].FormItem.Value(), 0),
+				Digits:           utils.Or(formItems[7].FormItem.Value(), 6),
 				UsageCounter:     0,
 			}
 

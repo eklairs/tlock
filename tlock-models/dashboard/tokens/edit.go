@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"slices"
-	"strconv"
 	"time"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -183,22 +182,11 @@ func InitializeEditTokenScreen(folder tlockvault.Folder, token tlockvault.Token,
 	// Get term size
 	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
-	// Initialize viewport
 	content := GenerateUI(form)
 
-	viewport := viewport.New(85, min(height, lipgloss.Height(content)))
+	// Initialize viewport
+	viewport := utils.DisableViewportKeys(viewport.New(85, min(height, lipgloss.Height(content))))
 	viewport.SetContent(content)
-
-	// Restrict to arrow keys to move viewport up and down to prevent conflict when the user is typing
-	viewport.KeyMap.Up = key.NewBinding(
-		key.WithKeys("up"),
-		key.WithHelp("↑", "up"),
-	)
-
-	viewport.KeyMap.Down = key.NewBinding(
-		key.WithKeys("down"),
-		key.WithHelp("↓", "down"),
-	)
 
 	return EditTokenScreen{
 		form:     form,
@@ -257,55 +245,18 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			// Instance of form
 			formItems := screen.form.Items
 
-			// Type of token
-			var tokenType tlockvault.TokenType
-
-			if formItems[3].FormItem.Value() == "TOTP" {
-				tokenType = tlockvault.TokenTypeTOTP
-			} else {
-				tokenType = tlockvault.TokenTypeHOTP
-			}
-
-			// Hashing function
-			hashFunction := otp.AlgorithmSHA256
-
-			switch formItems[4].FormItem.Value() {
-			case "SHA1":
-				hashFunction = otp.AlgorithmSHA1
-			case "SHA512":
-				hashFunction = otp.AlgorithmSHA512
-			case "MD5":
-				hashFunction = otp.AlgorithmMD5
-			}
-
-			// To int
-			toInt := func(str string) int {
-				res, _ := strconv.Atoi(str)
-
-				return res
-			}
-
-			// This or that
-			or := func(left string, right int) int {
-				if left == "" {
-					return right
-				}
-
-				return toInt(left)
-			}
-
 			// Okay its time to edit!
 			token := tlockvault.Token{
 				ID:               uuid.NewString(),
 				Account:          formItems[0].FormItem.Value(),
 				Issuer:           formItems[1].FormItem.Value(),
 				Secret:           formItems[2].FormItem.Value(),
-				Type:             tokenType,
-				HashingAlgorithm: hashFunction,
-				Period:           or(formItems[5].FormItem.Value(), screen.token.Period),
+				Type:             toTokenType(formItems[3].FormItem.Value()),
+				HashingAlgorithm: utils.ToHashFunction(formItems[4].FormItem.Value()),
+				Period:           utils.Or(formItems[5].FormItem.Value(), screen.token.Period),
 				InitialCounter:   screen.token.InitialCounter,
-				Digits:           or(formItems[7].FormItem.Value(), screen.token.Digits),
-				UsageCounter:     or(formItems[6].FormItem.Value(), screen.token.UsageCounter),
+				Digits:           utils.Or(formItems[7].FormItem.Value(), screen.token.Digits),
+				UsageCounter:     utils.Or(formItems[6].FormItem.Value(), screen.token.UsageCounter),
 			}
 
 			// Replace
@@ -409,4 +360,15 @@ func GenerateEditUI(form form.Form) string {
 		lipgloss.Center,
 		items...,
 	)
+}
+
+// Sets a custom error message for the given form item index
+func (screen EditTokenScreen) SetError(itemIndex int, error string) {
+	if item, ok := screen.form.Items[itemIndex].FormItem.(form.FormItemInputBox); ok {
+		// Set the error
+		item.ErrorMessage = &error
+
+		// Update item
+		screen.form.Items[2].FormItem = item
+	}
 }
