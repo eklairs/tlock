@@ -1,6 +1,8 @@
 package modelmanager
 
 import (
+	"os"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"golang.org/x/term"
@@ -100,7 +102,7 @@ func (manager *ModelManager) Update(msg tea.Msg) tea.Cmd {
 
 // Calls the View() function on the current screen with center aligned to the screen
 func (manager ModelManager) View() string {
-	width, height, _ := term.GetSize(0)
+	width, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
 	return lipgloss.Place(
 		width, height,
