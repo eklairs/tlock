@@ -313,6 +313,9 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 		screen.form.Items[5].Enabled = false
 	}
 
+    // Update the height of the viewport
+    screen.viewport.Height = min(height, lipgloss.Height(screen.content))
+
 	return screen, tea.Batch(cmds...)
 }
 
