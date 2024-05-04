@@ -167,7 +167,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 			cmds = append(cmds, func() tea.Msg { return tlockmessages.RequestFolderChanged{} })
 
 		case "shift+tab":
-			panic("AAAAA")
+			cmds = append(cmds, func() tea.Msg { return tlockmessages.RequestFolderChanged{} })
 
 		// Move folder down
 		case "ctrl+up":
