@@ -198,7 +198,7 @@ func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	}
 
 	// Render
-	fmt.Fprint(w, render_fn(m.Width()-9, tokenRenderable, account, issuer, code, item.Token.Period, item.time))
+	fmt.Fprint(w, render_fn(m.Width()-9, tokenRenderable, account, issuer, code, item.Token.Period, item.time, d.context.Config.EnableIcon))
 }
 
 // Tokens

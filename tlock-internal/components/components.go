@@ -48,10 +48,14 @@ func ListItemInactive(width int, title, suffix string) string {
 // === Token item ==
 
 // Token list item renderer implementation
-func tokenItemImpl(width int, icon, account, separator, issuer, code string, spacerStyle lipgloss.Style, uiStyle lipgloss.Style) string {
+func tokenItemImpl(width int, icon, account, separator, issuer, code string, spacerStyle lipgloss.Style, uiStyle lipgloss.Style, showIcon bool) string {
 	space_width := width - lipgloss.Width(account) - lipgloss.Width(separator) - lipgloss.Width(issuer) - lipgloss.Width(code) - 3
 
-	icon = spacerStyle.Render(fmt.Sprintf("%s%s", icon, spacerStyle.Render("  ")))
+	if showIcon {
+		icon = spacerStyle.Render(fmt.Sprintf("%s%s", icon, spacerStyle.Render("  ")))
+	} else {
+		icon = ""
+	}
 
 	// Icon renderable
 	var ui string
@@ -81,7 +85,7 @@ func tokenItemImpl(width int, icon, account, separator, issuer, code string, spa
 }
 
 // List item active
-func TokenItemActive(width int, icon, account, issuer, code string, period int, timeLeft *int) string {
+func TokenItemActive(width int, icon, account, issuer, code string, period int, timeLeft *int, showIcon bool) string {
 	style := tlockstyles.Styles.ListItemActive
 
 	if timeLeft != nil {
@@ -95,7 +99,7 @@ func TokenItemActive(width int, icon, account, issuer, code string, period int, 
 		tlockstyles.Styles.BackgroundOver.Render(" • "),
 		tlockstyles.Styles.BackgroundOver.Render(issuer),
 		tlockstyles.Styles.BackgroundOver.Render(tlockstyles.Styles.Title.Render(code)),
-		tlockstyles.Styles.BackgroundOver, style,
+		tlockstyles.Styles.BackgroundOver, style, showIcon,
 	)
 
 	// Get the number of blocks required to render
@@ -114,14 +118,14 @@ func TokenItemActive(width int, icon, account, issuer, code string, period int, 
 }
 
 // List item active
-func TokenItemInactive(width int, icon, account, issuer, code string, period int, timeLeft *int) string {
+func TokenItemInactive(width int, icon, account, issuer, code string, period int, timeLeft *int, showIcon bool) string {
 	return tokenItemImpl(
 		width, icon,
 		tlockstyles.Styles.SubText.Render(account),
 		tlockstyles.Styles.SubText.Render(" • "),
 		tlockstyles.Styles.SubText.Render(issuer),
 		tlockstyles.Styles.SubText.Render(code),
-		tlockstyles.Styles.SubText, tlockstyles.Styles.ListItemInactive,
+		tlockstyles.Styles.SubText, tlockstyles.Styles.ListItemInactive, showIcon,
 	)
 }
 

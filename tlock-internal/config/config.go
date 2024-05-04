@@ -21,12 +21,16 @@ type Config struct {
 	// Current theme
 	// Defaults to `Catppuccin`
 	CurrentTheme string
+
+	/// Enable icons or not
+	EnableIcon bool
 }
 
 // Returns the default config
 func DefaultConfig() Config {
 	return Config{
 		CurrentTheme: DEFAULT_THEME,
+		EnableIcon:   false,
 	}
 }
 
