@@ -192,7 +192,7 @@ func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	icon, ok := d.context.Icons[item.Token.Issuer]
 
 	if ok {
-		tokenRenderable = lipgloss.NewStyle().Foreground(lipgloss.Color("#" + icon.Hex)).Render(icon.Unicode)
+		tokenRenderable = lipgloss.NewStyle().Foreground(lipgloss.Color("#" + icon.Hex)).Bold(true).Render(icon.Unicode)
 	} else {
 		tokenRenderable = tlockstyles.Styles.Title.Render("")
 	}
@@ -244,7 +244,7 @@ func buildTokensListView(tokens []tlockvault.Token, context *context.Context) li
 	// Get terminal size
 	width, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
-	return components.ListViewSimple(buildTokensItems(tokens), tokensListDelegate{context: context}, tokensWidth(width), height-3)
+	return components.ListViewSimple(buildTokensItems(tokens), tokensListDelegate{context: context}, tokensWidth(width), height-4)
 }
 
 // Initializes a new instance of folders
@@ -353,7 +353,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 	case tea.WindowSizeMsg:
 		if tokens.listview != nil {
 			tokens.listview.SetWidth(tokensWidth(msgType.Width))
-			tokens.listview.SetHeight(msgType.Height - 3)
+			tokens.listview.SetHeight(msgType.Height - 4)
 		}
 
 	case tlockmessages.RefreshTokensMsg:
@@ -397,7 +397,7 @@ func (tokens Tokens) View() string {
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
-		tlockstyles.Styles.AccentBgItem.Render("TOKENS"), "",
+		"", tlockstyles.Styles.AccentBgItem.Render("TOKENS"), "",
 		tokens.listview.View(),
 	)
 }
