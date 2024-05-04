@@ -12,6 +12,7 @@ import (
 	"golang.org/x/term"
 
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
@@ -74,13 +75,17 @@ type DashboardScreen struct {
 
 	// Tokens
 	tokens tokens.Tokens
+
+    // Status bar
+    statusbar components.StatusBar
 }
 
 // Initializes a new instance of dashboard screen
-func InitializeDashboardScreen(vault tlockvault.Vault, context *context.Context) DashboardScreen {
+func InitializeDashboardScreen(username string, vault tlockvault.Vault, context *context.Context) DashboardScreen {
 	return DashboardScreen{
 		vault:   &vault,
 		context: context,
+        statusbar: components.NewStatusBar(username),
 		folders: folders.InitializeFolders(&vault),
 		tokens:  tokens.InitializeTokens(&vault, context),
 	}
@@ -141,9 +146,14 @@ func (screen DashboardScreen) View() string {
 		return style.Render(ui)
 	}
 
-	return lipgloss.JoinHorizontal(
+    ui := lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		screen.folders.View(), "  ",
 		screen.tokens.View(),
 	)
+
+    return lipgloss.JoinVertical(
+        lipgloss.Top,
+        ui, screen.statusbar.View(),
+    )
 }

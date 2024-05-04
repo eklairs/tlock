@@ -57,6 +57,9 @@ type TLockStyles struct {
 	// Sub text item
 	SubTextItem lipgloss.Style
 
+	// Overlay item
+	OverlayItem lipgloss.Style
+
 	// Time left for inactive cards
 	TimeLeftInactive lipgloss.Style
 }
@@ -74,6 +77,7 @@ func InitializeStyles(theme context.Theme) {
 		Title:              with(base).Foreground(theme.Accent).Bold(true),
 		SubText:            with(base).Foreground(theme.SubText),
 		SubTextItem:        with(base).Foreground(theme.SubText).Padding(0, 1),
+		OverlayItem:        with(base).Foreground(theme.SubText).Background(theme.BackgroundOver).Padding(0, 1),
 		SubAltBg:           with(base).Background(theme.BackgroundOver).Padding(0, 1),
 		Error:              with(base).Foreground(theme.Error).Bold(true),
 		Input:              with(paddedItem).Width(65).Background(theme.BackgroundOver),

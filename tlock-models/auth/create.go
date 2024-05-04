@@ -161,7 +161,7 @@ func (screen CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 				screen.usernameError = &USERNAME_EXISTS
 			} else {
 				// Push dashboard screen
-				cmd = manager.PushScreen(dashboard.InitializeDashboardScreen(*vault, screen.context))
+				cmd = manager.PushScreen(dashboard.InitializeDashboardScreen(screen.usernameInput.Value(), *vault, screen.context))
 			}
 
 		default:

@@ -159,7 +159,7 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 				cmds = append(cmds, manager.PushScreen(InitializeEnterPassScreen(screen.context, user)))
 			} else {
 				// YAY!
-				cmds = append(cmds, manager.PushScreen(dashboard.InitializeDashboardScreen(*vault, screen.context)))
+				cmds = append(cmds, manager.PushScreen(dashboard.InitializeDashboardScreen(user.Username, *vault, screen.context)))
 			}
 		}
 	}
