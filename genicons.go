@@ -14,6 +14,7 @@ var OUT_DIR = path.Join("tlock-vendor", "icons")
 // Priority list
 var PRIORITY = []string{
 	"seti",
+	"fa",
 	"fae",
 	"md",
 }
