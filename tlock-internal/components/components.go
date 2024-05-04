@@ -151,7 +151,7 @@ func InputGroup(title, description string, error *string, input textinput.Model)
 
 	// Append error if any
 	if error != nil {
-		items = append(items, tlockstyles.Styles.Error.Copy().Width(65).Render(fmt.Sprintf("× %s", *error)), "")
+		items = append(items, tlockstyles.Styles.Error.Copy().Width(width).Render(fmt.Sprintf("× %s", *error)), "")
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Center, items...)

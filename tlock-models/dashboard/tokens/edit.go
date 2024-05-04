@@ -214,6 +214,13 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msgType, editTokenKeys.Enter):
+			for index, item := range screen.form.Items {
+				if input, ok := item.FormItem.(form.FormItemInputBox); ok {
+					input.ErrorMessage = nil
+					screen.form.Items[index].FormItem = input
+				}
+			}
+
 			// Get the user secret
 			secret := secretItem.Value()
 
@@ -242,6 +249,27 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 				break
 			}
 
+			period := utils.Or(screen.form.Items[5].FormItem.Value(), screen.token.Period)
+			digits := utils.Or(screen.form.Items[7].FormItem.Value(), screen.token.Digits)
+
+			// Dont allow period to be zero
+			if period < 1 {
+				screen.SetError(5, "Period cannot be less than 1")
+				break
+			}
+
+			// Dont allow digits to be less than 1 and more than 10
+			if digits < 1 {
+				screen.SetError(7, "Digits cannot be less than 1")
+				break
+			}
+
+			// Dont allow digits to be less than 1 and more than 10
+			if digits > 10 {
+				screen.SetError(7, "Digits cannot be more than 10")
+				break
+			}
+
 			// Instance of form
 			formItems := screen.form.Items
 
@@ -253,7 +281,7 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 				Secret:           formItems[2].FormItem.Value(),
 				Type:             toTokenType(formItems[3].FormItem.Value()),
 				HashingAlgorithm: utils.ToHashFunction(formItems[4].FormItem.Value()),
-				Period:           utils.Or(formItems[5].FormItem.Value(), screen.token.Period),
+				Period:           period,
 				InitialCounter:   screen.token.InitialCounter,
 				Digits:           utils.Or(formItems[7].FormItem.Value(), screen.token.Digits),
 				UsageCounter:     utils.Or(formItems[6].FormItem.Value(), screen.token.UsageCounter),
@@ -313,8 +341,8 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 		screen.form.Items[5].Enabled = false
 	}
 
-    // Update the height of the viewport
-    screen.viewport.Height = min(height, lipgloss.Height(screen.content))
+	// Update the height of the viewport
+	screen.viewport.Height = min(height, lipgloss.Height(screen.content))
 
 	return screen, tea.Batch(cmds...)
 }
@@ -372,6 +400,6 @@ func (screen EditTokenScreen) SetError(itemIndex int, error string) {
 		item.ErrorMessage = &error
 
 		// Update item
-		screen.form.Items[2].FormItem = item
+		screen.form.Items[itemIndex].FormItem = item
 	}
 }
