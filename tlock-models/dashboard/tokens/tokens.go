@@ -146,7 +146,7 @@ type tokensListDelegate struct {
 
 // Height
 func (d tokensListDelegate) Height() int {
-	return 4
+	return 3
 }
 
 // Spacing
