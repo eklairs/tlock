@@ -244,7 +244,7 @@ func buildTokensListView(tokens []tlockvault.Token, context *context.Context) li
 	// Get terminal size
 	width, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
-	return components.ListViewSimple(buildTokensItems(tokens), tokensListDelegate{context: context}, tokensWidth(width), height-4)
+	return components.ListViewSimple(buildTokensItems(tokens), tokensListDelegate{context: context}, tokensWidth(width), height-5)
 }
 
 // Initializes a new instance of folders
@@ -353,7 +353,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 	case tea.WindowSizeMsg:
 		if tokens.listview != nil {
 			tokens.listview.SetWidth(tokensWidth(msgType.Width))
-			tokens.listview.SetHeight(msgType.Height - 4)
+			tokens.listview.SetHeight(msgType.Height - 5)
 		}
 
 	case tlockmessages.RefreshTokensMsg:
@@ -373,6 +373,8 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 
 // View
 func (tokens Tokens) View() string {
+	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
+
 	if tokens.folder == nil {
 		// Yet to recieve message
 		return ""
@@ -381,7 +383,7 @@ func (tokens Tokens) View() string {
 	// Render placeholder for no tokens
 	if len(tokens.listview.Items()) == 0 {
 		style := lipgloss.NewStyle().
-			Height(tokens.listview.Height()).
+			Height(height-1).
 			Width(tokens.listview.Width()).
 			Align(lipgloss.Center, lipgloss.Center)
 
@@ -396,8 +398,8 @@ func (tokens Tokens) View() string {
 	}
 
 	return lipgloss.JoinVertical(
-		lipgloss.Left,
-		"", tlockstyles.Styles.AccentBgItem.Render("TOKENS"), "",
+		lipgloss.Left, "",
+		tlockstyles.Styles.AccentBgItem.Render("TOKENS"), "",
 		tokens.listview.View(),
 	)
 }

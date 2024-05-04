@@ -93,7 +93,7 @@ func buildListViewForFolders(vault *tlockvault.Vault) list.Model {
 	width, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
 	// Build listview
-	listview := components.ListViewSimple(buildFolderListItems(vault), folderListDelegate{}, foldersWidth(width), height-4) // -4 is for the title
+	listview := components.ListViewSimple(buildFolderListItems(vault), folderListDelegate{}, foldersWidth(width), height-6) // -4 is for the title
 
 	// Use custom keys
 	listview.KeyMap.CursorDown = key.NewBinding(
@@ -215,7 +215,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		// Handle terminal resizes
 	case tea.WindowSizeMsg:
 		folders.listview.SetWidth(foldersWidth(msgType.Width))
-		folders.listview.SetHeight(msgType.Height - 4)
+		folders.listview.SetHeight(msgType.Height - 6)
 
 	case tlockmessages.RequestFolderChanged:
 		// New focused item
@@ -248,7 +248,7 @@ func (folders Folders) View() string {
 	)
 
 	// Style
-	style := lipgloss.NewStyle().Height(height)
+	style := lipgloss.NewStyle().Height(height - 1)
 
 	// Render
 	return style.Render(ui)
