@@ -5,6 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/eklairs/tlock/tlock-internal/components"
 	"golang.org/x/term"
 )
 
@@ -84,7 +85,15 @@ func (manager *ModelManager) Update(msg tea.Msg) tea.Cmd {
 	screen_index := len(manager.stack) - 1
 
 	// Update
-	manager.stack[screen_index], cmd = manager.stack[screen_index].Update(msg, manager)
+    switch msg.(type) {
+    case components.StatusBarMsg:
+        // Send it to all the screens
+        for i := 0; i < len(manager.stack); i++ {
+            manager.stack[i], cmd = manager.stack[i].Update(msg, manager)
+        }
+    default:
+        manager.stack[screen_index], cmd = manager.stack[screen_index].Update(msg, manager)
+    }
 
 	// Resolve any pending operation
 	switch manager.operation.Action {

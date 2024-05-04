@@ -1,6 +1,7 @@
 package folders
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -109,6 +110,7 @@ func (screen EditFolderScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 			// Request folders refresh
 			cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })
+            cmds = append(cmds, func() tea.Msg { return components.StatusBarMsg{Message: fmt.Sprintf("Successfully renamed %s to %s!", screen.folder.Name, screen.name.Value())} })
 
 			// Pop
 			manager.PopScreen()

@@ -181,6 +181,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 						cmds,
 						func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
 						func() tea.Msg { return tlockmessages.RequestFolderChanged{} },
+                        func() tea.Msg { return components.StatusBarMsg{Message: fmt.Sprintf("Successfully moved %s folder up", focused.Name)} },
 					)
 				}
 			}
@@ -197,6 +198,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 						cmds,
 						func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
 						func() tea.Msg { return tlockmessages.RequestFolderChanged{} },
+                        func() tea.Msg { return components.StatusBarMsg{Message: fmt.Sprintf("Successfully moved %s folder down", focused.Name)} },
 					)
 				}
 			}

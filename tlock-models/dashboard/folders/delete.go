@@ -1,9 +1,12 @@
 package folders
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/eklairs/tlock/tlock-internal/components"
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
@@ -85,6 +88,7 @@ func (screen DeleteFolderScreen) Update(msg tea.Msg, manager *modelmanager.Model
 				cmds,
 				func() tea.Msg { return tlockmessages.RequestFolderChanged{} },
 				func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
+                func() tea.Msg { return components.StatusBarMsg{Message: fmt.Sprintf("Successfully deleted %s folder", screen.folder.Name)} },
 			)
 
 			// Pop

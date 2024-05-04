@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -17,7 +18,7 @@ type StatusBarMsg struct {
 
 type StatusBar struct {
     // Message to show
-    Message *string
+    Message string
 
     // Current user
     CurrentUser string
@@ -25,7 +26,7 @@ type StatusBar struct {
 
 func NewStatusBar(currentUser string) StatusBar {
     return StatusBar{
-        Message: nil,
+        Message: fmt.Sprintf("Welcome, %s!", currentUser),
         CurrentUser: currentUser,
     }
 }
@@ -33,7 +34,7 @@ func NewStatusBar(currentUser string) StatusBar {
 func (bar *StatusBar) Update(msg tea.Msg) {
     switch msgType := msg.(type) {
     case StatusBarMsg:
-        bar.Message = &msgType.Message
+        bar.Message = msgType.Message
     }
 }
 
@@ -59,15 +60,8 @@ func (bar *StatusBar) View() string {
         width -= lipgloss.Width(item)
     }
 
-    // Current message
-    message := ""
-
-    if bar.Message != nil {
-        message = *bar.Message
-    }
-
     // Render message
-    items[2] = tlockstyles.Styles.SubAltBg.Copy().Width(width).Render(message)
+    items[2] = tlockstyles.Styles.SubAltBg.Copy().Width(width).Render(bar.Message)
 
     return lipgloss.JoinHorizontal(lipgloss.Left, items...)
 }
