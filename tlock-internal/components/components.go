@@ -49,13 +49,13 @@ func ListItemInactive(width int, title, suffix string) string {
 
 // Token list item renderer implementation
 func tokenItemImpl(width int, icon, account, separator, issuer, code string, spacerStyle lipgloss.Style, uiStyle lipgloss.Style, showIcon bool) string {
-	space_width := width - lipgloss.Width(account) - lipgloss.Width(separator) - lipgloss.Width(issuer) - lipgloss.Width(code) - 3
-
 	if showIcon {
 		icon = spacerStyle.Render(fmt.Sprintf("%s%s", icon, spacerStyle.Render("  ")))
 	} else {
 		icon = ""
 	}
+
+	space_width := width - lipgloss.Width(account) - lipgloss.Width(separator) - lipgloss.Width(issuer) - lipgloss.Width(code) - lipgloss.Width(icon)
 
 	// Icon renderable
 	var ui string
@@ -111,7 +111,7 @@ func TokenItemActive(width int, icon, account, issuer, code string, period int, 
 		renderable := tlockstyles.Styles.Title.Render(strings.Repeat("▁", blocksPerSec**timeLeft))
 
 		// Render!
-		ui = lipgloss.JoinVertical(lipgloss.Left, ui, lipgloss.NewStyle().Inherit(style).UnsetPaddingTop().Width(width+6).Render(renderable))
+		ui = lipgloss.JoinVertical(lipgloss.Left, ui, lipgloss.NewStyle().Inherit(style).UnsetPaddingTop().Width(width + 6).Render(renderable))
 	}
 
 	return ui
