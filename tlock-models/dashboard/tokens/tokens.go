@@ -264,8 +264,20 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 	case tea.KeyMsg:
 		switch {
 		case msgType.String() == "c":
+            if !tokens.context.ClipboardAvailability {
+                cmds = append(cmds, func() tea.Msg { return components.StatusBarMsg{ Message: "Clipboard is not available", ErrorMessage: true } })
+            }
+
 			if focused := tokens.Focused(); focused != nil && tokens.context.ClipboardAvailability {
 				clipboard.Write(clipboard.FmtText, []byte(focused.CurrentCode))
+
+                accountName := focused.Token.Account
+
+                if accountName == "" {
+                    accountName = "<no account name>"
+                }
+
+                cmds = append(cmds, func() tea.Msg { return components.StatusBarMsg{ Message: fmt.Sprintf("Successfully copied token (%s)", accountName) } })
 			}
 
 		case msgType.String() == "a":
@@ -298,6 +310,14 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 
 				// Move cursor down
 				tokens.listview.CursorDown()
+
+                accountName := focused.Token.Account
+
+                if accountName == "" {
+                    accountName = "<no account name>"
+                }
+
+                cmds = append(cmds, func() tea.Msg { return components.StatusBarMsg{ Message: fmt.Sprintf("Successfully moved the token down (%s)", accountName) } })
 			}
 
 		case msgType.String() == "K":
@@ -310,6 +330,14 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 
 				// Move cursor down
 				tokens.listview.CursorUp()
+
+                accountName := focused.Token.Account
+
+                if accountName == "" {
+                    accountName = "<no account name>"
+                }
+
+                cmds = append(cmds, func() tea.Msg { return components.StatusBarMsg{ Message: fmt.Sprintf("Successfully moved the token up (%s)", accountName) } })
 			}
 
 		case msgType.String() == "n":
@@ -317,8 +345,14 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 				if focused.Token.Type == tlockvault.TokenTypeHOTP {
 					tokens.vault.IncreaseCounter(tokens.folder.ID, focused.Token.ID)
 
+                    accountName := focused.Token.Account
+                    if accountName == "" {
+                        accountName = "<no account name>"
+                    }
+
 					// Refresh tokens
 					cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshTokensMsg{} })
+                    cmds = append(cmds, func() tea.Msg { return components.StatusBarMsg{ Message: fmt.Sprintf("Successfully generated next token for %s", accountName) } })
 				}
 			}
 

@@ -1,6 +1,7 @@
 package tokens
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -247,11 +248,21 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 			// Add
 			screen.vault.AddTokenFromToken(screen.folder.ID, token)
 
+            accountName := formItems[0].FormItem.Value();
+
+            statusBarMessage := fmt.Sprintf("Successfully added token for %s", accountName);
+
+            if accountName == "" {
+                accountName = "<no account name>"
+                statusBarMessage = fmt.Sprintf("Successfully added token (no account name)")
+            }
+
 			// Require refresh of folders and tokens list
 			cmds = append(
 				cmds,
 				func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
 				func() tea.Msg { return tlockmessages.RefreshTokensMsg{} },
+                func() tea.Msg { return components.StatusBarMsg{ Message: statusBarMessage } },
 			)
 
 			// Pop

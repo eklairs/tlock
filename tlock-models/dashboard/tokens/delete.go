@@ -1,9 +1,12 @@
 package tokens
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/eklairs/tlock/tlock-internal/components"
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
@@ -85,11 +88,18 @@ func (screen DeleteTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelM
 			// Delete
 			screen.vault.DeleteToken(screen.folder.ID, screen.token.ID)
 
+            accountName := screen.token.Account
+
+            if accountName == "" {
+                accountName = "<no account name>"
+            }
+
 			// Require refresh of folders and tokens list
 			cmds = append(
 				cmds,
 				func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
 				func() tea.Msg { return tlockmessages.RefreshTokensMsg{} },
+                func() tea.Msg { return components.StatusBarMsg{ Message: fmt.Sprintf("Successfully deleted the token (%s)", accountName) } },
 			)
 
 			// Pop

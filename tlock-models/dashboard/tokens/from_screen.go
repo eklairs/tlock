@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/eklairs/tlock/tlock-internal/components"
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
@@ -101,6 +102,9 @@ type TokenFromScreen struct {
 
 	// Folder
 	folder tlockvault.Folder
+
+    // Status bar message to send
+    statusBarMessage string
 }
 
 // Initializes a new instance of fromScreen from screen
@@ -158,6 +162,7 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 					cmds,
 					func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
 					func() tea.Msg { return tlockmessages.RefreshTokensMsg{} },
+					func() tea.Msg { return components.StatusBarMsg{ Message: screen.statusBarMessage } },
 				)
 			}
 
@@ -207,9 +212,11 @@ func (screen TokenFromScreen) View() string {
 			} else {
 				// Find the account name
 				accountName := key.AccountName()
+                screen.statusBarMessage = fmt.Sprintf("Successfully added token for %s from screen", accountName)
 
 				if accountName == "" {
-					accountName = "<not found>"
+					accountName = "<no account name>"
+                    screen.statusBarMessage = fmt.Sprintf("Successfully added token from screen (no account name)")
 				}
 
 				// Show to user

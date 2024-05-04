@@ -14,11 +14,15 @@ import (
 
 type StatusBarMsg struct {
     Message string
+    ErrorMessage bool
 }
 
 type StatusBar struct {
     // Message to show
     Message string
+
+    // Is the meessage a error message
+    ErrorMessage bool
 
     // Current user
     CurrentUser string
@@ -35,6 +39,7 @@ func (bar *StatusBar) Update(msg tea.Msg) {
     switch msgType := msg.(type) {
     case StatusBarMsg:
         bar.Message = msgType.Message
+        bar.ErrorMessage = msgType.ErrorMessage
     }
 }
 
@@ -61,7 +66,13 @@ func (bar *StatusBar) View() string {
     }
 
     // Render message
-    items[2] = tlockstyles.Styles.SubAltBg.Copy().Width(width).Render(bar.Message)
+    messageStyle := tlockstyles.Styles.SubAltBg.Copy().Width(width)
+
+    if bar.ErrorMessage {
+        messageStyle = tlockstyles.Styles.Error.Copy().Inherit(tlockstyles.Styles.SubAltBg).Width(width)
+    }
+
+    items[2] = messageStyle.Render(bar.Message)
 
     return lipgloss.JoinHorizontal(lipgloss.Left, items...)
 }

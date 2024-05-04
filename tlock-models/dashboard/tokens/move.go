@@ -145,11 +145,18 @@ func (screen MoveTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			// Move token
 			screen.vault.MoveToken(screen.token.ID, screen.folder.ID, focusedFolder.ID)
 
+            accountName := screen.token.Account
+
+            if accountName == "" {
+                accountName = "no account name"
+            }
+
 			// Require refresh of folders and tokens list
 			cmds = append(
 				cmds,
 				func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
 				func() tea.Msg { return tlockmessages.RefreshTokensMsg{} },
+                func() tea.Msg { return components.StatusBarMsg{ Message: fmt.Sprintf("Successfully moved token (%s) to %s folder", accountName, focusedFolder.Name) } },
 			)
 
 			// Pop
