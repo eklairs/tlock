@@ -4,10 +4,18 @@ import (
 	"os"
 	"path"
 
+	_ "embed"
+
 	"github.com/adrg/xdg"
 	bubblekey "github.com/charmbracelet/bubbles/key"
+	"github.com/eklairs/tlock/tlock-internal/utils"
 	"gopkg.in/yaml.v3"
 )
+
+// Default config
+//
+//go:embed keybindings.yaml
+var DEFAULT_CONFIG_RAW []byte
 
 // Path to keybindings
 var KEYBINDINGS_CONFIG = path.Join(xdg.ConfigHome, "tlock", "keybindings.yaml")
@@ -156,6 +164,11 @@ func LoadKeyBindings() KeybindingsConfig {
 
 	// If there is error, return the default keybindings
 	if err != nil {
+		// The file probably doesnt exist,
+		// Lets write the default config
+		write_default()
+
+		// Return default
 		return default_keys
 	}
 
@@ -165,4 +178,12 @@ func LoadKeyBindings() KeybindingsConfig {
 	}
 
 	return default_keys
+}
+
+// Writes the default keybindings configuration
+func write_default() {
+	// Open file
+	if file, err := utils.EnsureExists(KEYBINDINGS_CONFIG); err == nil {
+		file.Write(DEFAULT_CONFIG_RAW)
+	}
 }
