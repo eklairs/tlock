@@ -6,19 +6,20 @@ import (
 
 	_ "embed"
 
-	"github.com/adrg/xdg"
 	bubblekey "github.com/charmbracelet/bubbles/key"
 	"github.com/eklairs/tlock/tlock-internal/utils"
 	"gopkg.in/yaml.v3"
 )
 
+// Returns the path to use for the user
+func pathFor(user string) string {
+	return path.Join(CONFIG_DIR, user, "keybindings.yaml")
+}
+
 // Default config
 //
 //go:embed keybindings.yaml
 var DEFAULT_CONFIG_RAW []byte
-
-// Path to keybindings
-var KEYBINDINGS_CONFIG = path.Join(xdg.ConfigHome, "tlock", "keybindings.yaml")
 
 // Just a wrapper
 type Keybinding struct {
@@ -154,19 +155,19 @@ func DefaultTokensKeyBinds() TokenKeyBinds {
 	}
 }
 
-// Load key bindings
-func LoadKeyBindings() KeybindingsConfig {
+// Load key bindings for a specific user
+func LoadKeyBindings(user string) KeybindingsConfig {
 	// Default key bindings
 	default_keys := DefaultKeybindingsConfig()
 
 	// Read file
-	raw, err := os.ReadFile(KEYBINDINGS_CONFIG)
+	raw, err := os.ReadFile(pathFor(user))
 
 	// If there is error, return the default keybindings
 	if err != nil {
 		// The file probably doesnt exist,
 		// Lets write the default config
-		write_default()
+		WriteDefault(user)
 
 		// Return default
 		return default_keys
@@ -181,9 +182,9 @@ func LoadKeyBindings() KeybindingsConfig {
 }
 
 // Writes the default keybindings configuration
-func write_default() {
+func WriteDefault(user string) {
 	// Open file
-	if file, err := utils.EnsureExists(KEYBINDINGS_CONFIG); err == nil {
+	if file, err := utils.EnsureExists(pathFor(user)); err == nil {
 		file.Write(DEFAULT_CONFIG_RAW)
 	}
 }

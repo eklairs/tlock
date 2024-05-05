@@ -14,7 +14,8 @@ import (
 var DEFAULT_THEME = "Catppuccin"
 
 // Path to the config file
-var CONFIG_PATH = path.Join(xdg.ConfigHome, "tlock", "tlock.json")
+var CONFIG_DIR = path.Join(xdg.ConfigHome, "tlock")
+var CONFIG_PATH = path.Join(xdg.ConfigHome, "tlock", "tlock.yaml")
 
 // Represents theme config
 type Config struct {

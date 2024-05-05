@@ -14,6 +14,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/eklairs/tlock/tlock-internal/components"
+	"github.com/eklairs/tlock/tlock-internal/config"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
@@ -70,6 +71,9 @@ type DashboardScreen struct {
 
 // Initializes a new instance of dashboard screen
 func InitializeDashboardScreen(username string, vault tlockvault.Vault, context *context.Context) DashboardScreen {
+	// Load keybindings for the user
+	context.Keybindings = config.LoadKeyBindings(username)
+
 	// Initialize dashboard keymap
 	dashboardKeys = dashboardKeyMap{
 		Help: key.NewBinding(

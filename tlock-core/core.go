@@ -10,6 +10,7 @@ import (
 	"github.com/kelindar/binary"
 	"github.com/rs/zerolog/log"
 
+	"github.com/eklairs/tlock/tlock-internal/config"
 	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
@@ -64,6 +65,9 @@ func (users *TLockCore) AddNewUser(username, password string) (*tlockvault.Vault
 
 	// Initialize new vault
 	vault := tlockvault.Initialize(password)
+
+	// Add keybindings file
+	config.WriteDefault(username)
 
 	// Add to users
 	users.Users = append(users.Users, User{Username: username, Vault: vault.Path})

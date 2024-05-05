@@ -87,7 +87,7 @@ func InitializeContext() Context {
 		Core:                  tlockcore.New(),
 		Config:                config.GetConfig(),
 		ClipboardAvailability: err == nil,
-		Keybindings:           config.LoadKeyBindings(),
+		Keybindings:           config.DefaultKeybindingsConfig(),
 	}
 }
 
