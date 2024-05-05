@@ -58,6 +58,9 @@ type Context struct {
 
 	// If the clipboard is available
 	ClipboardAvailability bool
+
+	// Keybindings
+	Keybindings config.KeybindingsConfig
 }
 
 // Initializes a new instance of the context
@@ -84,6 +87,7 @@ func InitializeContext() Context {
 		Core:                  tlockcore.New(),
 		Config:                config.GetConfig(),
 		ClipboardAvailability: err == nil,
+		Keybindings:           config.LoadKeyBindings(),
 	}
 }
 
