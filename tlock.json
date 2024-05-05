@@ -1,0 +1,13 @@
+{
+    "version": "1.0.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/eklairs/tlock/releases/download/v1.0.0/tlock-v1.0.0-windows-release.zip",
+            "bin": "tlock.exe",
+            "hash": "0ebaafdd4b341f5ea38f5847bd77ca8fb8b2544f1e6935090cf8a027e5429f4f"
+        }
+    },
+    "homepage": "https://github.com/eklairs/tlock",
+    "license": "MIT",
+    "description": "Two-Factor Authentication Token Manager in Terminal"
+}
