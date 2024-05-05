@@ -40,3 +40,48 @@ folders:
     # Default: "D"
     delete: ["D"]
 
+tokens:
+    # Add a new token
+    # Default: ["a"]
+    add: ["a"]
+
+    # Edit a new token
+    # Default: ["e"]
+    edit: ["e"]
+
+    # Switches the focus to the next token
+    # Default: ["j"]
+    next: ["j"]
+
+    # Switches the focus to the previous folder
+    # Default: ["k"]
+    previous: ["k"]
+
+    # Moves the focused token down
+    # Default: ["J"]
+    move_up: ["J"]
+
+    # Moves the focused token up
+    # Default: ["K"]
+    move_down: ["K"]
+
+    # Deletes the focused token
+    # Default: ["d"]
+    delete: ["d"]
+
+    # Moves the focused token
+    # Default: ["m"]
+    move: ["m"]
+
+    # Copies the code for the current token
+    # Default: ["c"]
+    copy: ["c"]
+
+    # Add from screen
+    # Default: ["s"]
+    add_from_screen: ["s"]
+
+    # Next token for HOTP based tokens
+    # Default: ["n"]
+    next_hotp: ["n"]
+
