@@ -1,17 +1,17 @@
 package config
 
 import (
-	"encoding/json"
 	"os"
 	"path"
 	"path/filepath"
 
 	"github.com/adrg/xdg"
 	"github.com/rs/zerolog/log"
+	"gopkg.in/yaml.v3"
 )
 
 // Default theme
-var DEFAULT_THEME = "Nord"
+var DEFAULT_THEME = "Catppuccin"
 
 // Path to the config file
 var CONFIG_PATH = path.Join(xdg.ConfigHome, "tlock", "tlock.json")
@@ -20,10 +20,10 @@ var CONFIG_PATH = path.Join(xdg.ConfigHome, "tlock", "tlock.json")
 type Config struct {
 	// Current theme
 	// Defaults to `Catppuccin`
-	CurrentTheme string
+	CurrentTheme string `yaml:"current_theme"`
 
 	/// Enable icons or not
-	EnableIcon bool
+	EnableIcon bool `yaml:"enable_icon"`
 }
 
 // Returns the default config
@@ -50,10 +50,11 @@ func GetConfig() Config {
 	}
 
 	// Parse
-	if err := json.Unmarshal(config_raw, &default_config); err != nil {
+	if err := yaml.Unmarshal(config_raw, &default_config); err != nil {
 		// Log
 		log.Error().Err(err).Msg("[config] Failed to parse config, syntax error possibly?")
 
+		// Return default config
 		return default_config
 	}
 
@@ -67,7 +68,7 @@ func (config Config) Write() {
 	os.MkdirAll(filepath.Dir(CONFIG_PATH), os.ModePerm)
 
 	// Marshal
-	data, _ := json.Marshal(config)
+	data, _ := yaml.Marshal(config)
 
 	// Write
 	file, err := os.Create(CONFIG_PATH)
