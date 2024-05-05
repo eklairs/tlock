@@ -120,7 +120,7 @@ func InitializeMoveTokenScreen(vault *tlockvault.Vault, folder tlockvault.Folder
 		vault:    vault,
 		token:    token,
 		folder:   folder,
-		listview: components.ListViewSimple(items, moveTokenDelegate{}, 65, 15),
+		listview: components.ListViewSimple(items, moveTokenDelegate{}, 65, min(15, len(vault.Folders)*3)),
 	}
 }
 
@@ -145,18 +145,20 @@ func (screen MoveTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			// Move token
 			screen.vault.MoveToken(screen.token.ID, screen.folder.ID, focusedFolder.ID)
 
-            accountName := screen.token.Account
+			accountName := screen.token.Account
 
-            if accountName == "" {
-                accountName = "no account name"
-            }
+			if accountName == "" {
+				accountName = "no account name"
+			}
 
 			// Require refresh of folders and tokens list
 			cmds = append(
 				cmds,
 				func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
 				func() tea.Msg { return tlockmessages.RefreshTokensMsg{} },
-                func() tea.Msg { return components.StatusBarMsg{ Message: fmt.Sprintf("Successfully moved token (%s) to %s folder", accountName, focusedFolder.Name) } },
+				func() tea.Msg {
+					return components.StatusBarMsg{Message: fmt.Sprintf("Successfully moved token (%s) to %s folder", accountName, focusedFolder.Name)}
+				},
 			)
 
 			// Pop
