@@ -82,7 +82,7 @@ func InitializeDashboardScreen(username string, vault tlockvault.Vault, context 
 		),
 		ChangeTheme: key.NewBinding(
 			key.WithKeys("ctrl+t"),
-			key.WithHelp("ctrl + t", "change theme"),
+			key.WithHelp("ctrl+t", "change theme"),
 		),
 	}
 
@@ -119,7 +119,7 @@ func (screen DashboardScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 		switch {
 		// Help menu
 		case key.Matches(msgType, dashboardKeys.Help):
-			cmd = manager.PushScreen(InitializeHelpScreen())
+			cmd = manager.PushScreen(InitializeHelpScreen(screen.context))
 
 		// Themes screen
 		case key.Matches(msgType, dashboardKeys.ChangeTheme):

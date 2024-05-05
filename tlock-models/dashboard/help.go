@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	"golang.org/x/term"
@@ -35,99 +36,6 @@ type helpKeyBindings struct {
 	Others []HelpKeyBindingSpec
 }
 
-var helpKeys = helpKeyBindings{
-	Folders: []HelpKeyBindingSpec{
-		{
-			Key:  "A",
-			Desc: "Add a new folder",
-		},
-		{
-			Key:  "E",
-			Desc: "Edit the current focused folder",
-		},
-		{
-			Key:  "tab",
-			Desc: "Switch to next folder",
-		},
-		{
-			Key:  "shift + tab",
-			Desc: "Switch to previous folder",
-		},
-		{
-			Key:  "ctrl + up",
-			Desc: "Move the focused folder up",
-		},
-		{
-			Key:  "ctrl + down",
-			Desc: "Move the focused folder down",
-		},
-		{
-			Key:  "D",
-			Desc: "Delete the current focused folder",
-		},
-	},
-	Tokens: []HelpKeyBindingSpec{
-		{
-			Key:  "a",
-			Desc: "Add a new token in the current focused folder",
-		},
-		{
-			Key:  "s",
-			Desc: "Add a new token from the screen",
-		},
-		{
-			Key:  "e",
-			Desc: "Edit the current focused token",
-		},
-		{
-			Key:  "m",
-			Desc: "Move the current focused token to another folder",
-		},
-		{
-			Key:  "n",
-			Desc: "Generates the token for the next counter [only of HOTP tokens]",
-		},
-		{
-			Key:  "c",
-			Desc: "Copy the current code for the focused token",
-		},
-		{
-			Key:  "j",
-			Desc: "Move focus to the text token",
-		},
-		{
-			Key:  "k",
-			Desc: "Move focus to the previous token",
-		},
-		{
-			Key:  "K",
-			Desc: "Move the focused token up",
-		},
-		{
-			Key:  "J",
-			Desc: "Move the focused token down",
-		},
-		{
-			Key:  "d",
-			Desc: "Delete the current focused token",
-		},
-	},
-	Others: []HelpKeyBindingSpec{
-		{
-			Key:  "?",
-			Desc: "Show this help window",
-		},
-		{
-			Key:  "ctrl + t",
-			Desc: "Change theme",
-		},
-		{
-			Key:  "ctrl + c / ctrl + q",
-			Desc: "Exit the application",
-		},
-	},
-}
-
 // Builds the help menu for the given set of key bindings and the tile
 func BuildHelpItem(title string, keys []HelpKeyBindingSpec) string {
 	items := make([]string, 0)
@@ -151,7 +59,104 @@ func BuildHelpItem(title string, keys []HelpKeyBindingSpec) string {
 	return lipgloss.JoinVertical(lipgloss.Left, items...)
 }
 
-func BuildHelpMenu() string {
+func BuildHelpMenu(context *context.Context) string {
+	m := func(keys []string) string {
+		return strings.Join(keys, "/")
+	}
+
+	var helpKeys = helpKeyBindings{
+		Folders: []HelpKeyBindingSpec{
+			{
+				Key:  m(context.Keybindings.Folder.Add.Keys()),
+				Desc: "Add a new folder",
+			},
+			{
+				Key:  m(context.Keybindings.Folder.Edit.Keys()),
+				Desc: "Edit the current focused folder",
+			},
+			{
+				Key:  m(context.Keybindings.Folder.Next.Keys()),
+				Desc: "Switch to next folder",
+			},
+			{
+				Key:  m(context.Keybindings.Folder.Previous.Keys()),
+				Desc: "Switch to previous folder",
+			},
+			{
+				Key:  m(context.Keybindings.Folder.MoveUp.Keys()),
+				Desc: "Move the focused folder up",
+			},
+			{
+				Key:  m(context.Keybindings.Folder.MoveDown.Keys()),
+				Desc: "Move the focused folder down",
+			},
+			{
+				Key:  m(context.Keybindings.Folder.Delete.Keys()),
+				Desc: "Delete the current focused folder",
+			},
+		},
+		Tokens: []HelpKeyBindingSpec{
+			{
+				Key:  m(context.Keybindings.Tokens.Add.Keys()),
+				Desc: "Add a new token in the current focused folder",
+			},
+			{
+				Key:  m(context.Keybindings.Tokens.AddScreen.Keys()),
+				Desc: "Add a new token from the screen",
+			},
+			{
+				Key:  m(context.Keybindings.Tokens.Edit.Keys()),
+				Desc: "Edit the current focused token",
+			},
+			{
+				Key:  m(context.Keybindings.Tokens.Move.Keys()),
+				Desc: "Move the current focused token to another folder",
+			},
+			{
+				Key:  m(context.Keybindings.Tokens.NextHOTP.Keys()),
+				Desc: "Generates the token for the next counter [only of HOTP tokens]",
+			},
+			{
+				Key:  m(context.Keybindings.Tokens.Copy.Keys()),
+				Desc: "Copy the current code for the focused token",
+			},
+			{
+				Key:  m(context.Keybindings.Tokens.Next.Keys()),
+				Desc: "Move focus to the next token",
+			},
+			{
+				Key:  m(context.Keybindings.Tokens.Previous.Keys()),
+				Desc: "Move focus to the previous token",
+			},
+			{
+				Key:  m(context.Keybindings.Tokens.MoveUp.Keys()),
+				Desc: "Move the focused token up",
+			},
+			{
+				Key:  m(context.Keybindings.Tokens.MoveDown.Keys()),
+				Desc: "Move the focused token down",
+			},
+			{
+				Key:  m(context.Keybindings.Tokens.Delete.Keys()),
+				Desc: "Delete the current focused token",
+			},
+		},
+		Others: []HelpKeyBindingSpec{
+			{
+				Key:  "?",
+				Desc: "Show this help window",
+			},
+			{
+				Key:  "ctrl+t",
+				Desc: "Change theme",
+			},
+			{
+				Key:  "ctrl+c / ctrl+q",
+				Desc: "Exit the application",
+			},
+		},
+	}
+
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
 		tlockstyles.Styles.Title.Render(helpAsciiArt), "",
@@ -168,11 +173,11 @@ type HelpScreen struct {
 }
 
 // Initializes a new instance of the help screen
-func InitializeHelpScreen() HelpScreen {
+func InitializeHelpScreen(context *context.Context) HelpScreen {
 	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
 	viewport := viewport.New(65, height)
-	viewport.SetContent(BuildHelpMenu())
+	viewport.SetContent(BuildHelpMenu(context))
 
 	return HelpScreen{
 		viewport: viewport,
