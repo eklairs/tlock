@@ -1,6 +1,9 @@
 # Use golang's official docker image
 FROM golang:alpine
 
+# Enable colors
+ENV TERM=xterm-256color
+
 # Install buil deps
 RUN apk add build-base libx11-dev git
 
