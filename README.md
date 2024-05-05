@@ -6,14 +6,14 @@ TLock is an open-source tool to store and manage your authentication tokens secu
 
 ## Features
 
-- 📺  In Terminal
-- ⌨️  Easily traverse through UI with keyboard
-- 🔒  Proper encryption to secure your tokens at rest
-- ⚡️  Supports Industry Standard TOTP and HOTP-based tokens
-- ➕  Easily add tokens manually or from the screen (QR Code)
-- 📁  Organize your tokens inside of folders
-- 🎨  Themes to personalize tlock
-- 🖼  Icon of the provider
+- 🚀 Cross-platform - Works perfectly on Windows, Linux, and MacOS.
+- ⚡️ Blazingly Fast app written in Golang.
+- 👥 Supports multiple users, each protected optionally with a password.
+- ⌨️ Traverse through the UI with customizable key keybindings (can have different keybindings per user).
+- 📁 Supports organizing tokens inside of folders.
+- 🌟 Supports industry-standard TOTP and HOTP-based tokens.
+- 📷 Easily add tokens from the screen or the advanced token editor.
+- 🎨 Supports multiple themes to sync the TLock theme with your favorite color scheme.
 
 >[!NOTE]
 >For showing the provider's icon, you must have Nerd Fonts installed
@@ -26,20 +26,17 @@ TLock is an open-source tool to store and manage your authentication tokens secu
   yay -S tlock
   ```
 
-- **MacOS** (with MacPorts)
-
-  ```fish
-  sudo port install tlock
-  ```
-
 - **Windows** (with scoop)
 
   ```fish
+  scoop bucket add tlock https://github.com/eklairs/tlock
   scoop install tlock
   ```
+
 - **Manually**
 
   You can also download the binary based on your operating system to use TLock from [releases](https://github.com/eklairs/tlock/releases)
+  
 - **go**
 
   ```fish
@@ -59,7 +56,7 @@ Open your terminal and type `tlock` to start using tlock!
 
 ## Contributing
 
-Did you come across a bug or want to introduce a new feature? Read the [CONTRIBUTING.md](https://github.com/eklairs/tlock/blob/main/CONTRIBUTING.md) and get started!
+Did you come across a bug or want to introduce a new feature? Don't hesitate to open up an issue or pull request!
 
 ## License
 
