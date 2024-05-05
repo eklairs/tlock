@@ -121,16 +121,7 @@ func (k tokenKeyMap) FullHelp() [][]key.Binding {
 }
 
 // Keys
-var tokenKeys = tokenKeyMap{
-	Manual: key.NewBinding(
-		key.WithKeys("a"),
-		key.WithHelp("a", "add token"),
-	),
-	Screen: key.NewBinding(
-		key.WithKeys("s"),
-		key.WithHelp("s", "add from screen"),
-	),
-}
+var tokenKeys tokenKeyMap
 
 var EmptyAsciiArt = `
 \    /\
@@ -249,6 +240,18 @@ func buildTokensListView(tokens []tlockvault.Token, context *context.Context) li
 
 // Initializes a new instance of folders
 func InitializeTokens(vault *tlockvault.Vault, context *context.Context) Tokens {
+	// Initialize keys
+	tokenKeys = tokenKeyMap{
+		Manual: key.NewBinding(
+			key.WithKeys(context.Keybindings.Tokens.Add.Keys()...),
+			key.WithHelp(strings.Join(context.Keybindings.Tokens.Add.Keys(), "/"), "add token"),
+		),
+		Screen: key.NewBinding(
+			key.WithKeys(context.Keybindings.Tokens.AddScreen.Keys()...),
+			key.WithHelp(strings.Join(context.Keybindings.Tokens.AddScreen.Keys(), "/"), "add token from screen"),
+		),
+	}
+
 	return Tokens{
 		vault:   vault,
 		folder:  nil,
