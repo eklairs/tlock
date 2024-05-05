@@ -1,0 +1,42 @@
+# Keybindings
+
+# Keybindings can be defined for a action in the following way:
+#
+# <action>: [<keys>]
+#
+# Examples:
+#
+# add: ["A"]
+# move_down: ["ctrl", "down"]
+#
+# etc
+
+folders:
+    # Add a new folder
+    # Default: ["A"]
+    add: ["A"]
+
+    # Edit a new folder
+    # Default: ["E"]
+    edit: ["E"]
+
+    # Switches the focus to the next folder
+    # Default: ["tab"]
+    next: ["tab"]
+
+    # Switches the focus to the previous folder
+    # Default: ["shift", "tab"]
+    previous: ["shift", "tab"]
+
+    # Moves the focused token up
+    # Default: ["ctrl", "up"]
+    move_up: ["ctrl", "up"]
+
+    # Moves the focused token down
+    # Default: ["ctrl", "down"]
+    move_up: ["ctrl", "down"]
+
+    # Deletes the focused folder
+    # Default: "D"
+    delete: ["D"]
+
