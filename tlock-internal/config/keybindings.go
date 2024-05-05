@@ -99,22 +99,22 @@ type TokenKeyBinds struct {
 	Previous Keybinding `yaml:"previous"`
 
 	// Move folder up
-	MoveUp Keybinding `yaml:"J"`
+	MoveUp Keybinding `yaml:"move_up"`
 
 	// Move folder down
-	MoveDown Keybinding `yaml:"K"`
+	MoveDown Keybinding `yaml:"move_down"`
 
 	// Delete
-	Delete Keybinding `yaml:"d"`
+	Delete Keybinding `yaml:"delete"`
 
 	// Delete
-	Copy Keybinding `yaml:"c"`
+	Copy Keybinding `yaml:"copy"`
 
 	// Next token for HOTP
-	NextHOTP Keybinding `yaml:"n"`
+	NextHOTP Keybinding `yaml:"next_hotp"`
 
 	// Next token for HOTP
-	Move Keybinding `yaml:"m"`
+	Move Keybinding `yaml:"move"`
 }
 
 // Returns the default keybindings
