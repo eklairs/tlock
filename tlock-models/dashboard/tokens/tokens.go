@@ -263,44 +263,48 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-		case msgType.String() == "c":
-            if !tokens.context.ClipboardAvailability {
-                cmds = append(cmds, func() tea.Msg { return components.StatusBarMsg{ Message: "Clipboard is not available", ErrorMessage: true } })
-            }
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Copy):
+			if !tokens.context.ClipboardAvailability {
+				cmds = append(cmds, func() tea.Msg {
+					return components.StatusBarMsg{Message: "Clipboard is not available", ErrorMessage: true}
+				})
+			}
 
 			if focused := tokens.Focused(); focused != nil && tokens.context.ClipboardAvailability {
 				clipboard.Write(clipboard.FmtText, []byte(focused.CurrentCode))
 
-                accountName := focused.Token.Account
+				accountName := focused.Token.Account
 
-                if accountName == "" {
-                    accountName = "<no account name>"
-                }
+				if accountName == "" {
+					accountName = "<no account name>"
+				}
 
-                cmds = append(cmds, func() tea.Msg { return components.StatusBarMsg{ Message: fmt.Sprintf("Successfully copied token (%s)", accountName) } })
+				cmds = append(cmds, func() tea.Msg {
+					return components.StatusBarMsg{Message: fmt.Sprintf("Successfully copied token (%s)", accountName)}
+				})
 			}
 
-		case msgType.String() == "a":
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Add):
 			if tokens.folder != nil {
 				manager.PushScreen(InitializeAddTokenScreen(*tokens.folder, tokens.vault))
 			}
 
-		case msgType.String() == "e":
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Edit):
 			if focused := tokens.Focused(); focused != nil {
 				manager.PushScreen(InitializeEditTokenScreen(*tokens.folder, focused.Token, tokens.vault))
 			}
 
-		case msgType.String() == "m":
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Move):
 			if focused := tokens.Focused(); focused != nil {
 				manager.PushScreen(InitializeMoveTokenScreen(tokens.vault, *tokens.folder, focused.Token))
 			}
 
-		case msgType.String() == "d":
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Delete):
 			if focused := tokens.Focused(); focused != nil {
 				manager.PushScreen(InitializeDeleteTokenScreen(tokens.vault, *tokens.folder, focused.Token))
 			}
 
-		case msgType.String() == "J":
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.MoveDown):
 			if focused := tokens.Focused(); focused != nil {
 				// Move token down
 				tokens.vault.MoveTokenDown(tokens.folder.ID, focused.Token.ID)
@@ -311,16 +315,18 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 				// Move cursor down
 				tokens.listview.CursorDown()
 
-                accountName := focused.Token.Account
+				accountName := focused.Token.Account
 
-                if accountName == "" {
-                    accountName = "<no account name>"
-                }
+				if accountName == "" {
+					accountName = "<no account name>"
+				}
 
-                cmds = append(cmds, func() tea.Msg { return components.StatusBarMsg{ Message: fmt.Sprintf("Successfully moved the token down (%s)", accountName) } })
+				cmds = append(cmds, func() tea.Msg {
+					return components.StatusBarMsg{Message: fmt.Sprintf("Successfully moved the token down (%s)", accountName)}
+				})
 			}
 
-		case msgType.String() == "K":
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.MoveUp):
 			if focused := tokens.Focused(); focused != nil {
 				// Move token down
 				tokens.vault.MoveTokenUp(tokens.folder.ID, focused.Token.ID)
@@ -331,32 +337,36 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 				// Move cursor down
 				tokens.listview.CursorUp()
 
-                accountName := focused.Token.Account
+				accountName := focused.Token.Account
 
-                if accountName == "" {
-                    accountName = "<no account name>"
-                }
+				if accountName == "" {
+					accountName = "<no account name>"
+				}
 
-                cmds = append(cmds, func() tea.Msg { return components.StatusBarMsg{ Message: fmt.Sprintf("Successfully moved the token up (%s)", accountName) } })
+				cmds = append(cmds, func() tea.Msg {
+					return components.StatusBarMsg{Message: fmt.Sprintf("Successfully moved the token up (%s)", accountName)}
+				})
 			}
 
-		case msgType.String() == "n":
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.NextHOTP):
 			if focused := tokens.Focused(); focused != nil {
 				if focused.Token.Type == tlockvault.TokenTypeHOTP {
 					tokens.vault.IncreaseCounter(tokens.folder.ID, focused.Token.ID)
 
-                    accountName := focused.Token.Account
-                    if accountName == "" {
-                        accountName = "<no account name>"
-                    }
+					accountName := focused.Token.Account
+					if accountName == "" {
+						accountName = "<no account name>"
+					}
 
 					// Refresh tokens
 					cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshTokensMsg{} })
-                    cmds = append(cmds, func() tea.Msg { return components.StatusBarMsg{ Message: fmt.Sprintf("Successfully generated next token for %s", accountName) } })
+					cmds = append(cmds, func() tea.Msg {
+						return components.StatusBarMsg{Message: fmt.Sprintf("Successfully generated next token for %s", accountName)}
+					})
 				}
 			}
 
-		case key.Matches(msgType, tokenKeys.Screen):
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.AddScreen):
 			if tokens.folder != nil {
 				manager.PushScreen(InitializeTokenFromScreen(tokens.vault, *tokens.folder))
 			}
