@@ -43,6 +43,12 @@ TLock is an open-source tool to store and manage your authentication tokens secu
   go install github.com/eklairs/tlock@latest
   ```
 
+- **Docker**
+  
+  ```fish
+  docker run -it --rm ghcr.io/eklairs/tlock:latest
+  ```
+
 ## Screenshots
 
 <img src="/assets/login.png" />
