@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"os"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -47,20 +48,7 @@ func (k dashboardKeyMap) FullHelp() [][]key.Binding {
 }
 
 // Keys
-var dashboardKeys = dashboardKeyMap{
-	Help: key.NewBinding(
-		key.WithKeys("?"),
-		key.WithHelp("?", "help menu"),
-	),
-	Add: key.NewBinding(
-		key.WithKeys("A"),
-		key.WithHelp("A", "add folder"),
-	),
-	ChangeTheme: key.NewBinding(
-		key.WithKeys("ctrl+t"),
-		key.WithHelp("ctrl + t", "change theme"),
-	),
-}
+var dashboardKeys dashboardKeyMap
 
 // Dashboard screen
 type DashboardScreen struct {
@@ -82,6 +70,22 @@ type DashboardScreen struct {
 
 // Initializes a new instance of dashboard screen
 func InitializeDashboardScreen(username string, vault tlockvault.Vault, context *context.Context) DashboardScreen {
+	// Initialize dashboard keymap
+	dashboardKeys = dashboardKeyMap{
+		Help: key.NewBinding(
+			key.WithKeys("?"),
+			key.WithHelp("?", "help menu"),
+		),
+		Add: key.NewBinding(
+			key.WithKeys(context.Keybindings.Folder.Add.Keys()...),
+			key.WithHelp(strings.Join(context.Keybindings.Folder.Add.Keys(), "/"), "add folder"),
+		),
+		ChangeTheme: key.NewBinding(
+			key.WithKeys("ctrl+t"),
+			key.WithHelp("ctrl + t", "change theme"),
+		),
+	}
+
 	return DashboardScreen{
 		vault:     &vault,
 		context:   context,

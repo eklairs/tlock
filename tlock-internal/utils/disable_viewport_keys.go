@@ -5,6 +5,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 )
 
+// Disables the letter keys to prevent moving of viewport with the typing
 func DisableViewportKeys(viewport viewport.Model) viewport.Model {
 	viewport.KeyMap.Up = key.NewBinding(
 		key.WithKeys("up"),
