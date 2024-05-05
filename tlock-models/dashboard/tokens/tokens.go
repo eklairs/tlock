@@ -263,7 +263,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Copy):
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Copy.Binding):
 			if !tokens.context.ClipboardAvailability {
 				cmds = append(cmds, func() tea.Msg {
 					return components.StatusBarMsg{Message: "Clipboard is not available", ErrorMessage: true}
@@ -284,27 +284,27 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 				})
 			}
 
-		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Add):
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Add.Binding):
 			if tokens.folder != nil {
 				manager.PushScreen(InitializeAddTokenScreen(*tokens.folder, tokens.vault))
 			}
 
-		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Edit):
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Edit.Binding):
 			if focused := tokens.Focused(); focused != nil {
 				manager.PushScreen(InitializeEditTokenScreen(*tokens.folder, focused.Token, tokens.vault))
 			}
 
-		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Move):
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Move.Binding):
 			if focused := tokens.Focused(); focused != nil {
 				manager.PushScreen(InitializeMoveTokenScreen(tokens.vault, *tokens.folder, focused.Token))
 			}
 
-		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Delete):
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Delete.Binding):
 			if focused := tokens.Focused(); focused != nil {
 				manager.PushScreen(InitializeDeleteTokenScreen(tokens.vault, *tokens.folder, focused.Token))
 			}
 
-		case key.Matches(msgType, tokens.context.Keybindings.Tokens.MoveDown):
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.MoveDown.Binding):
 			if focused := tokens.Focused(); focused != nil {
 				// Move token down
 				tokens.vault.MoveTokenDown(tokens.folder.ID, focused.Token.ID)
@@ -326,7 +326,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 				})
 			}
 
-		case key.Matches(msgType, tokens.context.Keybindings.Tokens.MoveUp):
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.MoveUp.Binding):
 			if focused := tokens.Focused(); focused != nil {
 				// Move token down
 				tokens.vault.MoveTokenUp(tokens.folder.ID, focused.Token.ID)
@@ -348,7 +348,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 				})
 			}
 
-		case key.Matches(msgType, tokens.context.Keybindings.Tokens.NextHOTP):
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.NextHOTP.Binding):
 			if focused := tokens.Focused(); focused != nil {
 				if focused.Token.Type == tlockvault.TokenTypeHOTP {
 					tokens.vault.IncreaseCounter(tokens.folder.ID, focused.Token.ID)
@@ -366,7 +366,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 				}
 			}
 
-		case key.Matches(msgType, tokens.context.Keybindings.Tokens.AddScreen):
+		case key.Matches(msgType, tokens.context.Keybindings.Tokens.AddScreen.Binding):
 			if tokens.folder != nil {
 				manager.PushScreen(InitializeTokenFromScreen(tokens.vault, *tokens.folder))
 			}
