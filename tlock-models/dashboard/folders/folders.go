@@ -11,6 +11,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/components"
+	"github.com/eklairs/tlock/tlock-internal/context"
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-internal/utils"
@@ -74,6 +75,9 @@ type Folders struct {
 	// Last focused index of the listview
 	// Used for calculating if the list item focus has been changed
 	lastFocused int
+
+	// Context
+	context *context.Context
 }
 
 // Returns the folders in the form of list item
@@ -88,7 +92,7 @@ func buildFolderListItems(vault *tlockvault.Vault) []list.Item {
 }
 
 // Builds the listview for the given list of folders
-func buildListViewForFolders(vault *tlockvault.Vault) list.Model {
+func buildListViewForFolders(vault *tlockvault.Vault, context *context.Context) list.Model {
 	// Get size
 	width, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
@@ -96,21 +100,15 @@ func buildListViewForFolders(vault *tlockvault.Vault) list.Model {
 	listview := components.ListViewSimple(buildFolderListItems(vault), folderListDelegate{}, foldersWidth(width), height-6) // -4 is for the title
 
 	// Use custom keys
-	listview.KeyMap.CursorDown = key.NewBinding(
-		key.WithKeys("tab"),
-		key.WithHelp("tab", "down"),
-	)
+	listview.KeyMap.CursorUp = context.Keybindings.Folder.Previous
+	listview.KeyMap.CursorDown = context.Keybindings.Folder.Next
 
-	listview.KeyMap.CursorUp = key.NewBinding(
-		key.WithKeys("shift+tab"),
-		key.WithHelp("shift+tab", "up"),
-	)
-
+	// Return listview
 	return listview
 }
 
 // Initializes a new instance of folders
-func InitializeFolders(vault *tlockvault.Vault) Folders {
+func InitializeFolders(vault *tlockvault.Vault, context *context.Context) Folders {
 	lastFocused := -1
 
 	if len(vault.Folders) != 0 {
@@ -119,7 +117,8 @@ func InitializeFolders(vault *tlockvault.Vault) Folders {
 
 	return Folders{
 		vault:       vault,
-		listview:    buildListViewForFolders(vault),
+		context:     context,
+		listview:    buildListViewForFolders(vault, context),
 		lastFocused: lastFocused,
 	}
 }
@@ -146,31 +145,31 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
-		switch msgType.String() {
+		switch {
 		// Add new folder
-		case "A":
+		case key.Matches(msgType, folders.context.Keybindings.Folder.Add):
 			cmds = append(cmds, manager.PushScreen(InitializeAddFolderScreen(folders.vault)))
 
 		// Edit focused token
-		case "E":
+		case key.Matches(msgType, folders.context.Keybindings.Folder.Edit):
 			if focused := folders.Focused(); focused != nil {
 				cmds = append(cmds, manager.PushScreen(InitializeEditFolderScreen(*focused, folders.vault)))
 			}
 
 		// Delete focused token
-		case "D":
+		case key.Matches(msgType, folders.context.Keybindings.Folder.Delete):
 			if focused := folders.Focused(); focused != nil {
 				cmds = append(cmds, manager.PushScreen(InitializeDeleteFolderScreen(*focused, folders.vault)))
 			}
 
-		case "tab":
+		case key.Matches(msgType, folders.context.Keybindings.Folder.Next):
 			cmds = append(cmds, func() tea.Msg { return tlockmessages.RequestFolderChanged{} })
 
-		case "shift+tab":
+		case key.Matches(msgType, folders.context.Keybindings.Folder.Previous):
 			cmds = append(cmds, func() tea.Msg { return tlockmessages.RequestFolderChanged{} })
 
 		// Move folder down
-		case "ctrl+up":
+		case key.Matches(msgType, folders.context.Keybindings.Folder.MoveUp):
 			if focused := folders.Focused(); focused != nil {
 				if folders.vault.MoveFolderUp(focused.ID) {
 					// Move cursor down
@@ -180,13 +179,15 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 					cmds = append(
 						cmds,
 						func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
-                        func() tea.Msg { return components.StatusBarMsg{Message: fmt.Sprintf("Successfully moved %s folder up", focused.Name)} },
+						func() tea.Msg {
+							return components.StatusBarMsg{Message: fmt.Sprintf("Successfully moved %s folder up", focused.Name)}
+						},
 					)
 				}
 			}
 
 		// Move folder down
-		case "ctrl+down":
+		case key.Matches(msgType, folders.context.Keybindings.Folder.MoveDown):
 			if focused := folders.Focused(); focused != nil {
 				if folders.vault.MoveFolderDown(focused.ID) {
 					// Move cursor down
@@ -196,7 +197,9 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 					cmds = append(
 						cmds,
 						func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
-                        func() tea.Msg { return components.StatusBarMsg{Message: fmt.Sprintf("Successfully moved %s folder up", focused.Name)} },
+						func() tea.Msg {
+							return components.StatusBarMsg{Message: fmt.Sprintf("Successfully moved %s folder up", focused.Name)}
+						},
 					)
 				}
 			}

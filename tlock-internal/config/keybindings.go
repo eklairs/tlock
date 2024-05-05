@@ -77,9 +77,9 @@ func DefaultFolderKeyBinds() FolderKeyBinds {
 		Add:      new_key("A"),
 		Edit:     new_key("E"),
 		Next:     new_key("tab"),
-		Previous: new_key("shift", "tab"),
-		MoveUp:   new_key("ctrl", "up"),
-		MoveDown: new_key("ctrl", "down"),
+		Previous: new_key("shift+tab"),
+		MoveUp:   new_key("ctrl+up"),
+		MoveDown: new_key("ctrl+down"),
 		Delete:   new_key("D"),
 	}
 }

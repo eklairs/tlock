@@ -76,18 +76,18 @@ type DashboardScreen struct {
 	// Tokens
 	tokens tokens.Tokens
 
-    // Status bar
-    statusbar components.StatusBar
+	// Status bar
+	statusbar components.StatusBar
 }
 
 // Initializes a new instance of dashboard screen
 func InitializeDashboardScreen(username string, vault tlockvault.Vault, context *context.Context) DashboardScreen {
 	return DashboardScreen{
-		vault:   &vault,
-		context: context,
-        statusbar: components.NewStatusBar(username),
-		folders: folders.InitializeFolders(&vault),
-		tokens:  tokens.InitializeTokens(&vault, context),
+		vault:     &vault,
+		context:   context,
+		statusbar: components.NewStatusBar(username),
+		folders:   folders.InitializeFolders(&vault, context),
+		tokens:    tokens.InitializeTokens(&vault, context),
 	}
 }
 
@@ -123,8 +123,8 @@ func (screen DashboardScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 		}
 	}
 
-    // Update statusbar
-    screen.statusbar.Update(msg)
+	// Update statusbar
+	screen.statusbar.Update(msg)
 
 	return screen, tea.Batch(screen.folders.Update(msg, manager), screen.tokens.Update(msg, manager), cmd)
 }
@@ -149,14 +149,14 @@ func (screen DashboardScreen) View() string {
 		return style.Render(ui)
 	}
 
-    ui := lipgloss.JoinHorizontal(
+	ui := lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		screen.folders.View(), "  ",
 		screen.tokens.View(),
 	)
 
-    return lipgloss.JoinVertical(
-        lipgloss.Top,
-        ui, screen.statusbar.View(),
-    )
+	return lipgloss.JoinVertical(
+		lipgloss.Top,
+		ui, screen.statusbar.View(),
+	)
 }

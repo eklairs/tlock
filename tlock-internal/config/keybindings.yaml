@@ -25,16 +25,16 @@ folders:
     next: ["tab"]
 
     # Switches the focus to the previous folder
-    # Default: ["shift", "tab"]
-    previous: ["shift", "tab"]
+    # Default: ["shift+tab"]
+    previous: ["shift+tab"]
 
     # Moves the focused token up
-    # Default: ["ctrl", "up"]
-    move_up: ["ctrl", "up"]
+    # Default: ["ctrl+up"]
+    move_up: ["ctrl+up"]
 
     # Moves the focused token down
-    # Default: ["ctrl", "down"]
-    move_up: ["ctrl", "down"]
+    # Default: ["ctrl+down"]
+    move_down: ["ctrl+down"]
 
     # Deletes the focused folder
     # Default: "D"
