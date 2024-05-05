@@ -131,10 +131,7 @@ func (screen DashboardScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 		}
 	}
 
-	// Update statusbar
-	screen.statusbar.Update(msg)
-
-	return screen, tea.Batch(screen.folders.Update(msg, manager), screen.tokens.Update(msg, manager), cmd)
+	return screen, tea.Batch(screen.folders.Update(msg, manager), screen.tokens.Update(msg, manager), cmd, screen.statusbar.Update(msg))
 }
 
 // View
