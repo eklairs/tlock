@@ -112,6 +112,9 @@ func (screen UserOptionsScreen) Update(msg tea.Msg, manager *modelmanager.ModelM
 				cmd = append(cmd, manager.PushScreen(InitializeEnterPassScreen(screen.context, screen.user, InitializeEditUsernameScreen)))
 			case 1:
 				cmd = append(cmd, manager.PushScreen(InitializeChangePasswordScreen(screen.context, screen.user)))
+
+            case 2:
+				cmd = append(cmd, manager.PushScreen(InitializeEnterPassScreen(screen.context, screen.user, InitializeDeleteUserScreen)))
 			}
 		}
 	}

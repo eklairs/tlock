@@ -92,6 +92,19 @@ func (core TLockCore) RenameUser(oldName, newName string) {
 	}
 }
 
+// Deletes a user
+func (core TLockCore) DeleteUser(username string) {
+	userIndex := slices.IndexFunc(core.Users, func(user User) bool { return user.Username == username })
+
+	if userIndex != -1 {
+        // Remove user
+        core.Users = utils.Remove(core.Users, userIndex)
+
+		// Write
+		core.write()
+	}
+}
+
 // [PRIVATE] Writes the current users value to the file
 func (users TLockCore) write() {
 	// Serialize
