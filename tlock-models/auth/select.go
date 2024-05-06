@@ -185,6 +185,9 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 // View
 func (screen SelectUserScreen) View() string {
+	// Update items
+	screen.listview.SetItems(utils.Map(screen.context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user) }))
+
 	// List of items to render
 	items := []string{
 		// Ascii art
