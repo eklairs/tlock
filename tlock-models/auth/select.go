@@ -23,10 +23,10 @@ var selectUserAscii = `
 █▄▄ █▄█ █▄█ █ █ ▀█`
 
 // select user list item
-type selectUserListItem string
+type selectUserListItem tlockcore.User
 
 func (item selectUserListItem) FilterValue() string {
-	return string(item)
+	return string(item.Username)
 }
 
 // Select user list view delegate
@@ -62,20 +62,21 @@ func (d selectUserDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	}
 
 	// Render
-	fmt.Fprint(w, renderer(65, string(item), "›"))
+	fmt.Fprint(w, renderer(65, item.Username, "›"))
 }
 
 // Select user key map
 type selectUserKeyMap struct {
-	Up    key.Binding
-	Down  key.Binding
-	Enter key.Binding
-	New   key.Binding
+	Up      key.Binding
+	Down    key.Binding
+	Enter   key.Binding
+	New     key.Binding
+	Options key.Binding
 }
 
 // ShortHelp()
 func (k selectUserKeyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Up, k.Down, k.New, k.Enter}
+	return []key.Binding{k.Up, k.Down, k.New, k.Options, k.Enter}
 }
 
 // LongHelp()
@@ -106,6 +107,10 @@ var selectUserKeys = selectUserKeyMap{
 		key.WithKeys("enter"),
 		key.WithHelp("enter", "login as"),
 	),
+	Options: key.NewBinding(
+		key.WithKeys("o"),
+		key.WithHelp("o", "user options"),
+	),
 }
 
 // Select user
@@ -120,7 +125,7 @@ type SelectUserScreen struct {
 // New instance of select user
 func InitializeSelectUserScreen(context *context.Context) SelectUserScreen {
 	// Renderable list of users
-	usersList := utils.Map(context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user.Username) })
+	usersList := utils.Map(context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user) })
 
 	// Return instance
 	return SelectUserScreen{
@@ -147,6 +152,12 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 		switch {
 		case key.Matches(msgType, selectUserKeys.New):
 			cmds = append(cmds, manager.PushScreen(InitializeCreateUserScreen(screen.context)))
+
+		case key.Matches(msgType, selectUserKeys.Options):
+			if focused, ok := screen.listview.SelectedItem().(selectUserListItem); ok {
+				cmds = append(cmds, manager.PushScreen(InitializeUserOptionsScreen(screen.context, tlockcore.User(focused))))
+			}
+
 		case key.Matches(msgType, selectUserKeys.Enter):
 			// User
 			user := screen.context.Core.Users[screen.listview.Index()]
