@@ -111,7 +111,7 @@ func (screen DashboardScreen) Init() tea.Cmd {
 		}
 	}
 
-	return tea.Batch(cmd, tlockmessages.DispatchRefreshTokensValueMsg)
+	return tea.Batch(cmd, tlockmessages.DispatchRefreshTokensValueMsg())
 }
 
 // Update

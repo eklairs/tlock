@@ -47,7 +47,7 @@ func (model RootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// We dispatch back the message from root model because its the only model that recieves all the models everytime.
 	// If a new screen is pushed to modelmanager, the dashboard will not recieve the message and thus will break the update
 	case tlockmessages.RefreshTokensValue:
-		cmds = append(cmds, tlockmessages.DispatchRefreshTokensValueMsg)
+		cmds = append(cmds, tlockmessages.DispatchRefreshTokensValueMsg())
 	}
 
 	// Update model manager

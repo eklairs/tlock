@@ -25,12 +25,8 @@ type RequestFolderChanged struct{}
 // This is sent after every second after the dashboard has been loaded
 type RefreshTokensValue struct{}
 
-func DispatchRefreshTokensValueMsg() tea.Msg {
-	currentTime := time.Now()
-	nextSecond := currentTime.Truncate(time.Second).Add(time.Second)
-	duration := nextSecond.Sub(currentTime)
-
-	time.Sleep(duration)
-
-	return RefreshTokensValue{}
+func DispatchRefreshTokensValueMsg() tea.Cmd {
+	return tea.Every(time.Second, func(t time.Time) tea.Msg {
+		return RefreshTokensValue{}
+	})
 }
