@@ -155,10 +155,10 @@ func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	item := listItem.(tokensListItem)
 
 	// Decide renderer function
-	render_fn := components.TokenItemInactive
+	render_fn := components.TokenItemActive
 
-	if index == m.Index() {
-		render_fn = components.TokenItemActive
+	if index != m.Index() {
+		render_fn = components.TokenItemInactive
 	}
 
 	// Account name
@@ -176,7 +176,13 @@ func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	}
 
 	// Suffix (current code)
-	code := strings.Join(strings.Split(item.CurrentCode, ""), "   ")
+	codeToShow := item.CurrentCode
+
+	// If it is not the current focused index, we will hide the token
+	if index != m.Index() {
+		// Hide it aywa with astrisk
+		codeToShow = strings.Repeat("*", item.Token.Digits)
+	}
 
 	var tokenRenderable string
 
@@ -189,7 +195,7 @@ func (d tokensListDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	}
 
 	// Render
-	fmt.Fprint(w, render_fn(m.Width()-9, tokenRenderable, account, issuer, code, item.Token.Period, item.time, d.context.Config.EnableIcon))
+	fmt.Fprint(w, render_fn(m.Width()-9, tokenRenderable, account, issuer, strings.Join(strings.Split(codeToShow, ""), "   "), item.Token.Period, item.time, d.context.Config.EnableIcon))
 }
 
 // Tokens
