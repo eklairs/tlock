@@ -70,7 +70,7 @@ type DashboardScreen struct {
 }
 
 // Initializes a new instance of dashboard screen
-func InitializeDashboardScreen(username string, vault tlockvault.Vault, context *context.Context) DashboardScreen {
+func InitializeDashboardScreen(username string, vault *tlockvault.Vault, context *context.Context) modelmanager.Screen {
 	// Load keybindings for the user
 	context.Keybindings = config.LoadKeyBindings(username)
 
@@ -91,11 +91,11 @@ func InitializeDashboardScreen(username string, vault tlockvault.Vault, context 
 	}
 
 	return DashboardScreen{
-		vault:     &vault,
+		vault:     vault,
 		context:   context,
 		statusbar: components.NewStatusBar(username),
-		folders:   folders.InitializeFolders(&vault, context),
-		tokens:    tokens.InitializeTokens(&vault, context),
+		folders:   folders.InitializeFolders(vault, context),
+		tokens:    tokens.InitializeTokens(vault, context),
 	}
 }
 

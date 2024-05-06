@@ -13,7 +13,6 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/constants"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
-	"github.com/eklairs/tlock/tlock-models/dashboard"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
@@ -55,6 +54,9 @@ var enterPassKeys = enterPassKeyMap{
 	),
 }
 
+// Next function
+type NextFunc = func(string, *tlockvault.Vault, *context.Context) modelmanager.Screen
+
 // Enter pass screen
 type EnterPassScreen struct {
 	// Context
@@ -68,10 +70,13 @@ type EnterPassScreen struct {
 
 	// Any error message
 	errorMessage *string
+
+	// Next
+	next NextFunc
 }
 
 // Initialize root model
-func InitializeEnterPassScreen(context *context.Context, user tlockcore.User) EnterPassScreen {
+func InitializeEnterPassScreen(context *context.Context, user tlockcore.User, next NextFunc) EnterPassScreen {
 	// Password input
 	passwordInput := components.InitializeInputBox("Your password goes here...")
 	passwordInput.EchoCharacter = constants.CHAR_ECHO
@@ -82,6 +87,7 @@ func InitializeEnterPassScreen(context *context.Context, user tlockcore.User) En
 		context:   context,
 		user:      user,
 		passInput: passwordInput,
+		next:      next,
 	}
 }
 
@@ -112,7 +118,7 @@ func (screen EnterPassScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			if err != nil {
 				screen.errorMessage = &ERROR_PASSWORD_WRONG
 			} else {
-				cmd = manager.PushScreen(dashboard.InitializeDashboardScreen(screen.user.Username, *vault, screen.context))
+				cmd = manager.ReplaceScreen(screen.next(screen.user.Username, vault, screen.context))
 			}
 		default:
 			// Update input box

@@ -21,6 +21,7 @@ const (
 	OperationNone = iota
 	OperationPush
 	OperationPop
+	OperationReplace
 )
 
 // Type of operation
@@ -67,6 +68,16 @@ func (manager *ModelManager) PushScreen(screen Screen) tea.Cmd {
 	return screen.Init()
 }
 
+// Replaces the current screen with a new screen on the stack
+func (manager *ModelManager) ReplaceScreen(screen Screen) tea.Cmd {
+	manager.operation = Operation{
+		Action: OperationReplace,
+		Screen: &screen,
+	}
+
+	return screen.Init()
+}
+
 // Pops the top screen from the stack
 func (manager *ModelManager) PopScreen() {
 	if len(manager.stack) > 1 {
@@ -85,15 +96,15 @@ func (manager *ModelManager) Update(msg tea.Msg) tea.Cmd {
 	screen_index := len(manager.stack) - 1
 
 	// Update
-    switch msg.(type) {
-    case components.StatusBarMsg:
-        // Send it to all the screens
-        for i := 0; i < len(manager.stack); i++ {
-            manager.stack[i], cmd = manager.stack[i].Update(msg, manager)
-        }
-    default:
-        manager.stack[screen_index], cmd = manager.stack[screen_index].Update(msg, manager)
-    }
+	switch msg.(type) {
+	case components.StatusBarMsg:
+		// Send it to all the screens
+		for i := 0; i < len(manager.stack); i++ {
+			manager.stack[i], cmd = manager.stack[i].Update(msg, manager)
+		}
+	default:
+		manager.stack[screen_index], cmd = manager.stack[screen_index].Update(msg, manager)
+	}
 
 	// Resolve any pending operation
 	switch manager.operation.Action {
@@ -101,6 +112,8 @@ func (manager *ModelManager) Update(msg tea.Msg) tea.Cmd {
 		manager.stack = append(manager.stack, *manager.operation.Screen)
 	case OperationPop:
 		manager.stack = manager.stack[:screen_index]
+	case OperationReplace:
+		manager.stack[screen_index] = *manager.operation.Screen
 	}
 
 	// Reset operation

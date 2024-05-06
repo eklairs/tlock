@@ -59,7 +59,7 @@ func New() TLockCore {
 
 // Adds a new user
 func (users *TLockCore) AddNewUser(username, password string) (*tlockvault.Vault, error) {
-	if users.exists(username) {
+	if users.Exists(username) {
 		return nil, errors.New("User already exists")
 	}
 
@@ -77,6 +77,19 @@ func (users *TLockCore) AddNewUser(username, password string) (*tlockvault.Vault
 
 	// Return vault
 	return &vault, nil
+}
+
+// Renames a user
+func (core TLockCore) RenameUser(oldName, newName string) {
+	userIndex := slices.IndexFunc(core.Users, func(user User) bool { return user.Username == oldName })
+
+	if userIndex != -1 {
+		// Rename if the user is found
+		core.Users[userIndex].Username = newName
+
+		// Write
+		core.write()
+	}
 }
 
 // [PRIVATE] Writes the current users value to the file
@@ -97,6 +110,6 @@ func (users TLockCore) write() {
 }
 
 // Checks if a user with the name exists
-func (users TLockCore) exists(username string) bool {
+func (users TLockCore) Exists(username string) bool {
 	return slices.IndexFunc(users.Users, func(user User) bool { return user.Username == username }) != -1
 }

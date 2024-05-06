@@ -107,7 +107,12 @@ func (screen UserOptionsScreen) Update(msg tea.Msg, manager *modelmanager.ModelM
 			manager.PopScreen()
 
 		case key.Matches(msgType, userOptionsKeys.Enter):
-			cmd = append(cmd, manager.PushScreen(InitializeChangePasswordScreen(screen.context, screen.user)))
+			switch screen.focused {
+			case 0:
+				cmd = append(cmd, manager.PushScreen(InitializeEnterPassScreen(screen.context, screen.user, InitializeEditUsernameScreen)))
+			case 1:
+				cmd = append(cmd, manager.PushScreen(InitializeChangePasswordScreen(screen.context, screen.user)))
+			}
 		}
 	}
 
