@@ -14,8 +14,8 @@ import (
 )
 
 const userOptionsAscii = `
-█▀█ █▀█ ▀█▀ █ █▀█ █▄ █ █▀
-█▄█ █▀▀  █  █ █▄█ █ ▀█ ▄█`
+█▀▀ █ █ ▄▀█ █▄ █ █▀▀ █▀▀   █▀█ ▄▀█ █▀ █▀
+█▄▄ █▀█ █▀█ █ ▀█ █▄█ ██▄   █▀▀ █▀█ ▄█ ▄█`
 
 // User options key map
 type userOptionsKeyMap struct {
@@ -105,6 +105,9 @@ func (screen UserOptionsScreen) Update(msg tea.Msg, manager *modelmanager.ModelM
 
 		case key.Matches(msgType, userOptionsKeys.Esc):
 			manager.PopScreen()
+
+		case key.Matches(msgType, userOptionsKeys.Enter):
+			cmd = append(cmd, manager.PushScreen(InitializeChangePasswordScreen(screen.context, screen.user)))
 		}
 	}
 

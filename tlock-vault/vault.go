@@ -369,6 +369,15 @@ func (vault *Vault) MoveTokenUp(folderId, tokenId string) bool {
 	return true
 }
 
+// Updates the password for the vault
+func (vault *Vault) ChangePassword(password string) {
+	// Set the master password
+	vault.password = password
+
+	// Rewrite
+	vault.write()
+}
+
 // Find a folder index by its uuid
 func (vault *Vault) find_folder(id string) int {
 	return slices.IndexFunc(vault.Folders, func(folder Folder) bool { return folder.ID == id })
