@@ -124,7 +124,7 @@ func InitializeAddTokenScreen(folder tlockvault.Folder, vault *tlockvault.Vault)
 			Title:         "Hash function",
 			Description:   "Hash function for the token",
 			Values:        []string{"SHA1", "SHA256", "SHA512", "MD5"},
-			SelectedIndex: 1,
+			SelectedIndex: 0,
 		},
 		form.FormItemInputBox{
 			Title:       "Period",
@@ -248,21 +248,21 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 			// Add
 			screen.vault.AddTokenFromToken(screen.folder.ID, token)
 
-            accountName := formItems[0].FormItem.Value();
+			accountName := formItems[0].FormItem.Value()
 
-            statusBarMessage := fmt.Sprintf("Successfully added token for %s", accountName);
+			statusBarMessage := fmt.Sprintf("Successfully added token for %s", accountName)
 
-            if accountName == "" {
-                accountName = "<no account name>"
-                statusBarMessage = fmt.Sprintf("Successfully added token (no account name)")
-            }
+			if accountName == "" {
+				accountName = "<no account name>"
+				statusBarMessage = fmt.Sprintf("Successfully added token (no account name)")
+			}
 
 			// Require refresh of folders and tokens list
 			cmds = append(
 				cmds,
 				func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
 				func() tea.Msg { return tlockmessages.RefreshTokensMsg{} },
-                func() tea.Msg { return components.StatusBarMsg{ Message: statusBarMessage } },
+				func() tea.Msg { return components.StatusBarMsg{Message: statusBarMessage} },
 			)
 
 			// Pop
