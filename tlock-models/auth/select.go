@@ -159,7 +159,18 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 		case key.Matches(msgType, selectUserKeys.Options):
 			if focused, ok := screen.listview.SelectedItem().(selectUserListItem); ok {
-				cmds = append(cmds, manager.PushScreen(InitializeEnterPassScreenCustomOpts(screen.context, tlockcore.User(focused), InitializeUserOptionsScreen, sudoAscii, "Enter password for %s to see user options")))
+				vault, err := tlockvault.Load(focused.Vault, "")
+
+				// If the vault is protected by default password, lets just directly move to the user options screen
+				if err == nil {
+					cmds = append(cmds, manager.PushScreen(InitializeUserOptionsScreen(focused.Username, vault, screen.context)))
+				} else {
+					// Screen to go to
+					next := InitializeEnterPassScreenCustomOpts(screen.context, tlockcore.User(focused), InitializeUserOptionsScreen, sudoAscii, "Enter password for %s to see user options")
+
+					// Push
+					cmds = append(cmds, manager.PushScreen(next))
+				}
 			}
 
 		case key.Matches(msgType, selectUserKeys.Enter):
