@@ -97,8 +97,8 @@ func (core TLockCore) DeleteUser(username string) {
 	userIndex := slices.IndexFunc(core.Users, func(user User) bool { return user.Username == username })
 
 	if userIndex != -1 {
-        // Remove user
-        core.Users = utils.Remove(core.Users, userIndex)
+		// Remove user
+		core.Users = utils.Remove(core.Users, userIndex)
 
 		// Write
 		core.write()

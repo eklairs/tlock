@@ -88,7 +88,9 @@ func (screen DeleteFolderScreen) Update(msg tea.Msg, manager *modelmanager.Model
 				cmds,
 				func() tea.Msg { return tlockmessages.RequestFolderChanged{} },
 				func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
-                func() tea.Msg { return components.StatusBarMsg{Message: fmt.Sprintf("Successfully deleted %s folder", screen.folder.Name)} },
+				func() tea.Msg {
+					return components.StatusBarMsg{Message: fmt.Sprintf("Successfully deleted %s folder", screen.folder.Name)}
+				},
 			)
 
 			// Pop

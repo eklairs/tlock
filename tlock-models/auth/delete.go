@@ -9,7 +9,6 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
-	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
 
 var deleteUserAsciiArt = `

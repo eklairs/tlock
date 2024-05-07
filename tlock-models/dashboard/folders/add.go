@@ -107,7 +107,9 @@ func (screen AddFolderScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 
 			// Request folders refresh
 			cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })
-            cmds = append(cmds, func() tea.Msg { return components.StatusBarMsg{Message: fmt.Sprintf("Successfully created folder named %s", screen.name.Value())} })
+			cmds = append(cmds, func() tea.Msg {
+				return components.StatusBarMsg{Message: fmt.Sprintf("Successfully created folder named %s", screen.name.Value())}
+			})
 
 			// Pop
 			manager.PopScreen()

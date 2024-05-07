@@ -111,7 +111,7 @@ func TokenItemActive(width int, icon, account, issuer, code string, period int, 
 		renderable := tlockstyles.Styles.Title.Render(strings.Repeat("▁", blocksPerSec**timeLeft))
 
 		// Render!
-		ui = lipgloss.JoinVertical(lipgloss.Left, ui, lipgloss.NewStyle().Inherit(style).UnsetPaddingTop().Width(width + 6).Render(renderable))
+		ui = lipgloss.JoinVertical(lipgloss.Left, ui, lipgloss.NewStyle().Inherit(style).UnsetPaddingTop().Width(width+6).Render(renderable))
 	}
 
 	return ui

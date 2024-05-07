@@ -289,21 +289,21 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 
 			// Replace
 			screen.vault.ReplaceToken(screen.folder.ID, screen.token.ID, token)
-            accountName := formItems[0].FormItem.Value();
+			accountName := formItems[0].FormItem.Value()
 
-            statusBarMessage := fmt.Sprintf("Successfully edited token for %s", accountName);
+			statusBarMessage := fmt.Sprintf("Successfully edited token for %s", accountName)
 
-            if accountName == "" {
-                accountName = "<no account name>"
-                statusBarMessage = fmt.Sprintf("Successfully edited token (no account name)")
-            }
+			if accountName == "" {
+				accountName = "<no account name>"
+				statusBarMessage = fmt.Sprintf("Successfully edited token (no account name)")
+			}
 
 			// Require refresh of folders and tokens list
 			cmds = append(
 				cmds,
 				func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
 				func() tea.Msg { return tlockmessages.RefreshTokensMsg{} },
-                func() tea.Msg { return components.StatusBarMsg{ Message: statusBarMessage } },
+				func() tea.Msg { return components.StatusBarMsg{Message: statusBarMessage} },
 			)
 
 			// Pop

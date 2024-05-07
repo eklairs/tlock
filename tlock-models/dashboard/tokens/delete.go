@@ -88,18 +88,20 @@ func (screen DeleteTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelM
 			// Delete
 			screen.vault.DeleteToken(screen.folder.ID, screen.token.ID)
 
-            accountName := screen.token.Account
+			accountName := screen.token.Account
 
-            if accountName == "" {
-                accountName = "<no account name>"
-            }
+			if accountName == "" {
+				accountName = "<no account name>"
+			}
 
 			// Require refresh of folders and tokens list
 			cmds = append(
 				cmds,
 				func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
 				func() tea.Msg { return tlockmessages.RefreshTokensMsg{} },
-                func() tea.Msg { return components.StatusBarMsg{ Message: fmt.Sprintf("Successfully deleted the token (%s)", accountName) } },
+				func() tea.Msg {
+					return components.StatusBarMsg{Message: fmt.Sprintf("Successfully deleted the token (%s)", accountName)}
+				},
 			)
 
 			// Pop
