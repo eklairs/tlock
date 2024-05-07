@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/context"
+	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
@@ -122,6 +123,10 @@ func (screen UserOptionsScreen) Update(msg tea.Msg, manager *modelmanager.ModelM
 				cmd = append(cmd, manager.PushScreen(InitializeDeleteUserScreen(screen.user, screen.context)))
 			}
 		}
+
+	case tlockmessages.UserDeletedMsg:
+		// If we recieve delete user message, then its time we pop ourself (it is no longer needed / workable)
+		manager.PopScreen()
 	}
 
 	return screen, tea.Batch(cmd...)

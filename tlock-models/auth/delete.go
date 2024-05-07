@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/context"
+	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 )
@@ -69,6 +70,8 @@ func (screen DeleteUserScreen) Init() tea.Cmd {
 
 // Update
 func (screen DeleteUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
+	cmds := make([]tea.Cmd, 0)
+
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -79,11 +82,15 @@ func (screen DeleteUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 			// Pop
 			manager.PopScreen()
 
+			// Send user deleted message
+			cmds = append(cmds, func() tea.Msg { return tlockmessages.UserDeletedMsg{} })
+
 		case key.Matches(msgType, deleteUserKeys.GoBack):
 			manager.PopScreen()
 		}
 	}
-	return screen, nil
+
+	return screen, tea.Batch(cmds...)
 }
 
 // View

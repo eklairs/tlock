@@ -30,3 +30,6 @@ func DispatchRefreshTokensValueMsg() tea.Cmd {
 		return RefreshTokensValue{}
 	})
 }
+
+// User has been deleted
+type UserDeletedMsg struct{}
