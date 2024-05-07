@@ -99,6 +99,9 @@ func (screen ChangePasswordScreen) Update(msg tea.Msg, manager *modelmanager.Mod
 			// Change password
 			screen.vault.ChangePassword(screen.newPassword.Value())
 
+			// Pop screen
+			manager.PopScreen()
+
 		default:
 			screen.newPassword, _ = screen.newPassword.Update(msg)
 		}
