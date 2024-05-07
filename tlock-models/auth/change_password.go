@@ -70,6 +70,7 @@ func InitializeChangePasswordScreen(context *context.Context, vault *tlockvault.
 	newPassword := components.InitializeInputBox("Your new password goes here...")
 	newPassword.EchoMode = textinput.EchoPassword
 	newPassword.EchoCharacter = constants.CHAR_ECHO
+	newPassword.Focus()
 
 	return ChangePasswordScreen{
 		context:     context,
