@@ -198,11 +198,13 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 	return screen, tea.Batch(cmds...)
 }
 
+// Resets the items on the listview based on the data
+func (screen SelectUserScreen) resetItems() {
+	screen.listview.SetItems(utils.Map(screen.context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user) }))
+}
+
 // View
 func (screen SelectUserScreen) View() string {
-	// Update items
-	screen.listview.SetItems(utils.Map(screen.context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user) }))
-
 	// List of items to render
 	items := []string{
 		// Ascii art
