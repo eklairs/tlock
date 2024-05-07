@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"slices"
+	"time"
 
 	"github.com/adrg/xdg"
 	"github.com/eklairs/tlock/tlock-internal/utils"
@@ -81,6 +82,10 @@ type Vault struct {
 
 	// Password
 	password string
+
+	// Data to write channel
+	// Data is writted to file at every 5 second
+	dataChan chan []Folder
 }
 
 // Initializes a new instance of the vault at the given path
@@ -94,11 +99,18 @@ func Initialize(password string) Vault {
 		log.Fatal().Err(err).Str("path", dir).Msg("Failed to create directory for user")
 	}
 
+	// Initialize sender
+	sender := make(chan []Folder, 1) // Lets keep the size to 1 because we only want top data
+
 	// Initialize vault
 	vault := Vault{
 		password: password,
 		Path:     path.Join(dir, "vault.bin"),
+		dataChan: sender,
 	}
+
+	// Start worker
+	go vault.startFileWriterWorker(sender)
 
 	// Write empty data
 	vault.write()
@@ -109,22 +121,14 @@ func Initialize(password string) Vault {
 
 // Writes the current data to the vault
 func (vault Vault) write() {
-	// Serialize
-	serialized, _ := binary.Marshal(vault.Folders)
-
-	// Encrypt
-	encrypted := Encrypt(vault.password, serialized)
-
-	// Create parent dir
-	file, err := utils.EnsureExists(vault.Path)
-
-	// Check for errors
-	if err != nil {
-		log.Fatal().Err(err).Str("path", vault.Path).Msg("[tlockvault] Failed to write encrypted data to file")
+	// Clear any existing data
+	select {
+	case <-vault.dataChan:
+	default:
 	}
 
-	// Write
-	file.Write(encrypted)
+	// Send the new data to write
+	vault.dataChan <- vault.Folders
 }
 
 // Loads a new vault instance
@@ -153,12 +157,22 @@ func Load(path, password string) (*Vault, error) {
 		return nil, errors.New("Invalid password, please try again")
 	}
 
+	// Sender channel
+	sender := make(chan []Folder, 1)
+
 	// Create vault instance and return
-	return &Vault{
+	vault := &Vault{
 		password: password,
 		Folders:  data,
 		Path:     path,
-	}, nil
+		dataChan: sender, // Lets keep the size to 1 because we only want top data
+	}
+
+	// Start worker
+	go vault.startFileWriterWorker(sender)
+
+	// Return
+	return vault, nil
 }
 
 // Adds a new folder to the vault
@@ -395,4 +409,31 @@ func toType(type_ string) TokenType {
 	}
 
 	return TokenTypeTOTP
+}
+
+// Writing to file implementation
+func (vault *Vault) startFileWriterWorker(recv chan []Folder) {
+	for {
+		if data, ok := <-recv; ok {
+			// Serialize
+			serialized, _ := binary.Marshal(data)
+
+			// Encrypt
+			encrypted := Encrypt(vault.password, serialized)
+
+			// Create parent dir
+			file, err := utils.EnsureExists(vault.Path)
+
+			// Check for errors
+			if err != nil {
+				log.Fatal().Err(err).Str("path", vault.Path).Msg("[tlockvault] Failed to write encrypted data to file")
+			}
+
+			// Write
+			file.Write(encrypted)
+		}
+
+		// Sleep for 5 second
+		time.Sleep(time.Second * 1)
+	}
 }
