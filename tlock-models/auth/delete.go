@@ -49,55 +49,55 @@ var deleteUserKeys = deleteUserKeyMap{
 
 // Delete user screen
 type DeleteUserScreen struct {
-    // User to delete
-    User string
+	// User to delete
+	User string
 
-    // Context
-    Context *context.Context
+	// Context
+	Context *context.Context
 }
 
-func InitializeDeleteUserScreen(user string, _ *tlockvault.Vault, context *context.Context) modelmanager.Screen {
-    return DeleteUserScreen{
-        User: user,
-        Context: context,
-    }
+func InitializeDeleteUserScreen(user string, context *context.Context) modelmanager.Screen {
+	return DeleteUserScreen{
+		User:    user,
+		Context: context,
+	}
 }
 
 // Init
 func (screen DeleteUserScreen) Init() tea.Cmd {
-    return nil
+	return nil
 }
 
 // Update
 func (screen DeleteUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
-    switch msgType := msg.(type) {
-    case tea.KeyMsg:
-        switch {
-        case key.Matches(msgType, deleteUserKeys.Delete):
-            // Delete user
-            screen.Context.Core.DeleteUser(screen.User)
+	switch msgType := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msgType, deleteUserKeys.Delete):
+			// Delete user
+			screen.Context.Core.DeleteUser(screen.User)
 
-            // Pop
-            manager.PopScreen()
+			// Pop
+			manager.PopScreen()
 
-        case key.Matches(msgType, deleteUserKeys.GoBack):
-            manager.PopScreen()
-        }
-    }
-    return screen, nil
+		case key.Matches(msgType, deleteUserKeys.GoBack):
+			manager.PopScreen()
+		}
+	}
+	return screen, nil
 }
 
 // View
 func (screen DeleteUserScreen) View() string {
-    return lipgloss.JoinVertical(
-        lipgloss.Center,
-        tlockstyles.Styles.Title.Render(deleteUserAsciiArt), "",
-        tlockstyles.Styles.SubText.Render(fmt.Sprintf("Are you sure you want to ")),
-        lipgloss.JoinHorizontal(
-            lipgloss.Center,
-            tlockstyles.Styles.Error.Copy().Bold(true).Render(fmt.Sprintf("× DELETE ")),
-            tlockstyles.Styles.SubText.Render(fmt.Sprintf("user %s forever?", screen.User)),
-        ), "",
-        tlockstyles.Help.View(deleteUserKeys),
-    )
+	return lipgloss.JoinVertical(
+		lipgloss.Center,
+		tlockstyles.Styles.Title.Render(deleteUserAsciiArt), "",
+		tlockstyles.Styles.SubText.Render(fmt.Sprintf("Are you sure you want to ")),
+		lipgloss.JoinHorizontal(
+			lipgloss.Center,
+			tlockstyles.Styles.Error.Copy().Bold(true).Render(fmt.Sprintf("× DELETE ")),
+			tlockstyles.Styles.SubText.Render(fmt.Sprintf("user %s forever?", screen.User)),
+		), "",
+		tlockstyles.Help.View(deleteUserKeys),
+	)
 }

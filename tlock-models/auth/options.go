@@ -6,16 +6,16 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	tlockcore "github.com/eklairs/tlock/tlock-core"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
+	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
 
 const userOptionsAscii = `
-█▀▀ █ █ ▄▀█ █▄ █ █▀▀ █▀▀   █▀█ ▄▀█ █▀ █▀
-█▄▄ █▀█ █▀█ █ ▀█ █▄█ ██▄   █▀▀ █▀█ ▄█ ▄█`
+█▀█ █▀█ ▀█▀ █ █▀█ █▄ █ █▀
+█▄█ █▀▀  █  █ █▄█ █ ▀█ ▄█`
 
 // User options key map
 type userOptionsKeyMap struct {
@@ -66,18 +66,22 @@ type UserOptionsScreen struct {
 	context *context.Context
 
 	// User
-	user tlockcore.User
+	user string
 
 	// Focused
 	focused int
+
+	// Vault
+	vault *tlockvault.Vault
 }
 
 // Initializes user options screen
-func InitializeUserOptionsScreen(context *context.Context, user tlockcore.User) UserOptionsScreen {
+func InitializeUserOptionsScreen(user string, vault *tlockvault.Vault, context *context.Context) modelmanager.Screen {
 	return UserOptionsScreen{
 		context: context,
 		user:    user,
 		focused: 0,
+		vault:   vault,
 	}
 }
 
@@ -109,12 +113,13 @@ func (screen UserOptionsScreen) Update(msg tea.Msg, manager *modelmanager.ModelM
 		case key.Matches(msgType, userOptionsKeys.Enter):
 			switch screen.focused {
 			case 0:
-				cmd = append(cmd, manager.PushScreen(InitializeEnterPassScreen(screen.context, screen.user, InitializeEditUsernameScreen)))
-			case 1:
-				cmd = append(cmd, manager.PushScreen(InitializeChangePasswordScreen(screen.context, screen.user)))
+				cmd = append(cmd, manager.PushScreen(InitializeEditUsernameScreen(screen.user, screen.context)))
 
-            case 2:
-				cmd = append(cmd, manager.PushScreen(InitializeEnterPassScreen(screen.context, screen.user, InitializeDeleteUserScreen)))
+			case 1:
+				cmd = append(cmd, manager.PushScreen(InitializeChangePasswordScreen(screen.context, screen.vault, screen.user)))
+
+			case 2:
+				cmd = append(cmd, manager.PushScreen(InitializeDeleteUserScreen(screen.user, screen.context)))
 			}
 		}
 	}
@@ -127,7 +132,7 @@ func (screen UserOptionsScreen) View() string {
 	// Elements
 	elements := []string{
 		tlockstyles.Styles.Title.Render(userOptionsAscii), "",
-		tlockstyles.Styles.SubText.Render(fmt.Sprintf("Select an option for %s", screen.user.Username)), "",
+		tlockstyles.Styles.SubText.Render(fmt.Sprintf("Select an option for %s", screen.user)), "",
 	}
 
 	// Options

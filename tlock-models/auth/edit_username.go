@@ -9,7 +9,6 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
-	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
 
 var editUsernameAscii = `
@@ -63,7 +62,7 @@ type EditUsernameScreen struct {
 }
 
 // Initialize
-func InitializeEditUsernameScreen(user string, _ *tlockvault.Vault, context *context.Context) modelmanager.Screen {
+func InitializeEditUsernameScreen(user string, context *context.Context) modelmanager.Screen {
 	newUsername := components.InitializeInputBox("Your new name goes here...")
 	newUsername.Focus()
 

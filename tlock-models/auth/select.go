@@ -22,6 +22,10 @@ var selectUserAscii = `
 █   █▀█ █▀▀ █ █▄ █
 █▄▄ █▄█ █▄█ █ █ ▀█`
 
+var sudoAscii = `
+█▀ █ █ █▀▄ █▀█
+▄█ █▄█ █▄▀ █▄█`
+
 // select user list item
 type selectUserListItem tlockcore.User
 
@@ -155,7 +159,7 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 		case key.Matches(msgType, selectUserKeys.Options):
 			if focused, ok := screen.listview.SelectedItem().(selectUserListItem); ok {
-				cmds = append(cmds, manager.PushScreen(InitializeUserOptionsScreen(screen.context, tlockcore.User(focused))))
+				cmds = append(cmds, manager.PushScreen(InitializeEnterPassScreenCustomOpts(screen.context, tlockcore.User(focused), InitializeUserOptionsScreen, sudoAscii, "Enter password for %s to see user options")))
 			}
 
 		case key.Matches(msgType, selectUserKeys.Enter):
