@@ -97,6 +97,12 @@ func (core *TLockCore) DeleteUser(username string) {
 	userIndex := slices.IndexFunc(core.Users, func(user User) bool { return user.Username == username })
 
 	if userIndex != -1 {
+		// Remove its vault
+		os.RemoveAll(path.Join(path.Dir(core.Users[userIndex].Vault)))
+
+		// Remove its config files
+		os.RemoveAll(path.Join(xdg.ConfigHome, "tlock", username))
+
 		// Remove user
 		core.Users = utils.Remove(core.Users, userIndex)
 
