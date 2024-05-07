@@ -17,9 +17,6 @@ type StatusBarMsg struct {
 	ErrorMessage bool
 }
 
-// Message to remove status bar message
-type RemoveStatusBarMsg struct{}
-
 type StatusBar struct {
 	// Message to show
 	Message string
@@ -43,17 +40,6 @@ func (bar *StatusBar) Update(msg tea.Msg) tea.Cmd {
 	case StatusBarMsg:
 		bar.Message = msgType.Message
 		bar.ErrorMessage = msgType.ErrorMessage
-
-		return func() tea.Msg {
-			// Let the message be alive for 4 second
-			time.Sleep(time.Second * 4)
-
-			// Remove
-			return RemoveStatusBarMsg{}
-		}
-
-	case RemoveStatusBarMsg:
-		bar.Message = ""
 	}
 
 	return nil
