@@ -15,6 +15,9 @@ var Styles TLockStyles
 
 // Themes used all over tlock
 type TLockStyles struct {
+	// Base
+	Base lipgloss.Style
+
 	// Title
 	Title lipgloss.Style
 
@@ -67,13 +70,14 @@ type TLockStyles struct {
 // Initializes the styles
 func InitializeStyles(theme context.Theme) {
 	// Base
-	base := lipgloss.NewStyle()
+	base := lipgloss.NewStyle().Foreground(theme.Foreground)
 
 	// Base for padded items
 	paddedItem := with(base).Padding(1, 3)
 
 	// Initialize styles
 	Styles = TLockStyles{
+		Base:               with(base),
 		Title:              with(base).Foreground(theme.Accent).Bold(true),
 		SubText:            with(base).Foreground(theme.SubText),
 		SubTextItem:        with(base).Foreground(theme.SubText).Padding(0, 1),

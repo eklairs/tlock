@@ -88,6 +88,14 @@ func (bar *StatusBar) View() string {
 	// Join them all
 	ui := lipgloss.JoinHorizontal(lipgloss.Left, items...)
 
+	// Message renderable
+	render_fn := tlockstyles.Styles.Base.Render
+
+	// If it is an error message
+	if bar.ErrorMessage {
+		render_fn = tlockstyles.Styles.Error.Render
+	}
+
 	// Return
-	return lipgloss.JoinVertical(lipgloss.Left, ui, bar.Message)
+	return lipgloss.JoinVertical(lipgloss.Left, ui, render_fn("› "+bar.Message))
 }
