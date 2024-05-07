@@ -94,10 +94,11 @@ func buildFolderListItems(vault *tlockvault.Vault) []list.Item {
 // Builds the listview for the given list of folders
 func buildListViewForFolders(vault *tlockvault.Vault, context *context.Context) list.Model {
 	// Get size
-	width, height, _ := term.GetSize(int(os.Stdout.Fd()))
+	width, _, _ := term.GetSize(int(os.Stdout.Fd()))
 
 	// Build listview
-	listview := components.ListViewSimple(buildFolderListItems(vault), folderListDelegate{}, foldersWidth(width), height-6) // -4 is for the title
+	// Height will be auto handled by the view function
+	listview := components.ListViewSimple(buildFolderListItems(vault), folderListDelegate{}, foldersWidth(width), 0) // -4 is for the title
 
 	// Use custom keys
 	listview.KeyMap.CursorUp = context.Keybindings.Folder.Previous.Binding
@@ -243,6 +244,9 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 func (folders Folders) View() string {
 	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
+	// Set the height of the listview
+	folders.listview.SetHeight(height - 4)
+
 	// Build UI
 	ui := lipgloss.JoinVertical(
 		lipgloss.Left, "",
@@ -251,6 +255,7 @@ func (folders Folders) View() string {
 	)
 
 	// Style
+	// Lets set the height-1 for the bottom bar
 	style := lipgloss.NewStyle().Height(height - 1)
 
 	// Render
