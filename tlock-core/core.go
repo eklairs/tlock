@@ -93,7 +93,7 @@ func (core TLockCore) RenameUser(oldName, newName string) {
 }
 
 // Deletes a user
-func (core TLockCore) DeleteUser(username string) {
+func (core *TLockCore) DeleteUser(username string) {
 	userIndex := slices.IndexFunc(core.Users, func(user User) bool { return user.Username == username })
 
 	if userIndex != -1 {
