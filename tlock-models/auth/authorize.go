@@ -8,11 +8,13 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	tlockcore "github.com/eklairs/tlock/tlock-core"
+
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/constants"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+
+	tlockcore "github.com/eklairs/tlock/tlock-core"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
@@ -73,10 +75,21 @@ type EnterPassScreen struct {
 
 	// Next
 	next NextFunc
+
+	// Ascii
+	ascii string
+
+	// Description
+	description string
 }
 
 // Initialize root model
 func InitializeEnterPassScreen(context *context.Context, user tlockcore.User, next NextFunc) EnterPassScreen {
+	return InitializeEnterPassScreenCustomOpts(context, user, next, enterPassAsciiArt, "Login in as %s")
+}
+
+// Initializes enter pass screen with custom title and desc
+func InitializeEnterPassScreenCustomOpts(context *context.Context, user tlockcore.User, next NextFunc, ascii, desc string) EnterPassScreen {
 	// Password input
 	passwordInput := components.InitializeInputBox("Your password goes here...")
 	passwordInput.EchoCharacter = constants.CHAR_ECHO
@@ -84,10 +97,12 @@ func InitializeEnterPassScreen(context *context.Context, user tlockcore.User, ne
 	passwordInput.Focus()
 
 	return EnterPassScreen{
-		context:   context,
-		user:      user,
-		passInput: passwordInput,
-		next:      next,
+		context:     context,
+		user:        user,
+		passInput:   passwordInput,
+		next:        next,
+		ascii:       ascii,
+		description: desc,
 	}
 }
 
@@ -133,8 +148,8 @@ func (screen EnterPassScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 func (screen EnterPassScreen) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
-		tlockstyles.Styles.Title.Render(enterPassAsciiArt), "",
-		tlockstyles.Styles.SubText.Render(fmt.Sprintf("Login in as %s", screen.user.Username)), "",
+		tlockstyles.Styles.Title.Render(screen.ascii), "",
+		tlockstyles.Styles.SubText.Render(fmt.Sprintf(screen.description, screen.user.Username)), "",
 		components.InputGroup("Password", "Enter the super secret password", screen.errorMessage, screen.passInput),
 		tlockstyles.Help.View(enterPassKeys),
 	)
