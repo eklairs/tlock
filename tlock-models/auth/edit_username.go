@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/context"
+	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 )
@@ -80,6 +81,8 @@ func (screen EditUsernameScreen) Init() tea.Cmd {
 
 // Update
 func (screen EditUsernameScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
+	cmds := make([]tea.Cmd, 0)
+
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -95,9 +98,14 @@ func (screen EditUsernameScreen) Update(msg tea.Msg, manager *modelmanager.Model
 				if screen.context.Core.Exists(newUsername) {
 					screen.usernameError = &USERNAME_EXISTS
 				} else {
+					// Rename
 					screen.context.Core.RenameUser(screen.user, newUsername)
 
+					// Pop
 					manager.PopScreen()
+
+					// Send updated message
+					cmds = append(cmds, func() tea.Msg { return tlockmessages.UserEditedMsg{NewName: newUsername} })
 				}
 			}
 		}
@@ -107,7 +115,7 @@ func (screen EditUsernameScreen) Update(msg tea.Msg, manager *modelmanager.Model
 	screen.newUsername, _ = screen.newUsername.Update(msg)
 
 	// Return
-	return screen, nil
+	return screen, tea.Batch(cmds...)
 }
 
 // View

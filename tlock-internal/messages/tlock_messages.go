@@ -33,3 +33,8 @@ func DispatchRefreshTokensValueMsg() tea.Cmd {
 
 // User has been deleted
 type UserDeletedMsg struct{}
+
+// User has been edited
+type UserEditedMsg struct {
+	NewName string
+}
