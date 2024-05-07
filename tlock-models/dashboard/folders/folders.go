@@ -245,7 +245,7 @@ func (folders Folders) View() string {
 	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
 	// Set the height of the listview
-	folders.listview.SetHeight(height - 4)
+	folders.listview.SetHeight(height - 5)
 
 	// Build UI
 	ui := lipgloss.JoinVertical(
@@ -256,7 +256,7 @@ func (folders Folders) View() string {
 
 	// Style
 	// Lets set the height-1 for the bottom bar
-	style := lipgloss.NewStyle().Height(height - 1)
+	style := lipgloss.NewStyle().Height(height - 2)
 
 	// Render
 	return style.Render(ui)

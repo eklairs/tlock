@@ -436,7 +436,7 @@ func (tokens Tokens) View() string {
 	// Render placeholder for no tokens
 	if len(tokens.listview.Items()) == 0 {
 		style := lipgloss.NewStyle().
-			Height(height-1).
+			Height(height-2).
 			Width(tokens.listview.Width()).
 			Align(lipgloss.Center, lipgloss.Center)
 

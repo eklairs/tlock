@@ -77,18 +77,17 @@ func (bar *StatusBar) View() string {
 	// Current logged in user
 	items[4] = tlockstyles.Styles.AccentBgItem.Render(bar.CurrentUser)
 
+	// Sub width to fill in the gap
 	for _, item := range items {
 		width -= lipgloss.Width(item)
 	}
 
 	// Render message
-	messageStyle := tlockstyles.Styles.SubAltBg.Copy().Width(width)
+	items[2] = tlockstyles.Styles.SubAltBg.Copy().Width(width).Render()
 
-	if bar.ErrorMessage {
-		messageStyle = tlockstyles.Styles.Error.Copy().Inherit(tlockstyles.Styles.SubAltBg).Width(width)
-	}
+	// Join them all
+	ui := lipgloss.JoinHorizontal(lipgloss.Left, items...)
 
-	items[2] = messageStyle.Render(bar.Message)
-
-	return lipgloss.JoinHorizontal(lipgloss.Left, items...)
+	// Return
+	return lipgloss.JoinVertical(lipgloss.Left, ui, bar.Message)
 }
