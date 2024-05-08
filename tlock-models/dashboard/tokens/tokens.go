@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/atotto/clipboard"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -22,7 +23,6 @@ import (
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/hotp"
 	"github.com/pquerna/otp/totp"
-	"golang.design/x/clipboard"
 	"golang.org/x/term"
 )
 
@@ -273,24 +273,26 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Copy.Binding):
-			if !tokens.context.ClipboardAvailability {
+			if clipboard.Unsupported {
 				cmds = append(cmds, func() tea.Msg {
 					return components.StatusBarMsg{Message: "Clipboard is not available", ErrorMessage: true}
 				})
-			}
+			} else {
+				if focused := tokens.Focused(); focused != nil {
+					// Set clipboard
+					clipboard.WriteAll(focused.CurrentCode)
 
-			if focused := tokens.Focused(); focused != nil && tokens.context.ClipboardAvailability {
-				clipboard.Write(clipboard.FmtText, []byte(focused.CurrentCode))
+					accountName := focused.Token.Account
 
-				accountName := focused.Token.Account
+					if accountName == "" {
+						accountName = "<no account name>"
+					}
 
-				if accountName == "" {
-					accountName = "<no account name>"
+					cmds = append(cmds, func() tea.Msg {
+						return components.StatusBarMsg{Message: fmt.Sprintf("Successfully copied token (%s)", accountName)}
+					})
 				}
 
-				cmds = append(cmds, func() tea.Msg {
-					return components.StatusBarMsg{Message: fmt.Sprintf("Successfully copied token (%s)", accountName)}
-				})
 			}
 
 		case key.Matches(msgType, tokens.context.Keybindings.Tokens.Add.Binding):

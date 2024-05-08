@@ -9,7 +9,6 @@ import (
 	tlockcore "github.com/eklairs/tlock/tlock-core"
 	"github.com/eklairs/tlock/tlock-internal/config"
 	tlockvendor "github.com/eklairs/tlock/tlock-vendor"
-	"golang.design/x/clipboard"
 )
 
 type Icon struct {
@@ -56,9 +55,6 @@ type Context struct {
 	// Core
 	Core tlockcore.TLockCore
 
-	// If the clipboard is available
-	ClipboardAvailability bool
-
 	// Keybindings
 	Keybindings config.KeybindingsConfig
 }
@@ -66,9 +62,6 @@ type Context struct {
 // Initializes a new instance of the context
 // It is recommended to call this at a one place and then pass around the context
 func InitializeContext() Context {
-	// Init clipboard
-	err := clipboard.Init()
-
 	// Themes
 	var themes []Theme
 	json.Unmarshal(tlockvendor.ThemesJSON, &themes)
@@ -82,12 +75,11 @@ func InitializeContext() Context {
 
 	// Return
 	return Context{
-		Themes:                themes,
-		Icons:                 icons.Icons,
-		Core:                  tlockcore.New(),
-		Config:                config.GetConfig(),
-		ClipboardAvailability: err == nil,
-		Keybindings:           config.DefaultKeybindingsConfig(),
+		Themes:      themes,
+		Icons:       icons.Icons,
+		Core:        tlockcore.New(),
+		Config:      config.GetConfig(),
+		Keybindings: config.DefaultKeybindingsConfig(),
 	}
 }
 
