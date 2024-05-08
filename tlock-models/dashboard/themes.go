@@ -192,11 +192,38 @@ func (screen ThemesScreen) Update(msg tea.Msg, manager *modelmanager.ModelManage
 
 // View
 func (screen ThemesScreen) View() string {
+	// Paginator renderable
+	var paginatorRenderable string
+
+	// Total pages
+	totalPages := screen.listview.Paginator.TotalPages
+
+	// Add paginator if needed
+	if totalPages > 1 {
+		// Paginator items
+		paginatorItems := make([]string, totalPages)
+
+		// Add paginator dots
+		for index := 0; index < totalPages; index++ {
+			renderer := tlockstyles.Styles.SubText.Copy().Bold(true).Render
+
+			if index == screen.listview.Paginator.Page {
+				renderer = tlockstyles.Styles.Title.Render
+			}
+
+			paginatorItems = append(paginatorItems, renderer("•"))
+		}
+
+		// Add to ui
+		paginatorRenderable = lipgloss.JoinHorizontal(lipgloss.Center, paginatorItems...)
+	}
+
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
 		tlockstyles.Styles.Title.Render(themesAsciiArt), "",
 		tlockstyles.Styles.SubText.Render("Choose a theme for tlock"), "",
 		screen.listview.View(), "",
+		paginatorRenderable, "",
 		tlockstyles.Help.View(themesKeys),
 	)
 }
