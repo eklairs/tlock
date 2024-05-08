@@ -27,75 +27,84 @@
         "error": "#FF5555"
     },
     {
-      "name": "Gruvbox",
-      "background": "#282828",
-      "backgroundOver": "#3c3836",
-      "subText": "#928374",
-      "accent": "#d79921",
-      "foreground": "#ebdbb2",
-      "error": "#cc241d"
+        "name": "Gruvbox",
+        "background": "#282828",
+        "backgroundOver": "#3c3836",
+        "subText": "#928374",
+        "accent": "#d79921",
+        "foreground": "#ebdbb2",
+        "error": "#cc241d"
     },
     {
-      "name": "One Dark",
-      "background": "#282c34",
-      "backgroundOver": "#2c313a",
-      "subText": "#5c6370",
-      "accent": "#61afef",
-      "foreground": "#abb2bf",
-      "error": "#e06c75"
+        "name": "One Dark",
+        "background": "#282c34",
+        "backgroundOver": "#2c313a",
+        "subText": "#5c6370",
+        "accent": "#61afef",
+        "foreground": "#abb2bf",
+        "error": "#e06c75"
     },
     {
-      "name": "Everforest",
-      "background": "#2b3339",
-      "backgroundOver": "#3e4b53",
-      "subText": "#6f7e8b",
-      "accent": "#a3be8c",
-      "foreground": "#c0c5ce",
-      "error": "#bf616a"
+        "name": "Everforest",
+        "background": "#2b3339",
+        "backgroundOver": "#3e4b53",
+        "subText": "#6f7e8b",
+        "accent": "#a3be8c",
+        "foreground": "#c0c5ce",
+        "error": "#bf616a"
     },
     {
-      "name": "Tokyo Night",
-      "background": "#1a1b26",
-      "backgroundOver": "#1f202e",
-      "subText": "#6e7681",
-      "accent": "#7aa2f7",
-      "foreground": "#c0caf5",
-      "error": "#f7768e"
+        "name": "Tokyo Night",
+        "background": "#1a1b26",
+        "backgroundOver": "#1f202e",
+        "subText": "#6e7681",
+        "accent": "#7aa2f7",
+        "foreground": "#c0caf5",
+        "error": "#f7768e"
     },
     {
-      "name": "Monokai",
-      "background": "#272822",
-      "backgroundOver": "#3e3d32",
-      "subText": "#75715e",
-      "accent": "#f92672",
-      "foreground": "#f8f8f2",
-      "error": "#f92672"
+        "name": "Monokai",
+        "background": "#272822",
+        "backgroundOver": "#3e3d32",
+        "subText": "#75715e",
+        "accent": "#f92672",
+        "foreground": "#f8f8f2",
+        "error": "#f92672"
     },
     {
-      "name": "Material",
-      "background": "#263238",
-      "backgroundOver": "#2c3840",
-      "subText": "#546e7a",
-      "accent": "#82aaff",
-      "foreground": "#c3cee3",
-      "error": "#ff5370"
+        "name": "Material",
+        "background": "#263238",
+        "backgroundOver": "#2c3840",
+        "subText": "#546e7a",
+        "accent": "#82aaff",
+        "foreground": "#c3cee3",
+        "error": "#ff5370"
     },
     {
-      "name": "Night Owl",
-      "background": "#011627",
-      "backgroundOver": "#0d1117",
-      "subText": "#5b6c7f",
-      "accent": "#82b1ff",
-      "foreground": "#d6deeb",
-      "error": "#f07178"
+        "name": "Night Owl",
+        "background": "#011627",
+        "backgroundOver": "#0d1117",
+        "subText": "#5b6c7f",
+        "accent": "#82b1ff",
+        "foreground": "#d6deeb",
+        "error": "#f07178"
     },
     {
-      "name": "Solarized Dark",
-      "background": "#002b36",
-      "backgroundOver": "#073642",
-      "subText": "#586e75",
-      "accent": "#268bd2",
-      "foreground": "#93a1a1",
-      "error": "#dc322f"
+        "name": "Solarized Dark",
+        "background": "#002b36",
+        "backgroundOver": "#073642",
+        "subText": "#586e75",
+        "accent": "#268bd2",
+        "foreground": "#93a1a1",
+        "error": "#dc322f"
+    },
+    {
+        "name": "Rose Pine",
+        "background": "#191724",
+        "backgroundOver": "#1f1d2e",
+        "subText": "#6e6a86",
+        "accent": "#31748f",
+        "foreground": "#e0def4",
+        "error": "#eb6f92"
     }
 ]
