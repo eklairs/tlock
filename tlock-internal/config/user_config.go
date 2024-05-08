@@ -13,12 +13,12 @@ import (
 
 // Returns the path to use for the user
 func pathFor(user string) string {
-	return path.Join(CONFIG_DIR, user, "keybindings.yaml")
+	return path.Join(CONFIG_DIR, user, "config.yaml")
 }
 
 // Default config
 //
-//go:embed keybindings.yaml
+//go:embed default_config.yaml
 var DEFAULT_CONFIG_RAW []byte
 
 // Just a wrapper
@@ -49,12 +49,15 @@ func new_key(keys ...string) Keybinding {
 }
 
 // Keybindings config
-type KeybindingsConfig struct {
+type UserConfiguration struct {
+	// Whether to enable icons
+	EnableIcons bool `yaml:"enable_icons"`
+
 	// Folder keybindings
-	Folder FolderKeyBinds `yaml:"folders"`
+	Folder FolderKeyBinds `yaml:"folders_keybindings"`
 
 	// Token keybindings
-	Tokens TokenKeyBinds `yaml:"tokens"`
+	Tokens TokenKeyBinds `yaml:"tokens_keybindings"`
 }
 
 // Folder keybinds
@@ -118,10 +121,11 @@ type TokenKeyBinds struct {
 }
 
 // Returns the default keybindings
-func DefaultKeybindingsConfig() KeybindingsConfig {
-	return KeybindingsConfig{
-		Folder: DefaultFolderKeyBinds(),
-		Tokens: DefaultTokensKeyBinds(),
+func DefaultUserConfiguration() UserConfiguration {
+	return UserConfiguration{
+		EnableIcons: false,
+		Folder:      DefaultFolderKeyBinds(),
+		Tokens:      DefaultTokensKeyBinds(),
 	}
 }
 
@@ -155,30 +159,18 @@ func DefaultTokensKeyBinds() TokenKeyBinds {
 	}
 }
 
-// Load key bindings for a specific user
-func LoadKeyBindings(user string) KeybindingsConfig {
+// Load configuration for a specific user
+func LoadUserConfig(user string) UserConfiguration {
 	// Default key bindings
-	default_keys := DefaultKeybindingsConfig()
+	default_config := DefaultUserConfiguration()
 
-	// Read file
-	raw, err := os.ReadFile(pathFor(user))
-
-	// If there is error, return the default keybindings
-	if err != nil {
-		// The file probably doesnt exist,
-		// Lets write the default config
-		WriteDefault(user)
-
-		// Return default
-		return default_keys
+	// Parse the file if it is read
+	if raw, err := os.ReadFile(pathFor(user)); err == nil {
+		yaml.Unmarshal(raw, &default_config)
 	}
 
-	// Err
-	if err := yaml.Unmarshal(raw, &default_keys); err != nil {
-		return default_keys
-	}
-
-	return default_keys
+	// Return
+	return default_config
 }
 
 // Writes the default keybindings configuration

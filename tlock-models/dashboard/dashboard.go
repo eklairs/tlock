@@ -72,7 +72,7 @@ type DashboardScreen struct {
 // Initializes a new instance of dashboard screen
 func InitializeDashboardScreen(username string, vault *tlockvault.Vault, context *context.Context) modelmanager.Screen {
 	// Load keybindings for the user
-	context.Keybindings = config.LoadKeyBindings(username)
+	context.Config = config.LoadUserConfig(username)
 
 	// Initialize dashboard keymap
 	dashboardKeys = dashboardKeyMap{
@@ -81,8 +81,8 @@ func InitializeDashboardScreen(username string, vault *tlockvault.Vault, context
 			key.WithHelp("?", "help menu"),
 		),
 		Add: key.NewBinding(
-			key.WithKeys(context.Keybindings.Folder.Add.Keys()...),
-			key.WithHelp(strings.Join(context.Keybindings.Folder.Add.Keys(), "/"), "add folder"),
+			key.WithKeys(context.Config.Folder.Add.Keys()...),
+			key.WithHelp(strings.Join(context.Config.Folder.Add.Keys(), "/"), "add folder"),
 		),
 		ChangeTheme: key.NewBinding(
 			key.WithKeys("ctrl+t"),

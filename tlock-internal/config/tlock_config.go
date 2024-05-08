@@ -15,29 +15,25 @@ var DEFAULT_THEME = "Catppuccin"
 
 // Path to the config file
 var CONFIG_DIR = path.Join(xdg.ConfigHome, "tlock")
-var CONFIG_PATH = path.Join(xdg.ConfigHome, "tlock", "tlock.yaml")
+var CONFIG_PATH = path.Join(xdg.ConfigHome, "tlock", "conf.bin")
 
-// Represents theme config
-type Config struct {
+// TLock config is the config which is overriden by tlock itself
+type TLockConfig struct {
 	// Current theme
 	// Defaults to `Catppuccin`
 	CurrentTheme string `yaml:"current_theme"`
-
-	/// Enable icons or not
-	EnableIcon bool `yaml:"enable_icon"`
 }
 
 // Returns the default config
-func DefaultConfig() Config {
-	return Config{
+func DefaultTLockConfig() TLockConfig {
+	return TLockConfig{
 		CurrentTheme: DEFAULT_THEME,
-		EnableIcon:   false,
 	}
 }
 
 // Loads the config from the file
-func GetConfig() Config {
-	default_config := DefaultConfig()
+func GetTLockConfig() TLockConfig {
+	default_config := DefaultTLockConfig()
 
 	// Read raw
 	config_raw, err := os.ReadFile(CONFIG_PATH)
@@ -64,7 +60,7 @@ func GetConfig() Config {
 }
 
 // Writes the config
-func (config Config) Write() {
+func (config TLockConfig) Write() {
 	// Make directory
 	os.MkdirAll(filepath.Dir(CONFIG_PATH), os.ModePerm)
 

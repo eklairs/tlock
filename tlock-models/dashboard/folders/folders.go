@@ -101,8 +101,8 @@ func buildListViewForFolders(vault *tlockvault.Vault, context *context.Context) 
 	listview := components.ListViewSimple(buildFolderListItems(vault), folderListDelegate{}, foldersWidth(width), 0) // -4 is for the title
 
 	// Use custom keys
-	listview.KeyMap.CursorUp = context.Keybindings.Folder.Previous.Binding
-	listview.KeyMap.CursorDown = context.Keybindings.Folder.Next.Binding
+	listview.KeyMap.CursorUp = context.Config.Folder.Previous.Binding
+	listview.KeyMap.CursorDown = context.Config.Folder.Next.Binding
 
 	// Return listview
 	return listview
@@ -148,29 +148,29 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 	case tea.KeyMsg:
 		switch {
 		// Add new folder
-		case key.Matches(msgType, folders.context.Keybindings.Folder.Add.Binding):
+		case key.Matches(msgType, folders.context.Config.Folder.Add.Binding):
 			cmds = append(cmds, manager.PushScreen(InitializeAddFolderScreen(folders.vault)))
 
 		// Edit focused token
-		case key.Matches(msgType, folders.context.Keybindings.Folder.Edit.Binding):
+		case key.Matches(msgType, folders.context.Config.Folder.Edit.Binding):
 			if focused := folders.Focused(); focused != nil {
 				cmds = append(cmds, manager.PushScreen(InitializeEditFolderScreen(*focused, folders.vault)))
 			}
 
 		// Delete focused token
-		case key.Matches(msgType, folders.context.Keybindings.Folder.Delete.Binding):
+		case key.Matches(msgType, folders.context.Config.Folder.Delete.Binding):
 			if focused := folders.Focused(); focused != nil {
 				cmds = append(cmds, manager.PushScreen(InitializeDeleteFolderScreen(*focused, folders.vault)))
 			}
 
-		case key.Matches(msgType, folders.context.Keybindings.Folder.Next.Binding):
+		case key.Matches(msgType, folders.context.Config.Folder.Next.Binding):
 			cmds = append(cmds, func() tea.Msg { return tlockmessages.RequestFolderChanged{} })
 
-		case key.Matches(msgType, folders.context.Keybindings.Folder.Previous.Binding):
+		case key.Matches(msgType, folders.context.Config.Folder.Previous.Binding):
 			cmds = append(cmds, func() tea.Msg { return tlockmessages.RequestFolderChanged{} })
 
 		// Move folder down
-		case key.Matches(msgType, folders.context.Keybindings.Folder.MoveUp.Binding):
+		case key.Matches(msgType, folders.context.Config.Folder.MoveUp.Binding):
 			if focused := folders.Focused(); focused != nil {
 				if folders.vault.MoveFolderUp(focused.ID) {
 					// Move cursor down
@@ -188,7 +188,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 			}
 
 		// Move folder down
-		case key.Matches(msgType, folders.context.Keybindings.Folder.MoveDown.Binding):
+		case key.Matches(msgType, folders.context.Config.Folder.MoveDown.Binding):
 			if focused := folders.Focused(); focused != nil {
 				if folders.vault.MoveFolderDown(focused.ID) {
 					// Move cursor down

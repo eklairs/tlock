@@ -50,13 +50,13 @@ type Context struct {
 	Icons map[string]Icon
 
 	// Config
-	Config config.Config
+	TLockConfig config.TLockConfig
 
 	// Core
 	Core tlockcore.TLockCore
 
-	// Keybindings
-	Keybindings config.KeybindingsConfig
+	// User configuration
+	Config config.UserConfiguration
 }
 
 // Initializes a new instance of the context
@@ -78,8 +78,8 @@ func InitializeContext() Context {
 		Themes:      themes,
 		Icons:       icons.Icons,
 		Core:        tlockcore.New(),
-		Config:      config.GetConfig(),
-		Keybindings: config.DefaultKeybindingsConfig(),
+		Config:      config.DefaultUserConfiguration(),
+		TLockConfig: config.GetTLockConfig(),
 	}
 }
 
@@ -91,7 +91,7 @@ func (context Context) findTheme(name string) int {
 // Returns the current theme spec
 func (context Context) GetCurrentTheme() Theme {
 	// Get theme index
-	theme_index := context.findTheme(context.Config.CurrentTheme)
+	theme_index := context.findTheme(context.TLockConfig.CurrentTheme)
 
 	// If not found, then use the default theme
 	if theme_index == -1 {
@@ -104,7 +104,9 @@ func (context Context) GetCurrentTheme() Theme {
 
 // Sets the theme
 func (context *Context) SetTheme(theme string) {
-	context.Config.CurrentTheme = theme
+	// Update current theme
+	context.TLockConfig.CurrentTheme = theme
 
-	context.Config.Write()
+	// Write
+	context.TLockConfig.Write()
 }

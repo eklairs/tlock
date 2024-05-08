@@ -117,7 +117,7 @@ func InitializeThemesScreen(context *tlockcontext.Context) ThemesScreen {
 	listview := components.ListViewSimple(themeItems, themeListDelegate{}, 65, min(18, len(context.Themes)*3))
 
 	// Set the focus to the currently applied theme
-	for i := 0; i < slices.IndexFunc(context.Themes, func(t tlockcontext.Theme) bool { return t.Name == context.Config.CurrentTheme }); i++ {
+	for i := 0; i < slices.IndexFunc(context.Themes, func(t tlockcontext.Theme) bool { return t.Name == context.TLockConfig.CurrentTheme }); i++ {
 		listview.CursorDown()
 	}
 

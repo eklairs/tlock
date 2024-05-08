@@ -1,17 +1,15 @@
-# Keybindings
+# Whether to enable icons
+# Enabling icons require Nerd Fonts to be installed
+enable_icons: false
 
-# Keybindings can be defined for a action in the following way:
+# Specifying keys
+# Multiple keys can be binded to a single action, where the format of each key is: `<modifier>+<key>`
+# Where `modifier` is ctrl (control), shift (shift), esc (escape), etc
+# And the key is the key - A, B, Z
 #
-# <action>: [<keys>]
-#
-# Examples:
-#
-# add: ["A"]
-# move_down: ["ctrl", "down"]
-#
-# etc
+# NOTE: Keys are case sensitive - A and a are treated as different keys
 
-folders:
+folders_keybindings:
     # Add a new folder
     # Default: ["A"]
     add: ["A"]
@@ -40,7 +38,7 @@ folders:
     # Default: "D"
     delete: ["D"]
 
-tokens:
+tokens_keybindings:
     # Add a new token
     # Default: ["a"]
     add: ["a"]
