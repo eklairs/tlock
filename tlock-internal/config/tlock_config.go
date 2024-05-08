@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/adrg/xdg"
+	"github.com/kelindar/binary"
 	"github.com/rs/zerolog/log"
-	"gopkg.in/yaml.v3"
 )
 
 // Default theme
@@ -47,7 +47,7 @@ func GetTLockConfig() TLockConfig {
 	}
 
 	// Parse
-	if err := yaml.Unmarshal(config_raw, &default_config); err != nil {
+	if err := binary.Unmarshal(config_raw, &default_config); err != nil {
 		// Log
 		log.Error().Err(err).Msg("[config] Failed to parse config, syntax error possibly?")
 
@@ -65,7 +65,7 @@ func (config TLockConfig) Write() {
 	os.MkdirAll(filepath.Dir(CONFIG_PATH), os.ModePerm)
 
 	// Marshal
-	data, _ := yaml.Marshal(config)
+	data, _ := binary.Marshal(config)
 
 	// Write
 	file, err := os.Create(CONFIG_PATH)
