@@ -128,6 +128,12 @@ func (screen UserOptionsScreen) Update(msg tea.Msg, manager *modelmanager.ModelM
 		// If we recieve delete user message, then its time we pop ourself (it is no longer needed / workable)
 		manager.PopScreen()
 
+		// Now we are at the select user screen
+		// If there are no users, we will replace the screen with create user screen
+		if len(screen.context.Core.Users) == 0 {
+			manager.ReplaceScreen(InitializeCreateUserScreen(screen.context))
+		}
+
 	case tlockmessages.UserEditedMsg:
 		// Lets update the name with the new one
 		// To prevent any crashes

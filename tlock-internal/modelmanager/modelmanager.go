@@ -9,9 +9,6 @@ import (
 	"golang.org/x/term"
 )
 
-// Message that represents the model has come back to focus
-type ScreenRefocusedMsg struct{}
-
 // A tea.Model-ish interface but for model manager
 type Screen interface {
 	Init() tea.Cmd
@@ -126,10 +123,6 @@ func (manager *ModelManager) ResolveOperation() {
 		manager.stack = append(manager.stack, *manager.operation.Screen)
 	case OperationPop:
 		manager.stack = manager.stack[:screen_index]
-
-		// Send new message
-		manager.Update(ScreenRefocusedMsg{})
-
 	case OperationReplace:
 		manager.stack[screen_index] = *manager.operation.Screen
 	}

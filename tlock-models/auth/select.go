@@ -188,12 +188,6 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 				cmds = append(cmds, manager.PushScreen(dashboard.InitializeDashboardScreen(user.Username, vault, screen.context)))
 			}
 		}
-
-	case modelmanager.ScreenRefocusedMsg:
-		// If the screen was refocused, lets check if the number of elements are not zero
-		if len(screen.context.Core.Users) == 0 {
-			manager.PushScreen(InitializeCreateUserScreen(screen.context))
-		}
 	}
 
 	// Update listview
