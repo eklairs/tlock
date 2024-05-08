@@ -9,6 +9,9 @@ import (
 	"golang.org/x/term"
 )
 
+// Message that represents the model has come back to focus
+type ScreenRefocusedMsg struct{}
+
 // A tea.Model-ish interface but for model manager
 type Screen interface {
 	Init() tea.Cmd
@@ -106,20 +109,35 @@ func (manager *ModelManager) Update(msg tea.Msg) tea.Cmd {
 		manager.stack[screen_index], cmd = manager.stack[screen_index].Update(msg, manager)
 	}
 
+	// Resolve operation
+	manager.ResolveOperation()
+
+	return cmd
+}
+
+// Resolves the operation
+func (manager *ModelManager) ResolveOperation() {
+	// Current screen is the screen at the top
+	screen_index := len(manager.stack) - 1
+
 	// Resolve any pending operation
 	switch manager.operation.Action {
 	case OperationPush:
 		manager.stack = append(manager.stack, *manager.operation.Screen)
 	case OperationPop:
 		manager.stack = manager.stack[:screen_index]
+
+		// We will send the refocused message!
+		manager.stack[screen_index-1], _ = manager.stack[screen_index-1].Update(ScreenRefocusedMsg{}, manager)
+
+		// Resolve any operation
+		manager.ResolveOperation()
 	case OperationReplace:
 		manager.stack[screen_index] = *manager.operation.Screen
 	}
 
 	// Reset operation
 	manager.operation = NoneOperation()
-
-	return cmd
 }
 
 // Calls the View() function on the current screen with center aligned to the screen
