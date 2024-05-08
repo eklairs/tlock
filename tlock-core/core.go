@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"slices"
+	"strings"
 
 	"github.com/adrg/xdg"
 	"github.com/kelindar/binary"
@@ -59,6 +60,9 @@ func New() TLockCore {
 
 // Adds a new user
 func (users *TLockCore) AddNewUser(username, password string) (*tlockvault.Vault, error) {
+	// strip spaces around username
+	username = strings.TrimSpace(username)
+
 	if users.Exists(username) {
 		return nil, errors.New("User already exists")
 	}
@@ -81,6 +85,7 @@ func (users *TLockCore) AddNewUser(username, password string) (*tlockvault.Vault
 
 // Renames a user
 func (core TLockCore) RenameUser(oldName, newName string) {
+	newName = strings.TrimSpace(newName)
 	userIndex := slices.IndexFunc(core.Users, func(user User) bool { return user.Username == oldName })
 
 	if userIndex != -1 {
