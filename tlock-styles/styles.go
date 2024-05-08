@@ -87,7 +87,7 @@ func InitializeStyles(theme context.Theme) {
 		Input:              with(paddedItem).Width(65).Background(theme.BackgroundOver),
 		Placeholder:        with(base).Background(theme.BackgroundOver).Foreground(theme.SubText),
 		ListItemActive:     with(paddedItem).Background(theme.BackgroundOver),
-		AccentBgItem:       with(base).Padding(0, 1).Background(theme.Accent).Foreground(theme.Background),
+		AccentBgItem:       with(base).Bold(true).Padding(0, 1).Background(theme.Accent).Foreground(theme.Background),
 		BackgroundOver:     with(base).Background(theme.BackgroundOver),
 		FolderItemInactive: with(paddedItem),
 		MockScreen:         with(base).Background(theme.BackgroundOver).Align(lipgloss.Center, lipgloss.Center).Width(27).Height(9),
