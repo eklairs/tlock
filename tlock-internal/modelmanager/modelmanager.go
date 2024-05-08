@@ -127,11 +127,9 @@ func (manager *ModelManager) ResolveOperation() {
 	case OperationPop:
 		manager.stack = manager.stack[:screen_index]
 
-		// We will send the refocused message!
-		manager.stack[screen_index-1], _ = manager.stack[screen_index-1].Update(ScreenRefocusedMsg{}, manager)
+		// Send new message
+		manager.Update(ScreenRefocusedMsg{})
 
-		// Resolve any operation
-		manager.ResolveOperation()
 	case OperationReplace:
 		manager.stack[screen_index] = *manager.operation.Screen
 	}
