@@ -9,7 +9,7 @@ import (
 var ERR_USERNAME_EMPTY = errors.New("Username cannot be empty")
 
 // Error representing that the username is empty
-var ERR_USERNAME_EXISTS = errors.New("Username cannot be empty")
+var ERR_USERNAME_EXISTS = errors.New("User with that name already exists")
 
 // Validates if the username is okay to be used
 // Validation is done on the basis of its emptiness and if there are other users with the same name
