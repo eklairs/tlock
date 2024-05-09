@@ -105,14 +105,14 @@ func (screen DeleteFolderScreen) Update(msg tea.Msg, manager *modelmanager.Model
 func (screen DeleteFolderScreen) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
-		tlockstyles.Styles.Title.Render(deleteFolderAsciiArt), "",
-		tlockstyles.Styles.SubText.Render("Permanently delete tokens folder"), "",
+		tlockstyles.Title(deleteFolderAsciiArt), "",
+		tlockstyles.Dimmed("Permanently delete tokens folder"), "",
 		lipgloss.JoinHorizontal(
 			lipgloss.Center,
-			tlockstyles.Styles.SubText.Render("Are you sure you want to "),
+			tlockstyles.Dimmed("Are you sure you want to "),
 			tlockstyles.Styles.Error.Render("× DELETE "),
-			tlockstyles.Styles.Title.Render(screen.folder.Name),
-			tlockstyles.Styles.SubText.Render("?"),
+			tlockstyles.Title(screen.folder.Name),
+			tlockstyles.Dimmed("?"),
 		), "",
 		tlockstyles.Help.View(deleteFolderKeys),
 	)

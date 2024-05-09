@@ -143,19 +143,14 @@ func (screen ThemesScreen) Update(msg tea.Msg, manager *modelmanager.ModelManage
 			// Get original theme
 			originalTheme := screen.context.GetCurrentTheme()
 
-			// Reset back the theme
-			cmds = append(cmds, func() tea.Msg {
-				return tea.SetBackgroundColor(termenv.RGBColor(originalTheme.Background))
-			})
-
-			// Reinitialize styles
-			tlockstyles.InitializeStyles(tlockcontext.Theme(originalTheme))
+            // Set original theme
+            cmds = append(cmds, screen.SetTheme(originalTheme))
 
 			// Pop screen
 			manager.PopScreen()
 
 		case key.Matches(msgType, themesKeys.Save):
-			// Get the focused theem
+			// Get the focused theme
 			newTheme := screen.listview.SelectedItem().(themeItem)
 
 			// Set the theme
@@ -177,13 +172,8 @@ func (screen ThemesScreen) Update(msg tea.Msg, manager *modelmanager.ModelManage
 		// Get new theme
 		newTheme := screen.listview.SelectedItem().(themeItem)
 
-		// Change background color
-		cmds = append(cmds, func() tea.Msg {
-			return tea.SetBackgroundColor(termenv.RGBColor(newTheme.Background))
-		})
-
-		// Reinitialize styles
-		tlockstyles.InitializeStyles(tlockcontext.Theme(newTheme))
+        // Append cmd
+        cmds = append(cmds, screen.SetTheme(tlockcontext.Theme(newTheme)))
 	}
 
 	// Return
@@ -192,38 +182,23 @@ func (screen ThemesScreen) Update(msg tea.Msg, manager *modelmanager.ModelManage
 
 // View
 func (screen ThemesScreen) View() string {
-	// Paginator renderable
-	var paginatorRenderable string
-
-	// Total pages
-	totalPages := screen.listview.Paginator.TotalPages
-
-	// Add paginator if needed
-	if totalPages > 1 {
-		// Paginator items
-		paginatorItems := make([]string, totalPages)
-
-		// Add paginator dots
-		for index := 0; index < totalPages; index++ {
-			renderer := tlockstyles.Styles.SubText.Copy().Bold(true).Render
-
-			if index == screen.listview.Paginator.Page {
-				renderer = tlockstyles.Styles.Title.Render
-			}
-
-			paginatorItems = append(paginatorItems, renderer("•"))
-		}
-
-		// Add to ui
-		paginatorRenderable = lipgloss.JoinHorizontal(lipgloss.Center, paginatorItems...)
-	}
-
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
-		tlockstyles.Styles.Title.Render(themesAsciiArt), "",
-		tlockstyles.Styles.SubText.Render("Choose a theme for tlock"), "",
+		tlockstyles.Title(themesAsciiArt), "",
+		tlockstyles.Dimmed("Choose a theme for tlock"), "",
 		screen.listview.View(), "",
-		paginatorRenderable, "",
-		tlockstyles.Help.View(themesKeys),
+		components.Paginator(screen.listview), "",
+		tlockstyles.HelpView(themesKeys),
 	)
+}
+
+// Sets the theme
+func (screen ThemesScreen) SetTheme(theme tlockcontext.Theme) tea.Cmd {
+    // Reinitialize styles
+    tlockstyles.InitializeStyles(theme)
+
+    // Change background color
+    return func() tea.Msg {
+        return tea.SetBackgroundColor(termenv.RGBColor(theme.Background))
+    }
 }

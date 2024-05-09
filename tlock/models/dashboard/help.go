@@ -47,9 +47,9 @@ func BuildHelpItem(title string, keys []HelpKeyBindingSpec) string {
 	for _, key := range keys {
 		ui := lipgloss.JoinHorizontal(
 			lipgloss.Center,
-			tlockstyles.Styles.SubText.Render(key.Desc),
+			tlockstyles.Dimmed(key.Desc),
 			strings.Repeat(" ", 65-len(key.Desc)-len(key.Key)),
-			tlockstyles.Styles.Title.Render(key.Key),
+			tlockstyles.Title(key.Key),
 		)
 
 		items = append(items, ui, "")

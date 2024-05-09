@@ -19,18 +19,18 @@ func (vault *Vault) AddFolder(name string) error {
 		vault.write()
 	}
 
-	// No errors!
-	return nil
+    // Return
+	return err
 }
 
 // Renames the folder to a new name
-func (vault *Vault) RenameFolder(old, new string) error {
+func (vault *Vault) RenameFolder(old, newName string) error {
 	var err error
 
 	// Validate folder name
-	if new, err = vault.validateFolderName(new); err != nil {
+	if newName, err = vault.validateFolderName(newName); err == nil {
 		// Update
-		vault.Folders[vault.findFolder(old)].Name = new
+		vault.Folders[vault.findFolder(old)].Name = newName
 
 		// Write
 		vault.write()
