@@ -67,7 +67,7 @@ func (vault *Vault) AddTokenFromToken(folder string, token Token) error {
 func (vault *Vault) ReplaceToken(fromFolder string, token, newToken Token) error {
 	var err error
 
-	if newToken.Secret, err = vault.validateToken(newToken.Secret); err == nil {
+	if newToken.Secret, err = vault.validateToken(newToken.Secret); token.Secret == newToken.Secret || err == nil {
 		// Get folder index
 		if index := vault.findFolder(fromFolder); index != -1 {
 			// Replace
@@ -75,6 +75,9 @@ func (vault *Vault) ReplaceToken(fromFolder string, token, newToken Token) error
 
 			// Write
 			vault.write()
+
+            // Ok!
+            return nil
 		}
 	}
 
@@ -163,7 +166,7 @@ func (vault *Vault) findToken(folder int, secret string) int {
 
 // Checks if the token exists with a secret
 func (vault *Vault) tokenExists(secret string) bool {
-	for i := 0; i <= len(vault.Folders); i++ {
+	for i := 0; i < len(vault.Folders); i++ {
 		if vault.findToken(i, secret) != -1 {
 			return true
 		}
