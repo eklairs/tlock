@@ -254,10 +254,10 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			}
 
 			// Replace
-			if err := screen.vault.ReplaceToken(screen.folder.Name, screen.token, token); err != nil {
-				screen.SetError(5, err)
-				break
-			}
+            if err := screen.vault.ReplaceToken(screen.folder.Name, screen.token, token); err != nil {
+                screen.SetError(2, err)
+                break
+            }
 
 			accountName := formItems[0].FormItem.Value()
 

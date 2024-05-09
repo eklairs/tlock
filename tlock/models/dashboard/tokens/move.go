@@ -175,9 +175,9 @@ func (screen MoveTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 func (screen MoveTokenScreen) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
-		tlockstyles.Styles.Title.Render(moveTokenAscii), "",
-		tlockstyles.Styles.SubText.Render("Select the folder to move the token to"), "",
+		tlockstyles.Title(moveTokenAscii), "",
+		tlockstyles.Dimmed("Select the folder to move the token to"), "",
 		screen.listview.View(), "",
-		tlockstyles.Help.View(moveTokenKeys),
+		tlockstyles.HelpView(moveTokenKeys),
 	)
 }
