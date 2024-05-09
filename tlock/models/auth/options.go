@@ -147,8 +147,8 @@ func (screen UserOptionsScreen) Update(msg tea.Msg, manager *modelmanager.ModelM
 func (screen UserOptionsScreen) View() string {
 	// Elements
 	elements := []string{
-		tlockstyles.Styles.Title.Render(userOptionsAscii), "",
-		tlockstyles.Styles.SubText.Render(fmt.Sprintf("Select an option for %s", screen.user)), "",
+		tlockstyles.Title(userOptionsAscii), "",
+		tlockstyles.Dimmed(fmt.Sprintf("Select an option for %s", screen.user)), "",
 	}
 
 	// Options
@@ -168,7 +168,7 @@ func (screen UserOptionsScreen) View() string {
 	}
 
 	// Add help
-	elements = append(elements, "", tlockstyles.Help.View(userOptionsKeys))
+	elements = append(elements, "", tlockstyles.HelpView(userOptionsKeys))
 
 	return lipgloss.JoinVertical(lipgloss.Center, elements...)
 }

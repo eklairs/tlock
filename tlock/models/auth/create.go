@@ -5,13 +5,15 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	tea "github.com/charmbracelet/bubbletea"
+
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/constants"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock/models/dashboard"
+
 	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 )
 
@@ -147,6 +149,7 @@ func (screen CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 			// Add new user
 			vault, err := screen.context.Core.AddNewUser(username, screen.passwordInput.Value())
 
+            // Handle errors
 			if err != nil {
 				screen.usernameError = &err
 			} else {
@@ -172,10 +175,10 @@ func (screen CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 func (screen CreateUserScreen) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
-		tlockstyles.Styles.Title.Render(createUserAsciiArt), "",
-		tlockstyles.Styles.SubText.Render("Create a new user"), "",
+		tlockstyles.Title(createUserAsciiArt), "",
+		tlockstyles.Dimmed("Create a new user"), "",
 		components.InputGroup("Username", "Choose an awesome username, or keep it empty to use the current system name", screen.usernameError, screen.usernameInput),
 		components.InputGroup("Password", "Choose a super strong password, or keep it empty if you don't want any password", nil, screen.passwordInput),
-		tlockstyles.Help.View(createUserKeys),
+		tlockstyles.HelpView(createUserKeys),
 	)
 }

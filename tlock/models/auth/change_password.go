@@ -1,22 +1,24 @@
 package auth
 
 import (
+	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/constants"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 )
 
 // Change password ascii art
 var changePasswordAsciiArt = `
-█▀▀ █▀█ █▀▀ ▄▀█ ▀█▀ █▀▀   █ █ █▀ █▀▀ █▀█
-█▄▄ █▀▄ ██▄ █▀█  █  ██▄   █▄█ ▄█ ██▄ █▀▄`
+█▀▀ █ █ ▄▀█ █▄ █ █▀▀ █▀▀   █▀█ ▄▀█ █▀ █▀
+█▄▄ █▀█ █▀█ █ ▀█ █▄█ ██▄   █▀▀ █▀█ ▄█ ▄█`
 
 // Change password key map
 type changePasswordKeyMap struct {
@@ -112,11 +114,12 @@ func (screen ChangePasswordScreen) Update(msg tea.Msg, manager *modelmanager.Mod
 
 // View
 func (screen ChangePasswordScreen) View() string {
+    // Items
 	items := []string{
-		tlockstyles.Styles.Title.Render(changePasswordAsciiArt), "",
-		tlockstyles.Styles.SubText.Render("Change your password"), "",
+		tlockstyles.Title(changePasswordAsciiArt), "",
+		tlockstyles.Dimmed("Change your password"), "",
 		components.InputGroup("New password", "Enter the new password that you want to use to login from next time", nil, screen.newPassword),
-		tlockstyles.Help.View(changePasswordKeys),
+		tlockstyles.HelpView(changePasswordKeys),
 	}
 
 	// Return

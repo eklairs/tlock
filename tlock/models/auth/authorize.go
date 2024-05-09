@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/constants"
@@ -146,9 +146,9 @@ func (screen EnterPassScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 func (screen EnterPassScreen) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
-		tlockstyles.Styles.Title.Render(screen.ascii), "",
-		tlockstyles.Styles.SubText.Render(fmt.Sprintf(screen.description, screen.user.S())), "",
+		tlockstyles.Title(screen.ascii), "",
+		tlockstyles.Dimmed(fmt.Sprintf(screen.description, screen.user.S())), "",
 		components.InputGroup("Password", "Enter the super secret password", screen.errorMessage, screen.passInput),
-		tlockstyles.Help.View(enterPassKeys),
+		tlockstyles.HelpView(enterPassKeys),
 	)
 }

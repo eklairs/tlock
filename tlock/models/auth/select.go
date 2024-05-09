@@ -8,20 +8,24 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	tlockcore "github.com/eklairs/tlock/tlock-core"
+
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-internal/utils"
-	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"github.com/eklairs/tlock/tlock/models/dashboard"
+
+	tlockcore "github.com/eklairs/tlock/tlock-core"
+	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 )
 
+// Select user ascii art
 var selectUserAscii = `
 █   █▀█ █▀▀ █ █▄ █
 █▄▄ █▄█ █▄█ █ █ ▀█`
 
+// Sudo ascii art
 var sudoAscii = `
 █▀ █ █ █▀▄ █▀█
 ▄█ █▄█ █▄▀ █▄█`
@@ -154,41 +158,37 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
+		// New user
 		case key.Matches(msgType, selectUserKeys.New):
 			cmds = append(cmds, manager.PushScreen(InitializeCreateUserScreen(screen.context)))
 
+        // User options
 		case key.Matches(msgType, selectUserKeys.Options):
-			if focused, ok := screen.listview.SelectedItem().(selectUserListItem); ok {
-				focused := tlockcore.User(focused)
-				vault, err := tlockvault.Load(focused.Vault(), "")
+            // Try to unlock vault
+            focused, vault := screen.tryUnlock();
 
-				// If the vault is protected by default password, lets just directly move to the user options screen
-				if err == nil {
-					cmds = append(cmds, manager.PushScreen(InitializeUserOptionsScreen(focused.S(), vault, screen.context)))
-				} else {
-					// Screen to go to
-					next := InitializeEnterPassScreenCustomOpts(screen.context, tlockcore.User(focused), InitializeUserOptionsScreen, sudoAscii, "Enter password for %s to see user options")
+            // If the vault is protected, ask for password
+            if vault == nil {
+                // Screen to go to
+                next := InitializeEnterPassScreenCustomOpts(screen.context, tlockcore.User(focused), InitializeUserOptionsScreen, sudoAscii, "Enter password for %s to see user options")
 
-					// Push
-					cmds = append(cmds, manager.PushScreen(next))
-				}
+                // Push
+                cmds = append(cmds, manager.PushScreen(next))
+            } else {
+                cmds = append(cmds, manager.PushScreen(InitializeUserOptionsScreen(focused.S(), vault, screen.context)))
 			}
 
 		case key.Matches(msgType, selectUserKeys.Enter):
-			if focused, ok := screen.listview.SelectedItem().(selectUserListItem); ok {
-				focused := tlockcore.User(focused)
+            // Try to unlock vault
+            focused, vault := screen.tryUnlock();
 
-				// Try to decrypt user with empty password
-				vault, err := tlockvault.Load(focused.Vault(), "")
-
-				if err != nil {
-					// It is encrypted with a password, require password
-					cmds = append(cmds, manager.PushScreen(InitializeEnterPassScreen(screen.context, focused, dashboard.InitializeDashboardScreen)))
-				} else {
-					// YAY!
-					cmds = append(cmds, manager.PushScreen(dashboard.InitializeDashboardScreen(focused.S(), vault, screen.context)))
-				}
-			}
+            if vault == nil {
+                // It is encrypted with a password, require password
+                cmds = append(cmds, manager.PushScreen(InitializeEnterPassScreen(screen.context, focused, dashboard.InitializeDashboardScreen)))
+            } else {
+                // YAY!
+                cmds = append(cmds, manager.PushScreen(dashboard.InitializeDashboardScreen(focused.S(), vault, screen.context)))
+            }
 		}
 	}
 
@@ -205,47 +205,39 @@ func (screen SelectUserScreen) View() string {
 	// Update items
 	screen.listview.SetItems(utils.Map(screen.context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user) }))
 
+    // Set height
+    screen.listview.SetHeight(min(12, len(screen.context.Core.Users)*3))
+
 	// List of items to render
 	items := []string{
-		// Ascii art
-		tlockstyles.Styles.Title.Render(selectUserAscii), "",
-
-		// Some little description
-		tlockstyles.Styles.SubText.Render("Select a user to login as"), "",
-
-		// List of users
+		tlockstyles.Title(selectUserAscii), "",
+		tlockstyles.Dimmed("Select a user to login as"), "",
 		screen.listview.View(), "",
 	}
 
-	// Total pages
-	totalPages := screen.listview.Paginator.TotalPages
-
-	// Add paginator if needed
-	if totalPages > 1 {
-		// Paginator items
-		paginatorItems := make([]string, totalPages)
-
-		// Add paginator dots
-		for index := 0; index < totalPages; index++ {
-			renderer := tlockstyles.Styles.SubText.Copy().Bold(true).Render
-
-			if index == screen.listview.Paginator.Page {
-				renderer = tlockstyles.Styles.Title.Render
-			}
-
-			paginatorItems = append(paginatorItems, renderer("•"))
-		}
-
-		// Add to ui
-		items = append(items, lipgloss.JoinHorizontal(lipgloss.Center, paginatorItems...), "")
+	// Add paginator
+	if screen.listview.Paginator.TotalPages > 1 {
+		items = append(items, components.Paginator(screen.listview))
 	}
 
 	// Add help
-	items = append(items, tlockstyles.Help.View(selectUserKeys))
+	items = append(items, tlockstyles.HelpView(selectUserKeys))
 
 	// Return
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
 		items...,
 	)
+}
+
+// Tries to unlock the vault for the focused user
+func (screen SelectUserScreen) tryUnlock() (tlockcore.User, *tlockvault.Vault) {
+    // Get focused
+    focused := tlockcore.User(screen.listview.SelectedItem().(selectUserListItem))
+
+    // Try to decrypt user with empty password
+    vault, _ := tlockvault.Load(focused.Vault(), "")
+
+    // Return
+    return focused, vault
 }

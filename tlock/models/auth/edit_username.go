@@ -117,9 +117,9 @@ func (screen EditUsernameScreen) Update(msg tea.Msg, manager *modelmanager.Model
 func (screen EditUsernameScreen) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
-		tlockstyles.Styles.Title.Render(editUsernameAscii), "",
-		tlockstyles.Styles.SubText.Render("Change username"), "",
+		tlockstyles.Title(editUsernameAscii), "",
+		tlockstyles.Dimmed("Change username"), "",
 		components.InputGroup("New username", "Choose a new username that you want to set for yourself", screen.usernameError, screen.newUsername),
-		tlockstyles.Help.View(editUsernameKeys),
+		tlockstyles.HelpView(editUsernameKeys),
 	)
 }

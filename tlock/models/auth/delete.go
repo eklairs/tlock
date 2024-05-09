@@ -97,13 +97,13 @@ func (screen DeleteUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 func (screen DeleteUserScreen) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
-		tlockstyles.Styles.Title.Render(deleteUserAsciiArt), "",
+		tlockstyles.Title(deleteUserAsciiArt), "",
 		lipgloss.JoinHorizontal(
 			lipgloss.Center,
 			tlockstyles.Styles.Base.Render(fmt.Sprintf("Are you sure you want to ")),
 			tlockstyles.Styles.Error.Copy().Bold(true).Render(fmt.Sprintf("× DELETE ")),
 			tlockstyles.Styles.Base.Render(fmt.Sprintf("user %s forever?", screen.User)),
 		), "",
-		tlockstyles.Help.View(deleteUserKeys),
+		tlockstyles.HelpView(deleteUserKeys),
 	)
 }
