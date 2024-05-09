@@ -81,7 +81,7 @@ func (screen DeleteFolderScreen) Update(msg tea.Msg, manager *modelmanager.Model
 			manager.PopScreen()
 		case key.Matches(msgType, deleteFolderKeys.Delete):
 			// Delete the folder
-			screen.vault.DeleteFolder(screen.folder.ID)
+			screen.vault.DeleteFolder(screen.folder.Name)
 
 			// Request folders refresh
 			cmds = append(

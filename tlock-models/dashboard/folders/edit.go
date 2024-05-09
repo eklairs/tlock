@@ -106,7 +106,7 @@ func (screen EditFolderScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 			}
 
 			// Update the folder
-			screen.vault.RenameFolder(screen.folder.ID, screen.name.Value())
+			screen.vault.RenameFolder(screen.folder.Name, screen.name.Value())
 
 			// Request folders refresh
 			cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })

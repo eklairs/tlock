@@ -318,7 +318,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 		case key.Matches(msgType, tokens.context.Config.Tokens.MoveDown.Binding):
 			if focused := tokens.Focused(); focused != nil {
 				// Move token down
-				tokens.vault.MoveTokenDown(tokens.folder.ID, focused.Token.ID)
+				tokens.vault.MoveTokenDown(tokens.folder.Name, focused.Token)
 
 				// Refresh tokens
 				cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshTokensMsg{} })
@@ -340,7 +340,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 		case key.Matches(msgType, tokens.context.Config.Tokens.MoveUp.Binding):
 			if focused := tokens.Focused(); focused != nil {
 				// Move token down
-				tokens.vault.MoveTokenUp(tokens.folder.ID, focused.Token.ID)
+				tokens.vault.MoveTokenUp(tokens.folder.Name, focused.Token)
 
 				// Refresh tokens
 				cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshTokensMsg{} })
@@ -362,7 +362,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 		case key.Matches(msgType, tokens.context.Config.Tokens.NextHOTP.Binding):
 			if focused := tokens.Focused(); focused != nil {
 				if focused.Token.Type == tlockvault.TokenTypeHOTP {
-					tokens.vault.IncreaseCounter(tokens.folder.ID, focused.Token.ID)
+					tokens.vault.IncreaseCounter(tokens.folder.Name, focused.Token)
 
 					accountName := focused.Token.Account
 					if accountName == "" {
@@ -385,7 +385,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 
 	case tlockmessages.FolderChanged:
 		// Build listview
-		listview := buildTokensListView(tokens.vault.GetTokens(msgType.Folder.ID), tokens.context)
+		listview := buildTokensListView(tokens.vault.GetTokens(msgType.Folder.Name), tokens.context)
 
 		// Update listview
 		tokens.listview = &listview
@@ -413,7 +413,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 
 	case tlockmessages.RefreshTokensMsg:
 		if tokens.folder != nil {
-			cmds = append(cmds, tokens.listview.SetItems(buildTokensItems(tokens.vault.GetTokens(tokens.folder.ID))))
+			cmds = append(cmds, tokens.listview.SetItems(buildTokensItems(tokens.vault.GetTokens(tokens.folder.Name))))
 		}
 	}
 

@@ -86,7 +86,7 @@ func (screen DeleteTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelM
 			manager.PopScreen()
 		case key.Matches(msgType, deleteTokenKeys.Delete):
 			// Delete
-			screen.vault.DeleteToken(screen.folder.ID, screen.token.ID)
+			screen.vault.DeleteToken(screen.folder.Name, screen.token)
 
 			accountName := screen.token.Account
 

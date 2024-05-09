@@ -143,7 +143,7 @@ func (screen MoveTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			focusedFolder := screen.listview.Items()[screen.listview.Index()].(moveTokenListItem)
 
 			// Move token
-			screen.vault.MoveToken(screen.token.ID, screen.folder.ID, focusedFolder.ID)
+			screen.vault.MoveToken(screen.token, screen.folder.Name, focusedFolder.Name)
 
 			accountName := screen.token.Account
 

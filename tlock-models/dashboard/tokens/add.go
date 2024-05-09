@@ -16,7 +16,6 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
-	"github.com/google/uuid"
 	"github.com/pquerna/otp/totp"
 	"golang.org/x/term"
 )
@@ -233,7 +232,6 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 
 			// Okay its time to add!
 			token := tlockvault.Token{
-				ID:               uuid.NewString(),
 				Account:          formItems[0].FormItem.Value(),
 				Issuer:           formItems[1].FormItem.Value(),
 				Secret:           formItems[2].FormItem.Value(),
@@ -246,7 +244,7 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 			}
 
 			// Add
-			screen.vault.AddTokenFromToken(screen.folder.ID, token)
+			screen.vault.AddTokenFromToken(screen.folder.Name, token)
 
 			accountName := formItems[0].FormItem.Value()
 

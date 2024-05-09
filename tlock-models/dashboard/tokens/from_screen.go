@@ -155,7 +155,7 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			// Add the token
 			if screen.token != nil {
 				// Add token
-				screen.vault.AddToken(screen.folder.ID, *screen.token)
+				screen.vault.AddToken(screen.folder.Name, *screen.token)
 
 				// Require refresh of folders and tokens list
 				cmds = append(

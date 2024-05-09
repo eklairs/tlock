@@ -30,7 +30,7 @@ var sudoAscii = `
 type selectUserListItem tlockcore.User
 
 func (item selectUserListItem) FilterValue() string {
-	return string(item.Username)
+	return tlockcore.User(item).S()
 }
 
 // Select user list view delegate
@@ -66,7 +66,7 @@ func (d selectUserDelegate) Render(w io.Writer, m list.Model, index int, listIte
 	}
 
 	// Render
-	fmt.Fprint(w, renderer(65, item.Username, "›"))
+	fmt.Fprint(w, renderer(65, string(item), "›"))
 }
 
 // Select user key map
@@ -159,11 +159,12 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 		case key.Matches(msgType, selectUserKeys.Options):
 			if focused, ok := screen.listview.SelectedItem().(selectUserListItem); ok {
-				vault, err := tlockvault.Load(focused.Vault, "")
+                focused := tlockcore.User(focused)
+				vault, err := tlockvault.Load(focused.Vault(), "")
 
 				// If the vault is protected by default password, lets just directly move to the user options screen
 				if err == nil {
-					cmds = append(cmds, manager.PushScreen(InitializeUserOptionsScreen(focused.Username, vault, screen.context)))
+					cmds = append(cmds, manager.PushScreen(InitializeUserOptionsScreen(focused.S(), vault, screen.context)))
 				} else {
 					// Screen to go to
 					next := InitializeEnterPassScreenCustomOpts(screen.context, tlockcore.User(focused), InitializeUserOptionsScreen, sudoAscii, "Enter password for %s to see user options")
@@ -174,19 +175,20 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 			}
 
 		case key.Matches(msgType, selectUserKeys.Enter):
-			// User
-			user := screen.context.Core.Users[screen.listview.Index()]
+			if focused, ok := screen.listview.SelectedItem().(selectUserListItem); ok {
+                focused := tlockcore.User(focused)
 
-			// Try to decrypt user with empty password
-			vault, err := tlockvault.Load(user.Vault, "")
+                // Try to decrypt user with empty password
+                vault, err := tlockvault.Load(focused.Vault(), "")
 
-			if err != nil {
-				// It is encrypted with a password, require password
-				cmds = append(cmds, manager.PushScreen(InitializeEnterPassScreen(screen.context, user, dashboard.InitializeDashboardScreen)))
-			} else {
-				// YAY!
-				cmds = append(cmds, manager.PushScreen(dashboard.InitializeDashboardScreen(user.Username, vault, screen.context)))
-			}
+                if err != nil {
+                    // It is encrypted with a password, require password
+                    cmds = append(cmds, manager.PushScreen(InitializeEnterPassScreen(screen.context, focused, dashboard.InitializeDashboardScreen)))
+                } else {
+                    // YAY!
+                    cmds = append(cmds, manager.PushScreen(dashboard.InitializeDashboardScreen(focused.S(), vault, screen.context)))
+                }
+            }
 		}
 	}
 

@@ -1,119 +1,20 @@
 package tlockcore
 
 import (
-	"errors"
 	"os"
 	"path"
 	"slices"
-	"strings"
 
-	"github.com/adrg/xdg"
-	"github.com/kelindar/binary"
-	"github.com/rs/zerolog/log"
-
-	"github.com/eklairs/tlock/tlock-internal/config"
+	"github.com/eklairs/tlock/tlock-internal/paths"
 	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
+	"github.com/kelindar/binary"
 )
 
-// Users
-var USERS_PATH = path.Join(xdg.DataHome, "tlock", "users")
-
-// Represents a user
-type User struct {
-	// Username
-	Username string
-
-	// Path to its vault
-	Vault string
-}
-
-// TLock core
+// Core utilities
 type TLockCore struct {
 	// Users
 	Users []User
-}
-
-// Initializes a new instance of the core
-func New() TLockCore {
-	// Read users path
-	raw, err := os.ReadFile(USERS_PATH)
-
-	// Check for errors
-	if err != nil {
-		// Log
-		log.Debug().Msg("[users] Users map does not exist, returning empty users map")
-
-		// Return empty core
-		return TLockCore{}
-	}
-
-	var users TLockCore
-
-	// Parse
-	if err = binary.Unmarshal(raw, &users); err != nil {
-		log.Fatal().Err(err).Msg("[users] Failed to parse users map, syntax error possibly")
-	}
-
-	return users
-}
-
-// Adds a new user
-func (users *TLockCore) AddNewUser(username, password string) (*tlockvault.Vault, error) {
-	// strip spaces around username
-	username = strings.TrimSpace(username)
-
-	if users.Exists(username) {
-		return nil, errors.New("User already exists")
-	}
-
-	// Initialize new vault
-	vault := tlockvault.Initialize(password)
-
-	// Add keybindings file
-	config.WriteDefault(username)
-
-	// Add to users
-	users.Users = append(users.Users, User{Username: username, Vault: vault.Path})
-
-	// Write
-	users.write()
-
-	// Return vault
-	return &vault, nil
-}
-
-// Renames a user
-func (core TLockCore) RenameUser(oldName, newName string) {
-	newName = strings.TrimSpace(newName)
-	userIndex := slices.IndexFunc(core.Users, func(user User) bool { return user.Username == oldName })
-
-	if userIndex != -1 {
-		// Rename if the user is found
-		core.Users[userIndex].Username = newName
-
-		// Write
-		core.write()
-	}
-}
-
-// Deletes a user
-func (core *TLockCore) DeleteUser(username string) {
-	userIndex := slices.IndexFunc(core.Users, func(user User) bool { return user.Username == username })
-
-	if userIndex != -1 {
-		// Remove its vault
-		os.RemoveAll(path.Join(path.Dir(core.Users[userIndex].Vault)))
-
-		// Remove its config files
-		os.RemoveAll(path.Join(xdg.ConfigHome, "tlock", username))
-
-		// Remove user
-		core.Users = utils.Remove(core.Users, userIndex)
-
-		// Write
-		core.write()
-	}
 }
 
 // [PRIVATE] Writes the current users value to the file
@@ -122,18 +23,106 @@ func (users TLockCore) write() {
 	data, _ := binary.Marshal(users)
 
 	// Create file
-	file, err := utils.EnsureExists(USERS_PATH)
+	if file, err := utils.EnsureExists(paths.USERS); err == nil {
+		file.Write(data)
+	}
+}
 
-	// Check for errors
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to create users file")
+// Initializes a new instance of the core
+func New() (*TLockCore, error) {
+	// Raw
+	var raw []byte
+	var err error
+
+	// Read users path
+	if raw, err = os.ReadFile(paths.USERS); err != nil {
+		return &TLockCore{}, err
 	}
 
-	// Write
-	file.Write(data)
+	// Parsed users
+	var users []User
+
+	// Parse
+	if err = binary.Unmarshal(raw, &users); err != nil {
+		return &TLockCore{}, nil
+	}
+
+	return &TLockCore{Users: users}, nil
 }
 
-// Checks if a user with the name exists
-func (users TLockCore) Exists(username string) bool {
-	return slices.IndexFunc(users.Users, func(user User) bool { return user.Username == username }) != -1
+// Adds a new user
+func (core *TLockCore) AddNewUser(username, password string) (*tlockvault.Vault, error) {
+	var err error
+
+	// Vault
+	var vault *tlockvault.Vault
+
+	// Run validations
+	if username, err = core.validateUsername(username); err != nil {
+		return nil, err
+	}
+
+	// New user
+	user := User(username)
+
+	// Initialize new vault
+	if vault, err = tlockvault.Initialize(user.Vault(), password); err != nil {
+		return nil, err
+	}
+
+	// Add to users
+	core.Users = append(core.Users, user)
+
+	// Write
+	core.write()
+
+	// Return vault
+	return vault, nil
 }
+
+// Renames a user
+func (core *TLockCore) RenameUser(old, new string) error {
+	var err error
+
+	// Run validations
+	if new, err = core.validateUsername(new); err != nil {
+		return err
+	}
+
+	// Find
+	if index := core.Find(old); index != -1 {
+		// Rename if the user is found
+		core.Users[index] = User(new)
+
+		// Write
+		core.write()
+	}
+
+	// No errors
+	return nil
+}
+
+// Deletes a user
+func (core *TLockCore) DeleteUser(username string) {
+	if index := core.Find(username); index != -1 {
+		// Remove its vault
+		os.RemoveAll(path.Dir(User(username).Vault()))
+
+		// Remove user
+		core.Users = utils.Remove(core.Users, index)
+
+		// Write
+		core.write()
+	}
+}
+
+// Returns if the user with the given name already exists
+func (core TLockCore) Exists(username string) bool {
+	return core.Find(username) != -1
+}
+
+// Returns the index of the user
+func (core TLockCore) Find(username string) int {
+	return slices.Index(core.Users, User(username))
+}
+

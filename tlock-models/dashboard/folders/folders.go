@@ -172,7 +172,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		// Move folder down
 		case key.Matches(msgType, folders.context.Config.Folder.MoveUp.Binding):
 			if focused := folders.Focused(); focused != nil {
-				if folders.vault.MoveFolderUp(focused.ID) {
+				if folders.vault.MoveFolderUp(focused.Name) {
 					// Move cursor down
 					folders.listview.CursorUp()
 
@@ -190,7 +190,7 @@ func (folders *Folders) Update(msg tea.Msg, manager *modelmanager.ModelManager) 
 		// Move folder down
 		case key.Matches(msgType, folders.context.Config.Folder.MoveDown.Binding):
 			if focused := folders.Focused(); focused != nil {
-				if folders.vault.MoveFolderDown(focused.ID) {
+				if folders.vault.MoveFolderDown(focused.Name) {
 					// Move cursor down
 					folders.listview.CursorDown()
 

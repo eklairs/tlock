@@ -18,7 +18,6 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
-	"github.com/google/uuid"
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 	"golang.org/x/term"
@@ -275,7 +274,6 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 
 			// Okay its time to edit!
 			token := tlockvault.Token{
-				ID:               uuid.NewString(),
 				Account:          formItems[0].FormItem.Value(),
 				Issuer:           formItems[1].FormItem.Value(),
 				Secret:           formItems[2].FormItem.Value(),
@@ -288,7 +286,7 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			}
 
 			// Replace
-			screen.vault.ReplaceToken(screen.folder.ID, screen.token.ID, token)
+			screen.vault.ReplaceToken(screen.folder.Name, screen.token, token)
 			accountName := formItems[0].FormItem.Value()
 
 			statusBarMessage := fmt.Sprintf("Successfully edited token for %s", accountName)

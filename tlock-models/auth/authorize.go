@@ -127,13 +127,13 @@ func (screen EnterPassScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 		case key.Matches(msgType, enterPassKeys.Back):
 			manager.PopScreen()
 		case key.Matches(msgType, enterPassKeys.Login):
-			vault, err := tlockvault.Load(screen.user.Vault, screen.passInput.Value())
+			vault, err := tlockvault.Load(screen.user.Vault(), screen.passInput.Value())
 
 			// Show error message if vault was failed to be unlocked
 			if err != nil {
 				screen.errorMessage = &ERROR_PASSWORD_WRONG
 			} else {
-				cmd = manager.ReplaceScreen(screen.next(screen.user.Username, vault, screen.context))
+				cmd = manager.ReplaceScreen(screen.next(screen.user.S(), vault, screen.context))
 			}
 		default:
 			// Update input box
@@ -149,7 +149,7 @@ func (screen EnterPassScreen) View() string {
 	return lipgloss.JoinVertical(
 		lipgloss.Center,
 		tlockstyles.Styles.Title.Render(screen.ascii), "",
-		tlockstyles.Styles.SubText.Render(fmt.Sprintf(screen.description, screen.user.Username)), "",
+		tlockstyles.Styles.SubText.Render(fmt.Sprintf(screen.description, screen.user.S())), "",
 		components.InputGroup("Password", "Enter the super secret password", screen.errorMessage, screen.passInput),
 		tlockstyles.Help.View(enterPassKeys),
 	)
