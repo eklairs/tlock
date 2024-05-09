@@ -15,10 +15,6 @@ import (
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 )
 
-// Errors
-var USERNAME_EXISTS = "User with that name already exists"
-var USERNAME_EMPTY = "Please enter a username"
-
 // Create user ascii art
 var createUserAsciiArt = `
 █▀▀ █▀█ █▀▀ ▄▀█ ▀█▀ █▀▀   █ █ █▀ █▀▀ █▀█
@@ -73,7 +69,7 @@ type CreateUserScreen struct {
 	passwordInput textinput.Model
 
 	// Username error message
-	usernameError *string
+	usernameError *error
 
 	// System user if found
 	systemUser *user.User
@@ -145,12 +141,6 @@ func (screen CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 			if username == "" {
 				if screen.systemUser != nil {
 					username = screen.systemUser.Username
-				} else {
-					// Set error
-					screen.usernameError = &USERNAME_EMPTY
-
-					// Break
-					break
 				}
 			}
 
@@ -158,9 +148,8 @@ func (screen CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 			vault, err := screen.context.Core.AddNewUser(username, screen.passwordInput.Value())
 
 			if err != nil {
-				screen.usernameError = &USERNAME_EXISTS
+				screen.usernameError = &err
 			} else {
-				// Push dashboard screen
 				cmd = manager.PushScreen(dashboard.InitializeDashboardScreen(screen.usernameInput.Value(), vault, screen.context))
 			}
 

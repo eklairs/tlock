@@ -15,8 +15,6 @@ import (
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
 
-var ERROR_EMPTY_FOLDER_NAME = "Folder name cannot be empty"
-
 var addFolderAscii = `
 ▄▀█ █▀▄ █▀▄
 █▀█ █▄▀ █▄▀`
@@ -58,7 +56,7 @@ type AddFolderScreen struct {
 	name textinput.Model
 
 	// Error
-	errorMessage *string
+	errorMessage *error
 
 	// Vault
 	vault *tlockvault.Vault
@@ -95,15 +93,11 @@ func (screen AddFolderScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			manager.PopScreen()
 
 		case key.Matches(msgType, addFolderKeys.Enter):
-			// If it is empty, show error message
-			if screen.name.Value() == "" {
-				screen.errorMessage = &ERROR_EMPTY_FOLDER_NAME
-
-				break
-			}
-
 			// Add the folder
-			screen.vault.AddFolder(screen.name.Value())
+            if err := screen.vault.AddFolder(screen.name.Value()); err != nil {
+                screen.errorMessage = &err;
+                break
+            }
 
 			// Request folders refresh
 			cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })

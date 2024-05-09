@@ -59,7 +59,7 @@ type EditFolderScreen struct {
 	folder tlockvault.Folder
 
 	// Error message
-	errorMessage *string
+	errorMessage *error
 
 	// Vault
 	vault *tlockvault.Vault
@@ -99,14 +99,10 @@ func (screen EditFolderScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 			manager.PopScreen()
 
 		case key.Matches(msgType, editFolderKeys.Enter):
-			// If it is empty, then show error
-			if screen.name.Value() == "" {
-				screen.errorMessage = &ERROR_EMPTY_FOLDER_NAME
-				break
-			}
-
 			// Update the folder
-			screen.vault.RenameFolder(screen.folder.Name, screen.name.Value())
+            if err := screen.vault.RenameFolder(screen.folder.Name, screen.name.Value()); err != nil {
+                screen.errorMessage = &err; break;
+            }
 
 			// Request folders refresh
 			cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })

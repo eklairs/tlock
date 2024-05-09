@@ -41,7 +41,7 @@ type FormItemInputBox struct {
 	Input textinput.Model
 
 	// Error message
-	ErrorMessage *string
+	ErrorMessage *error
 }
 
 // Update

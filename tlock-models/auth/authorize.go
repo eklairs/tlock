@@ -19,8 +19,6 @@ import (
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
 
-var ERROR_PASSWORD_WRONG = "Wrong password, please check if it is correct"
-
 var enterPassAsciiArt = `
 █▀█ ▄▀█ █▀ █▀ █ █ █ █▀█ █▀█ █▀▄
 █▀▀ █▀█ ▄█ ▄█ ▀▄▀▄▀ █▄█ █▀▄ █▄▀`
@@ -71,7 +69,7 @@ type EnterPassScreen struct {
 	user tlockcore.User
 
 	// Any error message
-	errorMessage *string
+	errorMessage *error
 
 	// Next
 	next NextFunc
@@ -131,7 +129,7 @@ func (screen EnterPassScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 
 			// Show error message if vault was failed to be unlocked
 			if err != nil {
-				screen.errorMessage = &ERROR_PASSWORD_WRONG
+				screen.errorMessage = &err
 			} else {
 				cmd = manager.ReplaceScreen(screen.next(screen.user.S(), vault, screen.context))
 			}

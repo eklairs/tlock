@@ -1,10 +1,10 @@
 package tokens
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"slices"
-	"time"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -19,7 +19,6 @@ import (
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	"github.com/pquerna/otp"
-	"github.com/pquerna/otp/totp"
 	"golang.org/x/term"
 )
 
@@ -206,9 +205,6 @@ func (screen EditTokenScreen) Init() tea.Cmd {
 func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
 	cmds := make([]tea.Cmd, 0)
 
-	// Get the secret item
-	secretItem := screen.form.Items[2].FormItem.(form.FormItemInputBox)
-
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -220,52 +216,25 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 				}
 			}
 
-			// Get the user secret
-			secret := secretItem.Value()
-
-			// Error if any
-			var error *string
-
-			if secret == "" {
-				error = &ERROR_EMPTY_SECRET
-			}
-
-			// Try to generate code with the secret
-			_, err := totp.GenerateCode(secret, time.Now())
-
-			if err != nil {
-				error = &ERROR_INVALID_SECRET
-			}
-
-			if error != nil {
-				// Set the error
-				secretItem.ErrorMessage = error
-
-				// Update item
-				screen.form.Items[2].FormItem = secretItem
-
-				// Break
-				break
-			}
 
 			period := utils.Or(screen.form.Items[5].FormItem.Value(), screen.token.Period)
 			digits := utils.Or(screen.form.Items[7].FormItem.Value(), screen.token.Digits)
 
 			// Dont allow period to be zero
 			if period < 1 {
-				screen.SetError(5, "Period cannot be less than 1")
+				screen.SetError(5, errors.New("Period cannot be less than 1"))
 				break
 			}
 
 			// Dont allow digits to be less than 1 and more than 10
 			if digits < 1 {
-				screen.SetError(7, "Digits cannot be less than 1")
+				screen.SetError(7, errors.New("Digits cannot be less than 1"))
 				break
 			}
 
 			// Dont allow digits to be less than 1 and more than 10
 			if digits > 10 {
-				screen.SetError(7, "Digits cannot be more than 10")
+				screen.SetError(7, errors.New("Digits cannot be more than 10"))
 				break
 			}
 
@@ -286,7 +255,10 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			}
 
 			// Replace
-			screen.vault.ReplaceToken(screen.folder.Name, screen.token, token)
+            if err := screen.vault.ReplaceToken(screen.folder.Name, screen.token, token); err != nil {
+                screen.SetError(5, err); break;
+            }
+
 			accountName := formItems[0].FormItem.Value()
 
 			statusBarMessage := fmt.Sprintf("Successfully edited token for %s", accountName)
@@ -401,7 +373,7 @@ func GenerateEditUI(form form.Form) string {
 }
 
 // Sets a custom error message for the given form item index
-func (screen EditTokenScreen) SetError(itemIndex int, error string) {
+func (screen EditTokenScreen) SetError(itemIndex int, error error) {
 	if item, ok := screen.form.Items[itemIndex].FormItem.(form.FormItemInputBox); ok {
 		// Set the error
 		item.ErrorMessage = &error

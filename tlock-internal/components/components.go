@@ -143,7 +143,7 @@ func ListViewSimple(items []list.Item, delegate list.ItemDelegate, width, height
 	return listview
 }
 
-func InputGroup(title, description string, error *string, input textinput.Model) string {
+func InputGroup(title, description string, error *error, input textinput.Model) string {
 	// Total width relative to the input's width
 	width := input.Width + 7
 

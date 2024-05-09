@@ -59,7 +59,7 @@ type EditUsernameScreen struct {
 	newUsername textinput.Model
 
 	// Username error
-	usernameError *string
+	usernameError *error
 }
 
 // Initialize
@@ -90,24 +90,19 @@ func (screen EditUsernameScreen) Update(msg tea.Msg, manager *modelmanager.Model
 			manager.PopScreen()
 
 		case key.Matches(msgType, editUsernameKeys.Change):
+            // New username
 			newUsername := screen.newUsername.Value()
 
-			if newUsername == "" {
-				screen.usernameError = &USERNAME_EMPTY
-			} else {
-				if screen.context.Core.Exists(newUsername) {
-					screen.usernameError = &USERNAME_EXISTS
-				} else {
-					// Rename
-					screen.context.Core.RenameUser(screen.user, newUsername)
+            // Rename
+            if err := screen.context.Core.RenameUser(screen.user, newUsername); err != nil {
+                screen.usernameError = &err
+            } else {
+                // Pop
+                manager.PopScreen()
 
-					// Pop
-					manager.PopScreen()
-
-					// Send updated message
-					cmds = append(cmds, func() tea.Msg { return tlockmessages.UserEditedMsg{NewName: newUsername} })
-				}
-			}
+                // Send updated message
+                cmds = append(cmds, func() tea.Msg { return tlockmessages.UserEditedMsg{NewName: newUsername} })
+            }
 		}
 	}
 

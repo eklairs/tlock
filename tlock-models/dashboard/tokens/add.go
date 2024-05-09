@@ -1,9 +1,9 @@
 package tokens
 
 import (
+	"errors"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -16,7 +16,6 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
-	"github.com/pquerna/otp/totp"
 	"golang.org/x/term"
 )
 
@@ -28,12 +27,6 @@ func toTokenType(value string) tlockvault.TokenType {
 
 	return tlockvault.TokenTypeTOTP
 }
-
-// Error for empty secret
-var ERROR_EMPTY_SECRET = "Secret is required"
-
-// Error for invalid secret
-var ERROR_INVALID_SECRET = "Secret is invalid, are you sure you have typed correctly?"
 
 // Add token key map
 type addTokenKeyMap struct {
@@ -175,9 +168,6 @@ func (screen AddTokenScreen) Init() tea.Cmd {
 func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
 	cmds := make([]tea.Cmd, 0)
 
-	// Get the secret item
-	secretItem := screen.form.Items[2].FormItem.(form.FormItemInputBox)
-
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
 		switch {
@@ -189,41 +179,25 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 				}
 			}
 
-			// Get the user secret
-			secret := secretItem.Value()
-
-			// Dont allow empty secrets
-			if secret == "" {
-				screen.SetError(2, ERROR_EMPTY_SECRET)
-				break
-			}
-
-			// Try to generate code with the secret
-			_, err := totp.GenerateCode(secret, time.Now())
-
-			if err != nil {
-				screen.SetError(2, ERROR_INVALID_SECRET)
-				break
-			}
-
+            // Find
 			period := utils.Or(screen.form.Items[5].FormItem.Value(), 30)
 			digits := utils.Or(screen.form.Items[7].FormItem.Value(), 6)
 
 			// Dont allow period to be zero
 			if period < 1 {
-				screen.SetError(5, "Period cannot be less than 1")
+				screen.SetError(5, errors.New("Period cannot be less than 1"))
 				break
 			}
 
 			// Dont allow digits to be less than 1 and more than 10
 			if digits < 1 {
-				screen.SetError(7, "Digits cannot be less than 1")
+				screen.SetError(7, errors.New("Digits cannot be less than 1"))
 				break
 			}
 
 			// Dont allow digits to be less than 1 and more than 10
 			if digits > 10 {
-				screen.SetError(7, "Digits cannot be more than 10")
+				screen.SetError(7, errors.New("Digits cannot be more than 10"))
 				break
 			}
 
@@ -244,7 +218,9 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 			}
 
 			// Add
-			screen.vault.AddTokenFromToken(screen.folder.Name, token)
+            if err := screen.vault.AddTokenFromToken(screen.folder.Name, token); err != nil {
+                screen.SetError(2, err); break;
+            }
 
 			accountName := formItems[0].FormItem.Value()
 
@@ -316,7 +292,7 @@ func (screen AddTokenScreen) View() string {
 }
 
 // Sets a custom error message for the given form item index
-func (screen AddTokenScreen) SetError(itemIndex int, error string) {
+func (screen AddTokenScreen) SetError(itemIndex int, error error) {
 	if item, ok := screen.form.Items[itemIndex].FormItem.(form.FormItemInputBox); ok {
 		// Set the error
 		item.ErrorMessage = &error
