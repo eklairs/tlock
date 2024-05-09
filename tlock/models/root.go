@@ -5,7 +5,7 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/context"
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
-	"github.com/eklairs/tlock/tlock-models/auth"
+	"github.com/eklairs/tlock/tlock/models/auth"
 )
 
 // Root model

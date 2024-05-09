@@ -16,8 +16,8 @@ import (
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-internal/utils"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 	"github.com/pquerna/otp"
 	"golang.org/x/term"
 )
@@ -216,7 +216,6 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 				}
 			}
 
-
 			period := utils.Or(screen.form.Items[5].FormItem.Value(), screen.token.Period)
 			digits := utils.Or(screen.form.Items[7].FormItem.Value(), screen.token.Digits)
 
@@ -255,9 +254,10 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			}
 
 			// Replace
-            if err := screen.vault.ReplaceToken(screen.folder.Name, screen.token, token); err != nil {
-                screen.SetError(5, err); break;
-            }
+			if err := screen.vault.ReplaceToken(screen.folder.Name, screen.token, token); err != nil {
+				screen.SetError(5, err)
+				break
+			}
 
 			accountName := formItems[0].FormItem.Value()
 

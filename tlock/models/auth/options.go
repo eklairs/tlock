@@ -10,8 +10,8 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/context"
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 )
 
 const userOptionsAscii = `

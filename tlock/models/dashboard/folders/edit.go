@@ -11,8 +11,8 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/components"
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 )
 
 var editFolderAscii = `
@@ -100,9 +100,10 @@ func (screen EditFolderScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 		case key.Matches(msgType, editFolderKeys.Enter):
 			// Update the folder
-            if err := screen.vault.RenameFolder(screen.folder.Name, screen.name.Value()); err != nil {
-                screen.errorMessage = &err; break;
-            }
+			if err := screen.vault.RenameFolder(screen.folder.Name, screen.name.Value()); err != nil {
+				screen.errorMessage = &err
+				break
+			}
 
 			// Request folders refresh
 			cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })

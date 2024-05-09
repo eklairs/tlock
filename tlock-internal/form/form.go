@@ -6,7 +6,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/utils"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 )
 
 // Form item

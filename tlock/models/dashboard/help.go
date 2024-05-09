@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 	"golang.org/x/term"
 )
 

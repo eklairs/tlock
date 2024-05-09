@@ -6,8 +6,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/eklairs/tlock/tlock-internal/context"
-	tlockmodels "github.com/eklairs/tlock/tlock-models"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
+	tlockmodels "github.com/eklairs/tlock/tlock/models"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 )
 
 // TLock go brrr

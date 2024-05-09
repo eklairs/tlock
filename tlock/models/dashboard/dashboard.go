@@ -6,10 +6,10 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/eklairs/tlock/tlock-models/dashboard/folders"
-	"github.com/eklairs/tlock/tlock-models/dashboard/tokens"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
+	"github.com/eklairs/tlock/tlock/models/dashboard/folders"
+	"github.com/eklairs/tlock/tlock/models/dashboard/tokens"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 	"golang.org/x/term"
 
 	"github.com/charmbracelet/bubbles/key"

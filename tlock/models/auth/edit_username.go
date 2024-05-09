@@ -9,7 +9,7 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/context"
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 )
 
 var editUsernameAscii = `
@@ -90,19 +90,19 @@ func (screen EditUsernameScreen) Update(msg tea.Msg, manager *modelmanager.Model
 			manager.PopScreen()
 
 		case key.Matches(msgType, editUsernameKeys.Change):
-            // New username
+			// New username
 			newUsername := screen.newUsername.Value()
 
-            // Rename
-            if err := screen.context.Core.RenameUser(screen.user, newUsername); err != nil {
-                screen.usernameError = &err
-            } else {
-                // Pop
-                manager.PopScreen()
+			// Rename
+			if err := screen.context.Core.RenameUser(screen.user, newUsername); err != nil {
+				screen.usernameError = &err
+			} else {
+				// Pop
+				manager.PopScreen()
 
-                // Send updated message
-                cmds = append(cmds, func() tea.Msg { return tlockmessages.UserEditedMsg{NewName: newUsername} })
-            }
+				// Send updated message
+				cmds = append(cmds, func() tea.Msg { return tlockmessages.UserEditedMsg{NewName: newUsername} })
+			}
 		}
 	}
 

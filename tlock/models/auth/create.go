@@ -11,8 +11,8 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/constants"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
-	"github.com/eklairs/tlock/tlock-models/dashboard"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
+	"github.com/eklairs/tlock/tlock/models/dashboard"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 )
 
 // Create user ascii art

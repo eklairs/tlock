@@ -8,7 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 )
 
 // === List item active ==

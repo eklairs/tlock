@@ -13,7 +13,7 @@ import (
 	tlockcontext "github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-internal/utils"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 	"github.com/muesli/termenv"
 )
 

@@ -9,8 +9,8 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/constants"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 )
 
 // Change password ascii art

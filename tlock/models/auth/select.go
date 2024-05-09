@@ -13,9 +13,9 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-internal/utils"
-	"github.com/eklairs/tlock/tlock-models/dashboard"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
+	"github.com/eklairs/tlock/tlock/models/dashboard"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 )
 
 var selectUserAscii = `
@@ -159,7 +159,7 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 		case key.Matches(msgType, selectUserKeys.Options):
 			if focused, ok := screen.listview.SelectedItem().(selectUserListItem); ok {
-                focused := tlockcore.User(focused)
+				focused := tlockcore.User(focused)
 				vault, err := tlockvault.Load(focused.Vault(), "")
 
 				// If the vault is protected by default password, lets just directly move to the user options screen
@@ -176,19 +176,19 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 		case key.Matches(msgType, selectUserKeys.Enter):
 			if focused, ok := screen.listview.SelectedItem().(selectUserListItem); ok {
-                focused := tlockcore.User(focused)
+				focused := tlockcore.User(focused)
 
-                // Try to decrypt user with empty password
-                vault, err := tlockvault.Load(focused.Vault(), "")
+				// Try to decrypt user with empty password
+				vault, err := tlockvault.Load(focused.Vault(), "")
 
-                if err != nil {
-                    // It is encrypted with a password, require password
-                    cmds = append(cmds, manager.PushScreen(InitializeEnterPassScreen(screen.context, focused, dashboard.InitializeDashboardScreen)))
-                } else {
-                    // YAY!
-                    cmds = append(cmds, manager.PushScreen(dashboard.InitializeDashboardScreen(focused.S(), vault, screen.context)))
-                }
-            }
+				if err != nil {
+					// It is encrypted with a password, require password
+					cmds = append(cmds, manager.PushScreen(InitializeEnterPassScreen(screen.context, focused, dashboard.InitializeDashboardScreen)))
+				} else {
+					// YAY!
+					cmds = append(cmds, manager.PushScreen(dashboard.InitializeDashboardScreen(focused.S(), vault, screen.context)))
+				}
+			}
 		}
 	}
 

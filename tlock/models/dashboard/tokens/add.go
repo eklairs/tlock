@@ -14,8 +14,8 @@ import (
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	"github.com/eklairs/tlock/tlock-internal/utils"
-	tlockstyles "github.com/eklairs/tlock/tlock-styles"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
+	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 	"golang.org/x/term"
 )
 
@@ -179,7 +179,7 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 				}
 			}
 
-            // Find
+			// Find
 			period := utils.Or(screen.form.Items[5].FormItem.Value(), 30)
 			digits := utils.Or(screen.form.Items[7].FormItem.Value(), 6)
 
@@ -218,9 +218,10 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 			}
 
 			// Add
-            if err := screen.vault.AddTokenFromToken(screen.folder.Name, token); err != nil {
-                screen.SetError(2, err); break;
-            }
+			if err := screen.vault.AddTokenFromToken(screen.folder.Name, token); err != nil {
+				screen.SetError(2, err)
+				break
+			}
 
 			accountName := formItems[0].FormItem.Value()
 
