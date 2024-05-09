@@ -7,7 +7,6 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/kelindar/binary"
-	"github.com/rs/zerolog/log"
 )
 
 // Default theme
@@ -40,18 +39,11 @@ func GetTLockConfig() TLockConfig {
 
 	// If error, just return the default config
 	if err != nil {
-		// Log
-		log.Debug().Msg("[config] No config file found, returning the default config")
-
 		return default_config
 	}
 
 	// Parse
 	if err := binary.Unmarshal(config_raw, &default_config); err != nil {
-		// Log
-		log.Error().Err(err).Msg("[config] Failed to parse config, syntax error possibly?")
-
-		// Return default config
 		return default_config
 	}
 
@@ -73,8 +65,5 @@ func (config TLockConfig) Write() {
 	// If no error, write to file
 	if err == nil {
 		file.Write(data)
-	} else {
-		// Log
-		log.Error().Err(err).Msg("[config] Failed to write to config")
 	}
 }

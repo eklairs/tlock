@@ -10,13 +10,11 @@ require (
 	github.com/charmbracelet/bubbles v0.18.0
 	github.com/charmbracelet/bubbletea v0.25.0
 	github.com/charmbracelet/lipgloss v0.10.0
-	github.com/google/uuid v1.6.0
 	github.com/kbinani/screenshot v0.0.0-20230812210009-b87d31814237
 	github.com/kelindar/binary v1.0.19
 	github.com/makiuchi-d/gozxing v0.1.1
 	github.com/muesli/termenv v0.15.2
 	github.com/pquerna/otp v1.4.0
-	github.com/rs/zerolog v1.32.0
 	golang.org/x/crypto v0.17.0
 	golang.org/x/term v0.19.0
 	gopkg.in/yaml.v3 v3.0.0-20220521103104-8f96da9f5d5e
@@ -30,7 +28,6 @@ require (
 	github.com/jezek/xgb v1.1.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lxn/win v0.0.0-20210218163916-a377121e959e // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
