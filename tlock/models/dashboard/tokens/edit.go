@@ -180,7 +180,7 @@ func InitializeEditTokenScreen(folder tlockvault.Folder, token tlockvault.Token,
 	// Get term size
 	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
-	content := GenerateUI(form)
+	content := GenerateEditUI(form)
 
 	// Initialize viewport
 	viewport := utils.DisableViewportKeys(viewport.New(85, min(height, lipgloss.Height(content))))
@@ -297,7 +297,7 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 	screen.viewport, _ = screen.viewport.Update(msg)
 
 	// Generate UI
-	screen.content = GenerateUI(screen.form)
+	screen.content = GenerateEditUI(screen.form)
 
 	// Set viewport content
 	screen.viewport.Height = min(lipgloss.Height(screen.content), height)
