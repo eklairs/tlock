@@ -1,178 +1,31 @@
 package form
 
 import (
-	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/eklairs/tlock/tlock-internal/components"
-	"github.com/eklairs/tlock/tlock-internal/utils"
-	tlockstyles "github.com/eklairs/tlock/tlock/styles"
 )
 
-// Form item
-type FormItem interface {
-	// Handle messages
-	Update(msg tea.Msg) (FormItem, tea.Cmd)
-
-	// View
-	View() string
-
-	// Focus
-	Focus() FormItem
-
-	// Unfocus
-	Unfocus() FormItem
-
-	// Returns the value
-	Value() string
+// Message that represents that the form is submitted and the items pass the validators
+type FormSubmittedMsg struct {
+    Data map[string]string
 }
 
-// ==== Form Item Input Box Start ====
+// Validator
+type Validator func(value string) error
 
-// Form item for input boxes
-type FormItemInputBox struct {
-	// Title
-	Title string
-
-	// Description
-	Description string
-
-	// Input box
-	Input textinput.Model
-
-	// Error message
-	ErrorMessage *error
-}
-
-// Update
-func (item FormItemInputBox) Update(msg tea.Msg) (FormItem, tea.Cmd) {
-	var cmd tea.Cmd
-
-	item.Input, cmd = item.Input.Update(msg)
-
-	return item, cmd
-}
-
-// Focus
-func (item FormItemInputBox) Focus() FormItem {
-	item.Input.Focus()
-
-	return item
-}
-
-// Unfocus
-func (item FormItemInputBox) Unfocus() FormItem {
-	item.Input.Blur()
-
-	return item
-}
-
-// View
-func (item FormItemInputBox) View() string {
-	return components.InputGroup(item.Title, item.Description, item.ErrorMessage, item.Input)
-}
-
-// Value
-func (item FormItemInputBox) Value() string {
-	return item.Input.Value()
-}
-
-// ==== Form Item Input Box End ====
-
-// ==== Form Item Option Box Start ====
-
-// Form item for option box
-type FormItemOptionBox struct {
-	// Title
-	Title string
-
-	// Description
-	Description string
-
-	// Input box
-	Values []string
-
-	// Selected value
-	SelectedIndex int
-
-	// Error message
-	Focused bool
-}
-
-func (item FormItemOptionBox) Value() string {
-	return item.Values[item.SelectedIndex]
-}
-
-// Update
-func (item FormItemOptionBox) Update(msg tea.Msg) (FormItem, tea.Cmd) {
-	switch msgType := msg.(type) {
-	case tea.KeyMsg:
-		switch msgType.String() {
-		case "right":
-			if item.SelectedIndex != len(item.Values)-1 {
-				item.SelectedIndex += 1
-			}
-
-		case "left":
-			if item.SelectedIndex != 0 {
-				item.SelectedIndex -= 1
-			}
-		}
-	}
-
-	return item, nil
-}
-
-// Focus
-func (item FormItemOptionBox) Focus() FormItem {
-	item.Focused = true
-
-	return item
-}
-
-// Unfocus
-func (item FormItemOptionBox) Unfocus() FormItem {
-	item.Focused = false
-
-	return item
-}
-
-// View
-func (item FormItemOptionBox) View() string {
-	renderables := make([]string, len(item.Values))
-
-	for index, option := range item.Values {
-		if index == item.SelectedIndex {
-			if item.Focused {
-				renderables[index] = tlockstyles.Styles.AccentBgItem.Render(option)
-			} else {
-				renderables[index] = tlockstyles.Styles.SubAltBg.Render(option)
-			}
-		} else {
-			renderables[index] = tlockstyles.Styles.SubTextItem.Render(option)
-		}
-
-		renderables[index] += " "
-	}
-
-	ui := lipgloss.JoinVertical(
-		lipgloss.Left,
-		tlockstyles.Styles.Title.Render(item.Title),
-		tlockstyles.Styles.SubText.Render(item.Description), "",
-		lipgloss.JoinHorizontal(lipgloss.Left, renderables...),
-	)
-
-	return lipgloss.NewStyle().Width(31).Render(ui)
-}
-
-// ==== Form Item Option Box End ====
-
+// Form item wrapped
 type FormItemWrapped struct {
+    // ID
+    ID string
+
 	// Form item
 	FormItem FormItem
 
 	// Is it enabled
 	Enabled bool
+
+    // Validators
+    Validators []Validator
 }
 
 type Form struct {
@@ -185,36 +38,28 @@ type Form struct {
 
 // Initializes a new form item
 func New(items []FormItem) Form {
-	// Map
-	wrapped := utils.Map(items, func(item FormItem) FormItemWrapped { return FormItemWrapped{FormItem: item, Enabled: true} })
-
-	// Return instance
-	form := Form{
-		Items: wrapped,
-	}
-
-	// Focus first item
-	form.Items[0].FormItem = form.Items[0].FormItem.Focus()
-
-	// Return
-	return form
+	return Form{}
 }
 
 // Switches focus from one index to another
 func (form *Form) switchFocus(old, new int) {
-	form.Items[old].FormItem = form.Items[old].FormItem.Unfocus()
-	form.Items[new].FormItem = form.Items[new].FormItem.Focus()
+    // Do focus changing
+	form.Items[old].FormItem.Unfocus()
+	form.Items[new].FormItem.Focus()
 
+    // Set new index
 	form.FocusedIndex = new
 }
 
 // Updates
-func (form *Form) Update(msg tea.Msg) {
+func (form *Form) Update(msg tea.Msg) tea.Cmd {
+    cmds := make([]tea.Cmd, 0)
+
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
-		switch msgType.String() {
+		match_key: switch msgType.String() {
 		case "tab":
-			if form.FocusedIndex != len(form.Items)-1 {
+			if form.FocusedIndex != len(form.Items)-1 && form.FocusedItem().ShouldGoNext() {
 				next := form.FocusedIndex + 1
 
 				// If the next is disabled, then switch to its next
@@ -226,7 +71,7 @@ func (form *Form) Update(msg tea.Msg) {
 				form.switchFocus(form.FocusedIndex, next)
 			}
 		case "shift+tab":
-			if form.FocusedIndex != 0 {
+			if form.FocusedIndex != 0 && form.FocusedItem().ShouldGoPrev() {
 				next := form.FocusedIndex - 1
 
 				// If the next is disabled, then switch to its next
@@ -237,8 +82,53 @@ func (form *Form) Update(msg tea.Msg) {
 				// Change focus
 				form.switchFocus(form.FocusedIndex, next)
 			}
-		default:
-			form.Items[form.FocusedIndex].FormItem, _ = form.Items[form.FocusedIndex].FormItem.Update(msg)
+        case "enter":
+            data := make(map[string]string)
+
+            // Validate them all!
+            for _, item := range form.Items {
+                // Run validators
+                for _, validator := range item.Validators {
+                    if err := validator(item.FormItem.Value()); err != nil {
+                        // Set erro
+                        item.FormItem.SetError(&err)
+
+                        // There is issue with the form, break from the switch
+                        break match_key
+                    }
+                }
+
+                // Set the item
+                data[item.ID] = item.FormItem.Value()
+            }
+
+            // Return
+            cmds = append(cmds, func() tea.Msg { return FormSubmittedMsg{ Data: data } })
 		}
 	}
+
+    // Let the current form item handle 
+    cmds = append(cmds, form.Items[form.FocusedIndex].FormItem.Update(msg))
+
+    // Return
+    return tea.Batch(cmds...)
+}
+
+// Returns the focused form item
+func (form *Form) FocusedItem() FormItem {
+    return form.Items[form.FocusedIndex].FormItem
+}
+
+// Renders the form
+func (form Form) View() string {
+    // Items
+    items := make([]string, len(form.Items))
+
+    // Render them all
+    for index, item := range form.Items {
+        items[index] = item.FormItem.View()
+    }
+
+    // Render
+    return lipgloss.JoinVertical(lipgloss.Center, items...)
 }
