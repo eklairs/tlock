@@ -379,7 +379,7 @@ func (tokens *Tokens) Update(msg tea.Msg, manager *modelmanager.ModelManager) te
 
 		case key.Matches(msgType, tokens.context.Config.Tokens.AddScreen.Binding):
 			if tokens.folder != nil {
-				manager.PushScreen(InitializeTokenFromScreen(tokens.vault, *tokens.folder))
+				cmds = append(cmds, manager.PushScreen(InitializeTokenFromScreen(tokens.vault, *tokens.folder)))
 			}
 		}
 

@@ -2,8 +2,10 @@ package tokens
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/components"
@@ -17,12 +19,35 @@ import (
 	"github.com/pquerna/otp"
 )
 
+var MeterV2 = spinner.Spinner{
+    Frames: []string{
+        "▱▱▱▱",
+        "▰▱▱▱",
+        "▰▰▱▱",
+        "▰▰▰▱",
+        "▰▰▰▰",
+        "▱▰▰▰",
+        "▱▱▰▰",
+        "▱▱▱▰",
+    },
+    FPS: time.Second / 8, //nolint:gomnd
+}
+
+// Channel to send the token read from the screen
+var dataFromScreenChan = make(chan *string)
+
+// Message stating that a data has been recved
+type dataRecievedMsg struct {
+    data *string
+}
+
 var fromScreenAsciiArt = `
 █▀ █▀▀ █▀█ █▀▀ █▀▀ █▄ █
 ▄█ █▄▄ █▀▄ ██▄ ██▄ █ ▀█`
 
 const (
 	stateTake = iota
+    stateGathering
 	stateConfirm
 )
 
@@ -43,6 +68,14 @@ func (k fromScreenKeyMap) FullHelp() [][]key.Binding {
 		{k.GoBack},
 		{k.Start},
 	}
+}
+
+func pollDataFetched() tea.Cmd {
+    return func() tea.Msg {
+        return dataRecievedMsg{
+            data: <-dataFromScreenChan,
+        }
+    }
 }
 
 // Keys
@@ -97,6 +130,9 @@ type TokenFromScreen struct {
 	// Vault
 	vault *tlockvault.Vault
 
+    // Spinner
+    spinner  spinner.Model
+
 	// Token read from string
 	token *string
 
@@ -109,16 +145,23 @@ type TokenFromScreen struct {
 
 // Initializes a new instance of fromScreen from screen
 func InitializeTokenFromScreen(vault *tlockvault.Vault, folder tlockvault.Folder) TokenFromScreen {
+    // Initialize spinner
+    s := spinner.New()
+    s.Spinner = MeterV2
+    s.Style = tlockstyles.Styles.Title
+
+    // Return
 	return TokenFromScreen{
 		state:  stateTake,
 		vault:  vault,
+        spinner: s,
 		folder: folder,
 	}
 }
 
 // Init
 func (screen TokenFromScreen) Init() tea.Cmd {
-	return nil
+    return pollDataFetched()
 }
 
 // Update
@@ -132,23 +175,35 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			manager.PopScreen()
 
 		case key.Matches(msgType, fromScreenKeys.Start) && screen.state == stateTake:
-			if image, err := screenshot.CaptureRect(screenshot.GetDisplayBounds(0)); err == nil {
-				if bmp, err := gozxing.NewBinaryBitmapFromImage(image); err == nil {
-					qrReader := qrcode.NewQRCodeReader()
+            screen.state = stateGathering
 
-					if result, err := qrReader.Decode(bmp, nil); err == nil {
-						uri := result.String()
+            // Start spinner
+            cmds = append(cmds, screen.spinner.Tick)
 
-						screen.token = &uri
-					}
-				}
-			}
+            go func() {
+                if image, err := screenshot.CaptureRect(screenshot.GetDisplayBounds(0)); err == nil {
+                    if bmp, err := gozxing.NewBinaryBitmapFromImage(image); err == nil {
+                        qrReader := qrcode.NewQRCodeReader()
 
-			screen.state = stateConfirm
+                        if result, err := qrReader.Decode(bmp, nil); err == nil {
+                            uri := result.String()
 
-		case key.Matches(msgType, confirmScreenKeys.Retake):
+                            dataFromScreenChan <- &uri;
+                            return
+                        }
+                    }
+                }
+
+                dataFromScreenChan <- nil
+            }()
+
+        case key.Matches(msgType, confirmScreenKeys.Retake):
 			if screen.state == stateConfirm {
+                // Set state
 				screen.state = stateTake
+
+                // Restart poll
+                cmds = append(cmds, pollDataFetched())
 			}
 
 		case key.Matches(msgType, confirmScreenKeys.Continue) && screen.state == stateConfirm:
@@ -168,7 +223,17 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 
 			manager.PopScreen()
 		}
+
+    case dataRecievedMsg:
+        screen.token = msgType.data
+        screen.state = stateConfirm
 	}
+
+    if screen.state == stateGathering {
+        var cmd tea.Cmd
+        screen.spinner, cmd = screen.spinner.Update(msg)
+        cmds = append(cmds, cmd)
+    }
 
 	return screen, tea.Batch(cmds...)
 }
@@ -188,6 +253,9 @@ func (screen TokenFromScreen) View() string {
 			), "",
 			tlockstyles.Help.View(fromScreenKeys),
 		)
+
+    case stateGathering:
+        return screen.spinner.View()
 
 	case stateConfirm:
 		items := []string{
