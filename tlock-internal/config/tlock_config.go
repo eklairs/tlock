@@ -2,19 +2,14 @@ package config
 
 import (
 	"os"
-	"path"
 
-	"github.com/adrg/xdg"
+	"github.com/eklairs/tlock/tlock-internal/paths"
 	"github.com/eklairs/tlock/tlock-internal/utils"
 	"github.com/kelindar/binary"
 )
 
 // Default theme
 var DEFAULT_THEME = "Catppuccin"
-
-// Path to the config file
-var CONFIG_DIR = path.Join(xdg.ConfigHome, "tlock")
-var CONFIG_PATH = path.Join(xdg.ConfigHome, "tlock", "conf.bin")
 
 // TLock config is the config which is overriden by tlock itself
 type TLockConfig struct {
@@ -35,7 +30,7 @@ func GetTLockConfig() TLockConfig {
 	default_config := DefaultTLockConfig()
 
 	// Read raw
-    if config_raw, err := os.ReadFile(CONFIG_PATH); err == nil {
+    if config_raw, err := os.ReadFile(paths.TLOCK_CONFIG); err == nil {
         binary.Unmarshal(config_raw, &default_config)
     }
 
@@ -49,7 +44,7 @@ func (config TLockConfig) Write() {
 	data, _ := binary.Marshal(config)
 
     // Create file
-    if file, err := utils.EnsureExists(CONFIG_PATH); err == nil {
+    if file, err := utils.EnsureExists(paths.TLOCK_CONFIG); err == nil {
         file.Write(data)
     }
 }

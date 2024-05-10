@@ -2,19 +2,14 @@ package config
 
 import (
 	"os"
-	"path"
 
 	_ "embed"
 
 	bubblekey "github.com/charmbracelet/bubbles/key"
+	"github.com/eklairs/tlock/tlock-internal/paths"
 	"github.com/eklairs/tlock/tlock-internal/utils"
 	"gopkg.in/yaml.v3"
 )
-
-// Returns the path to use for the user
-func pathFor(user string) string {
-	return path.Join(CONFIG_DIR, user, "config.yaml")
-}
 
 // Default config
 //
@@ -165,7 +160,7 @@ func LoadUserConfig(user string) UserConfiguration {
 	default_config := DefaultUserConfiguration()
 
 	// Parse the file if it is read
-	if raw, err := os.ReadFile(pathFor(user)); err == nil {
+	if raw, err := os.ReadFile(paths.UserConfigFor(user)); err == nil {
 		yaml.Unmarshal(raw, &default_config)
     } else {
         WriteDefault(user)
@@ -178,7 +173,7 @@ func LoadUserConfig(user string) UserConfiguration {
 // Writes the default keybindings configuration
 func WriteDefault(user string) {
 	// Open file
-	if file, err := utils.EnsureExists(pathFor(user)); err == nil {
+	if file, err := utils.EnsureExists(paths.UserConfigFor(user)); err == nil {
 		file.Write(DEFAULT_CONFIG_RAW)
 	}
 }
