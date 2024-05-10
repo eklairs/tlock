@@ -53,7 +53,7 @@ type Context struct {
 	TLockConfig config.TLockConfig
 
 	// Core
-	Core tlockcore.TLockCore
+	Core *tlockcore.TLockCore
 
 	// User configuration
 	Config config.UserConfiguration
@@ -80,7 +80,7 @@ func InitializeContext() Context {
 	return Context{
 		Themes:      themes,
 		Icons:       icons.Icons,
-		Core:        *core,
+		Core:        core,
 		Config:      config.DefaultUserConfiguration(),
 		TLockConfig: config.GetTLockConfig(),
 	}
