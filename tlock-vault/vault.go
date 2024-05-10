@@ -35,3 +35,9 @@ func (vault *Vault) ChangePassword(password string) {
 	// Rewrite
 	vault.write()
 }
+
+// Stuff to run after the vault is initialized
+func (vault *Vault) PostInit() {
+	// Start worker
+	go vault.startFileWriterWorker(vault.dataChan)
+}

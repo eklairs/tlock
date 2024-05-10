@@ -21,19 +21,15 @@ func Initialize(at, password string) (*Vault, error) {
 		return nil, err
 	}
 
-	// Initialize sender
-	// Lets keep the size to 1 because we only want top data
-	sender := make(chan []Folder, 1)
-
 	// Initialize vault
 	vault := Vault{
 		path:     at,
 		password: password,
-		dataChan: sender,
+		dataChan: make(chan []Folder, 1),
 	}
 
-	// Start worker
-	go vault.startFileWriterWorker(sender)
+    // Run post init hook
+    vault.PostInit()
 
 	// Write empty data
 	vault.write()
@@ -70,20 +66,16 @@ func Load(path, password string) (*Vault, error) {
 		return nil, ERR_PASSWORD_INVALID
 	}
 
-	// Sender channel
-	// Lets keep the size to 1 because we only want top data
-	sender := make(chan []Folder, 1)
-
 	// Create vault instance and return
 	vault := &Vault{
 		path:     path,
 		Folders:  data,
 		password: password,
-		dataChan: sender,
+		dataChan: make(chan []Folder, 1),
 	}
 
-	// Start worker
-	go vault.startFileWriterWorker(sender)
+    // Run post init hook
+    vault.PostInit()
 
 	// Return
 	return vault, nil
