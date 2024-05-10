@@ -3,9 +3,9 @@ package config
 import (
 	"os"
 	"path"
-	"path/filepath"
 
 	"github.com/adrg/xdg"
+	"github.com/eklairs/tlock/tlock-internal/utils"
 	"github.com/kelindar/binary"
 )
 
@@ -35,17 +35,9 @@ func GetTLockConfig() TLockConfig {
 	default_config := DefaultTLockConfig()
 
 	// Read raw
-	config_raw, err := os.ReadFile(CONFIG_PATH)
-
-	// If error, just return the default config
-	if err != nil {
-		return default_config
-	}
-
-	// Parse
-	if err := binary.Unmarshal(config_raw, &default_config); err != nil {
-		return default_config
-	}
+    if config_raw, err := os.ReadFile(CONFIG_PATH); err == nil {
+        binary.Unmarshal(config_raw, &default_config)
+    }
 
 	// Return
 	return default_config
@@ -53,17 +45,11 @@ func GetTLockConfig() TLockConfig {
 
 // Writes the config
 func (config TLockConfig) Write() {
-	// Make directory
-	os.MkdirAll(filepath.Dir(CONFIG_PATH), os.ModePerm)
-
-	// Marshal
+    // Marshal
 	data, _ := binary.Marshal(config)
 
-	// Write
-	file, err := os.Create(CONFIG_PATH)
-
-	// If no error, write to file
-	if err == nil {
-		file.Write(data)
-	}
+    // Create file
+    if file, err := utils.EnsureExists(CONFIG_PATH); err == nil {
+        file.Write(data)
+    }
 }
