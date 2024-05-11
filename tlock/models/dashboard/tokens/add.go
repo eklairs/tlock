@@ -1,22 +1,12 @@
 package tokens
 
 import (
-	"errors"
-	"fmt"
-	"os"
-
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/form"
-	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
-	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
-	tlockstyles "github.com/eklairs/tlock/tlock/styles"
-	"golang.org/x/term"
 )
 
 // Converts the given string type tok token type
@@ -66,9 +56,13 @@ var addTokenKeys = addTokenKeyMap{
 	),
 }
 
+// Add token ascii
 var addTokenAscii = `
 ▄▀█ █▀▄ █▀▄
 █▀█ █▄▀ █▄▀`
+
+// Add token description
+var addTokenDesc = "Create a new token [only secret is required; rest are optional]"
 
 // Add token screen
 type AddTokenScreen struct {
@@ -90,73 +84,16 @@ type AddTokenScreen struct {
 
 // Initializes a new screen of AddTokenScreen
 func InitializeAddTokenScreen(folder tlockvault.Folder, vault *tlockvault.Vault) AddTokenScreen {
-	items := []form.FormItem{
-		form.FormItemInputBox{
-			Title:       "Account Name",
-			Description: "Name of the account, like John Doe",
-			Input:       components.InitializeInputBox("Account name goes here..."),
-		},
-		form.FormItemInputBox{
-			Title:       "Issuer Name",
-			Description: "Name of the issuer, like GitHub",
-			Input:       components.InitializeInputBox("Issuer name goes here..."),
-		},
-		form.FormItemInputBox{
-			Title:       "Secret",
-			Description: "The secret provided by the issuer",
-			Input:       components.InitializeInputBox("The secret goes here..."),
-		},
-		form.FormItemOptionBox{
-			Title:         "Type",
-			Description:   "Time or counter based token",
-			Values:        []string{"TOTP", "HOTP"},
-			SelectedIndex: 0,
-		},
-		form.FormItemOptionBox{
-			Title:         "Hash function",
-			Description:   "Hash function for the token",
-			Values:        []string{"SHA1", "SHA256", "SHA512", "MD5"},
-			SelectedIndex: 0,
-		},
-		form.FormItemInputBox{
-			Title:       "Period",
-			Description: "Time to refresh the token",
-			Input:       utils.ValidatorIntegerNo0(components.InitializeInputBoxCustomWidth("Time in seconds...", 24)),
-		},
-		form.FormItemInputBox{
-			Title:       "Initial counter",
-			Description: "Initial counter for HOTP token",
-			Input:       utils.ValidatorInteger(components.InitializeInputBoxCustomWidth("Initial counter...", 24)),
-		},
-		form.FormItemInputBox{
-			Title:       "Digits",
-			Description: "Number of digits",
-			Input:       utils.ValidatorIntegerNo0(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24)),
-		},
-	}
-
-	// Disable the HOTP initially
-	form := form.New(items)
-	form.Items[6].Enabled = false
-
-	// Get term size
-	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
-
-	// Initialize viewport
-	content := GenerateUI(form)
-
-	// Initialize viewport and disable conflicting keys
-	viewport := utils.DisableViewportKeys(viewport.New(85, min(height, lipgloss.Height(content))))
-	viewport.SetContent(content)
+    // Initialize form
+    form := BuildForm()
 
 	// Return
 	return AddTokenScreen{
-		form:     form,
-		vault:    vault,
-		folder:   folder,
-		content:  content,
-		viewport: viewport,
-	}
+        form: form,
+        vault: vault,
+        folder: folder,
+        viewport: IntoViewport(addTokenAscii, addTokenDesc, form),
+    }
 }
 
 // Init
@@ -166,124 +103,17 @@ func (screen AddTokenScreen) Init() tea.Cmd {
 
 // Update
 func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
-	cmds := make([]tea.Cmd, 0)
+    // Commands
+    cmds := make([]tea.Cmd, 0)
 
-	switch msgType := msg.(type) {
-	case tea.KeyMsg:
-		switch {
-		case key.Matches(msgType, addTokenKeys.Enter):
-			for index, item := range screen.form.Items {
-				if input, ok := item.FormItem.(form.FormItemInputBox); ok {
-					input.ErrorMessage = nil
-					screen.form.Items[index].FormItem = input
-				}
-			}
+    // Let the form handle its update
+    screen.form.Update(msg)
 
-			// Find
-			period := utils.Or(screen.form.Items[5].FormItem.Value(), 30)
-			digits := utils.Or(screen.form.Items[7].FormItem.Value(), 6)
+    // Update the viewport
+    DisableBasedOnType(&screen.form)
+    UpdateViewport(addTokenAscii, addTokenDesc, &screen.viewport, screen.form)
 
-			// Dont allow period to be zero
-			if period < 1 {
-				screen.SetError(5, errors.New("Period cannot be less than 1"))
-				break
-			}
-
-			// Dont allow digits to be less than 1 and more than 10
-			if digits < 1 {
-				screen.SetError(7, errors.New("Digits cannot be less than 1"))
-				break
-			}
-
-			// Dont allow digits to be less than 1 and more than 10
-			if digits > 10 {
-				screen.SetError(7, errors.New("Digits cannot be more than 10"))
-				break
-			}
-
-			// Instance of form
-			formItems := screen.form.Items
-
-			// Okay its time to add!
-			token := tlockvault.Token{
-				Account:          formItems[0].FormItem.Value(),
-				Issuer:           formItems[1].FormItem.Value(),
-				Secret:           formItems[2].FormItem.Value(),
-				Type:             toTokenType(formItems[3].FormItem.Value()),
-				HashingAlgorithm: utils.ToHashFunction(formItems[4].FormItem.Value()),
-				Period:           utils.Or(formItems[5].FormItem.Value(), 30),
-				InitialCounter:   utils.Or(formItems[6].FormItem.Value(), 0),
-				Digits:           utils.Or(formItems[7].FormItem.Value(), 6),
-				UsageCounter:     0,
-			}
-
-			// Add
-			if err := screen.vault.AddTokenFromToken(screen.folder.Name, token); err != nil {
-				screen.SetError(2, err)
-				break
-			}
-
-			accountName := formItems[0].FormItem.Value()
-
-			statusBarMessage := fmt.Sprintf("Successfully added token for %s", accountName)
-
-			if accountName == "" {
-				accountName = "<no account name>"
-				statusBarMessage = fmt.Sprintf("Successfully added token (no account name)")
-			}
-
-			// Require refresh of folders and tokens list
-			cmds = append(
-				cmds,
-				func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
-				func() tea.Msg { return tlockmessages.RefreshTokensMsg{} },
-				func() tea.Msg { return components.StatusBarMsg{Message: statusBarMessage} },
-			)
-
-			// Pop
-			manager.PopScreen()
-
-		case key.Matches(msgType, editTokenKeys.GoBack):
-			manager.PopScreen()
-		}
-
-	case tea.WindowSizeMsg:
-		screen.viewport.Height = min(msgType.Height, lipgloss.Height(screen.content))
-	}
-
-	// Update viewport
-	screen.viewport, _ = screen.viewport.Update(msg)
-
-	// Update the form
-	screen.form.Update(msg)
-
-	// Generate UI
-	screen.content = GenerateUI(screen.form)
-
-	// Set viewport content
-	screen.viewport.SetContent(screen.content)
-
-	// Enable / Disable items based on the choosen type
-	if screen.form.Items[3].FormItem.Value() == "TOTP" {
-		// Enable period item
-		screen.form.Items[5].Enabled = true
-
-		// Disable initial counter item
-		screen.form.Items[6].Enabled = false
-	}
-
-	if screen.form.Items[3].FormItem.Value() == "HOTP" {
-		// Enable initial counter item
-		screen.form.Items[6].Enabled = true
-
-		// Disable period item
-		screen.form.Items[5].Enabled = false
-	}
-
-	// Update the height of the viewport
-	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
-	screen.viewport.Height = min(height, lipgloss.Height(screen.content))
-
+    // Return
 	return screen, tea.Batch(cmds...)
 }
 
@@ -292,51 +122,3 @@ func (screen AddTokenScreen) View() string {
 	return screen.viewport.View()
 }
 
-// Sets a custom error message for the given form item index
-func (screen AddTokenScreen) SetError(itemIndex int, error error) {
-	if item, ok := screen.form.Items[itemIndex].FormItem.(form.FormItemInputBox); ok {
-		// Set the error
-		item.ErrorMessage = &error
-
-		// Update item
-		screen.form.Items[itemIndex].FormItem = item
-	}
-}
-
-// Generates the UI
-func GenerateUI(form form.Form) string {
-	// Items
-	items := []string{
-		tlockstyles.Styles.Title.Render(addTokenAscii), "",
-		tlockstyles.Styles.SubText.Render("Add a new token [secret is required, rest are optional]"), "",
-		form.Items[0].FormItem.View(), // Account name input
-		form.Items[1].FormItem.View(), // Issuer name input
-		form.Items[2].FormItem.View(), // Secret value input
-		lipgloss.JoinHorizontal(
-			lipgloss.Left,
-			form.Items[3].FormItem.View(), "   ",
-			form.Items[4].FormItem.View(),
-		), "",
-	}
-
-	// Render the input boxes based on choosen type
-	inputGroup := lipgloss.JoinHorizontal(
-		lipgloss.Left,
-		form.Items[5].FormItem.View(), "   ",
-		form.Items[7].FormItem.View(),
-	)
-
-	if form.Items[3].FormItem.Value() == "HOTP" {
-		inputGroup = lipgloss.JoinHorizontal(
-			lipgloss.Left,
-			form.Items[6].FormItem.View(), "   ",
-			form.Items[7].FormItem.View(),
-		)
-	}
-
-	// Add the help menu
-	items = append(items, inputGroup, "", tlockstyles.Help.View(addTokenKeys))
-
-	// Return!
-	return lipgloss.JoinVertical(lipgloss.Center, items...)
-}
