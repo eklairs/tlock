@@ -2,6 +2,7 @@ package tokens
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -34,11 +35,19 @@ var MeterV2 = spinner.Spinner{
 }
 
 // Channel to send the token read from the screen
-var dataFromScreenChan = make(chan *string)
+var dataFromScreenChan = make(chan *dataFromScreen)
+
+type dataFromScreen struct {
+    // The otp
+    Uri *string
+
+    // Any error from validators
+    Err error
+}
 
 // Message stating that a data has been recved
 type dataRecievedMsg struct {
-    data *string
+    data *dataFromScreen
 }
 
 var fromScreenAsciiArt = `
@@ -134,7 +143,7 @@ type TokenFromScreen struct {
     spinner  spinner.Model
 
 	// Token read from string
-	token *string
+	token *dataFromScreen
 
 	// Folder
 	folder tlockvault.Folder
@@ -188,8 +197,17 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
                         if result, err := qrReader.Decode(bmp, nil); err == nil {
                             uri := result.String()
 
-                            dataFromScreenChan <- &uri;
-                            return
+                            // Try to parse
+                            if key, err := otp.NewKeyFromURL(uri); err == nil {
+                                // Run validator
+                                _, err := screen.vault.ValidateToken(key.Secret())
+
+                                // Send
+                                dataFromScreenChan <- &dataFromScreen{
+                                    Uri: &uri,
+                                    Err: err,
+                                }
+                            }
                         }
                     }
                 }
@@ -208,9 +226,9 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 
 		case key.Matches(msgType, confirmScreenKeys.Continue) && screen.state == stateConfirm:
 			// Add the token
-			if screen.token != nil {
+			if screen.token != nil && screen.token.Err == nil {
 				// Add token
-				screen.vault.AddToken(screen.folder.Name, *screen.token)
+                screen.vault.AddToken(screen.folder.Name, *screen.token.Uri)
 
 				// Require refresh of folders and tokens list
 				cmds = append(
@@ -268,28 +286,36 @@ func (screen TokenFromScreen) View() string {
 			items = append(items, tlockstyles.Styles.Error.Render("Did not find any token!"))
 		} else {
 			// Try to parse the otp value
-			key, err := otp.NewKeyFromURL(*screen.token)
+            if screen.token.Err == nil {
+                key, err := otp.NewKeyFromURL(*screen.token.Uri)
 
-			// If there was error while finding
-			if err != nil {
-				// Show the error
-				items = append(items, tlockstyles.Styles.Error.Render("Did not find any token!"))
+                // If there was error while finding
+                if err != nil {
+                    // Show the error
+                    items = append(items, tlockstyles.Styles.Error.Render("Did not find any token!"))
 
-				// Reset token screen before its not what we were looking for
-				screen.token = nil
-			} else {
-				// Find the account name
-				accountName := key.AccountName()
-				screen.statusBarMessage = fmt.Sprintf("Successfully added token for %s from screen", accountName)
+                    // Reset token screen before its not what we were looking for
+                    screen.token = nil
+                } else {
+                    // Find the account name
+                    accountName := key.AccountName()
+                    screen.statusBarMessage = fmt.Sprintf("Successfully added token for %s from screen", accountName)
 
-				if accountName == "" {
-					accountName = "<no account name>"
-					screen.statusBarMessage = fmt.Sprintf("Successfully added token from screen (no account name)")
-				}
+                    if accountName == "" {
+                        accountName = "<no account name>"
+                        screen.statusBarMessage = fmt.Sprintf("Successfully added token from screen (no account name)")
+                    }
 
-				// Show to user
-				items = append(items, fmt.Sprintf("%s %s", tlockstyles.Styles.SubText.Render("Found a token for"), tlockstyles.Styles.Title.Render(accountName)))
-			}
+                    // Show to user
+                    items = append(items, fmt.Sprintf("%s %s", tlockstyles.Styles.SubText.Render("Found a token for"), tlockstyles.Styles.Title.Render(accountName)))
+                }
+            } else {
+                items = append(items, lipgloss.JoinHorizontal(
+                    lipgloss.Center,
+                    tlockstyles.Styles.Base.Render("Found a token from screen, but "),
+                    tlockstyles.Styles.Error.Render(strings.ToLower(screen.token.Err.Error())),
+                ))
+            }
 		}
 
 		// Add help

@@ -49,7 +49,7 @@ func (vault *Vault) AddToken(folderId string, uri string) error {
 func (vault *Vault) AddTokenFromToken(folder string, token Token) error {
 	var err error
 
-	if token.Secret, err = vault.validateToken(token.Secret); err == nil {
+	if token.Secret, err = vault.ValidateToken(token.Secret); err == nil {
 		// Find folder and if it exists, add
 		if index := vault.findFolder(folder); index != -1 {
 			vault.Folders[index].Tokens = append(vault.Folders[index].Tokens, token)
@@ -67,7 +67,7 @@ func (vault *Vault) AddTokenFromToken(folder string, token Token) error {
 func (vault *Vault) ReplaceToken(fromFolder string, token, newToken Token) error {
 	var err error
 
-	if newToken.Secret, err = vault.validateToken(newToken.Secret); token.Secret == newToken.Secret || err == nil {
+	if newToken.Secret, err = vault.ValidateToken(newToken.Secret); token.Secret == newToken.Secret || err == nil {
 		// Get folder index
 		if index := vault.findFolder(fromFolder); index != -1 {
 			// Replace

@@ -45,7 +45,7 @@ func (vault Vault) validateFolderName(name string) (string, error) {
 // Validates if the token is fit to be used
 // It is checked on the basis of the fact that it can be used to generate a secret
 // And no other token with the same secret exist
-func (vault Vault) validateToken(secret string) (string, error) {
+func (vault Vault) ValidateToken(secret string) (string, error) {
 	// Sanitize by trimming off the spaces
 	secret = strings.TrimSpace(secret)
 
