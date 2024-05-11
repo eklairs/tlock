@@ -3,9 +3,8 @@ package tlockvault
 import (
 	"errors"
 	"strings"
-	"time"
 
-	"github.com/pquerna/otp/totp"
+	"github.com/eklairs/tlock/tlock-internal/utils"
 )
 
 // Error representing that the folder name is empty
@@ -60,7 +59,7 @@ func (vault Vault) ValidateToken(secret string) (string, error) {
 	}
 
 	// Try to generate token
-	if _, err := totp.GenerateCode(secret, time.Now()); err != nil {
+	if !utils.ValidateSecret(secret) {
 		return secret, ERR_TOKEN_INVALID
 	}
 
