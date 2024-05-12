@@ -4,7 +4,7 @@
 
 TLock is an open-source tool to store and manage your authentication tokens securely. It gives users a centralized solution to generate and maintain time-based one-time passwords (TOTP) and other token types for secure authentication processes. By consolidating multiple authentication tokens into a single application, this 2FA manager streamlines the process of accessing accounts while ensuring high security.
 
-## Features
+## ⭐ Features
 
 - 🚀 Cross-platform - Works perfectly on Windows, Linux, and MacOS.
 - ⚡️ Blazingly Fast app written in Golang.
@@ -14,11 +14,12 @@ TLock is an open-source tool to store and manage your authentication tokens secu
 - 🌟 Supports industry-standard TOTP and HOTP-based tokens.
 - 📷 Easily add tokens from the screen or the advanced token editor.
 - 🎨 Supports multiple themes to sync the TLock theme with your favorite color scheme.
+- 😀 Show icon of the issuer if it is supported.
 
 >[!NOTE]
 >For showing the provider's icon, you must have Nerd Fonts installed
 
-## Installation
+## ⬇️ Installation
 
 - **Arch Linux** (with AUR helper, like yay)
 
@@ -37,30 +38,24 @@ TLock is an open-source tool to store and manage your authentication tokens secu
 
   You can also download the binary based on your operating system to use TLock from [releases](https://github.com/eklairs/tlock/releases)
   
-- **go**
-
-  ```fish
-  go install github.com/eklairs/tlock@latest
-  ```
-
 - **Docker**
   
   ```fish
   docker run -it --rm ghcr.io/eklairs/tlock:latest
   ```
 
-## Screenshots
+## 🖼️ Screenshots
 
 <img src="/assets/login.png" />
 <img src="/assets/dashboard.png" />
 <img src="/assets/help.png" />
 <img src="/assets/add_token.png" />
 
-## Running
+## 🏎️ Running
 
 Open your terminal and type `tlock` to start using tlock!
 
-## Contributing
+## ❤️ Contributing
 
 Did you come across a bug or want to introduce a new feature? Don't hesitate to open up an issue or pull request!
 
