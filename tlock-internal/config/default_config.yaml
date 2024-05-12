@@ -56,12 +56,12 @@ tokens_keybindings:
     previous: ["k"]
 
     # Moves the focused token down
-    # Default: ["J"]
-    move_up: ["J"]
+    # Default: ["K"]
+    move_up: ["K"]
 
     # Moves the focused token up
-    # Default: ["K"]
-    move_down: ["K"]
+    # Default: ["J"]
+    move_down: ["J"]
 
     # Deletes the focused token
     # Default: ["d"]
