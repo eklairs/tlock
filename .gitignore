@@ -22,3 +22,5 @@ go.work
 
 # `genvendor.sh` build directory
 build/
+
+dist/

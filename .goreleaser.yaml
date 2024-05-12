@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+
+version: 1
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - main: ./tlock
+    ldflags:
+      - -s -w -X github.com/eklairs/tlock/tlock-internal/constants.VERSION={{ .Tag }}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}-{{ .Tag }}-{{ .Os }}-{{ .Arch }}"
+
+    format_overrides:
+      - goos: windows
+        format: zip
+
