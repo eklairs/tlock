@@ -2,20 +2,25 @@ package form
 
 import (
 	"slices"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
+
+// Validator
+type Validator = func(vault *tlockvault.Vault, value string) error
 
 // Message that represents that the form is submitted and the items pass the validators
 type FormSubmittedMsg struct {
-    Data map[string]string
+	Data map[string]string
 }
 
 // Form item wrapped
 type FormItemWrapped struct {
-    // ID
-    ID string
+	// ID
+	ID string
 
 	// Form item
 	FormItem FormItem
@@ -23,8 +28,8 @@ type FormItemWrapped struct {
 	// Is it enabled
 	Enabled bool
 
-    // Validators
-    Validators []textinput.ValidateFunc
+	// Validators
+	Validators []Validator
 }
 
 type Form struct {
@@ -33,6 +38,9 @@ type Form struct {
 
 	// Focused index
 	FocusedIndex int
+
+    // Default values
+    Default map[string]string
 }
 
 // Initializes a new form item
@@ -41,50 +49,51 @@ func New() Form {
 }
 
 // Adds a new input to the form
-func (form *Form) AddInput(id, title, desc string, input textinput.Model, validators []textinput.ValidateFunc) {
-    form.Items = append(form.Items, FormItemWrapped{
-        ID: id,
-        FormItem: &FormItemInputBox{
-            Title: title,
-            Description: desc,
-            Input: input,
-        },
-        Enabled: true,
-        Validators: validators,
-    })
+func (form *Form) AddInput(id, title, desc string, input textinput.Model, validators []Validator) {
+	form.Items = append(form.Items, FormItemWrapped{
+		ID: id,
+		FormItem: &FormItemInputBox{
+			Title:       title,
+			Description: desc,
+			Input:       input,
+		},
+		Enabled:    true,
+		Validators: validators,
+	})
 }
 
 // Adds a new input to the form
 func (form *Form) AddOption(id, title, desc string, options []string) {
-    form.Items = append(form.Items, FormItemWrapped{
-        ID: id,
-        FormItem: &FormItemOptionBox{
-            Title: title,
-            Description: desc,
-            Values: options,
-        },
-        Enabled: true,
-        Validators: []textinput.ValidateFunc{},
-    })
+	form.Items = append(form.Items, FormItemWrapped{
+		ID: id,
+		FormItem: &FormItemOptionBox{
+			Title:       title,
+			Description: desc,
+			Values:      options,
+		},
+		Enabled:    true,
+		Validators: []Validator{},
+	})
 }
 
 // Switches focus from one index to another
 func (form *Form) switchFocus(old, new int) {
-    // Do focus changing
+	// Do focus changing
 	form.Items[old].FormItem.Unfocus()
 	form.Items[new].FormItem.Focus()
 
-    // Set new index
+	// Set new index
 	form.FocusedIndex = new
 }
 
 // Updates
-func (form *Form) Update(msg tea.Msg) tea.Cmd {
-    cmds := make([]tea.Cmd, 0)
+func (form *Form) Update(msg tea.Msg, vault *tlockvault.Vault) tea.Cmd {
+	cmds := make([]tea.Cmd, 0)
 
 	switch msgType := msg.(type) {
 	case tea.KeyMsg:
-		match_key: switch msgType.String() {
+	match_key:
+		switch msgType.String() {
 		case "tab":
 			if form.FocusedIndex != len(form.Items)-1 {
 				next := form.FocusedIndex + 1
@@ -109,64 +118,75 @@ func (form *Form) Update(msg tea.Msg) tea.Cmd {
 				// Change focus
 				form.switchFocus(form.FocusedIndex, next)
 			}
-        case "enter":
-            data := make(map[string]string)
+		case "enter":
+			data := make(map[string]string)
 
-            // Validate them all!
-            for _, item := range form.Items {
-                // Run validators
-                for _, validator := range item.Validators {
-                    if err := validator(item.FormItem.Value()); err != nil {
-                        // Set erro
-                        item.FormItem.SetError(&err)
+			// Validate them all!
+			for _, item := range form.Items {
+                // Get the value
+                value := strings.TrimSpace(item.FormItem.Value())
 
-                        // There is issue with the form, break from the switch
-                        break match_key
-                    }
+                // If it is empty, lets replace with default value
+                if defaultValue, ok := form.Default[item.ID]; ok && value == "" {
+                    value = defaultValue
                 }
 
-                // Set the item
-                data[item.ID] = item.FormItem.Value()
-            }
+                // Remove current error
+                item.FormItem.SetError(nil)
 
-            // Return
-            cmds = append(cmds, func() tea.Msg { return FormSubmittedMsg{ Data: data } })
+				// Run validators
+				for _, validator := range item.Validators {
+                    // Validate
+					if err := validator(vault, value); err != nil {
+						// Set erro
+						item.FormItem.SetError(&err)
+
+						// There is issue with the form, break from the switch
+						break match_key
+					}
+				}
+
+				// Set the item
+				data[item.ID] = value
+			}
+
+			// Return
+			cmds = append(cmds, func() tea.Msg { return FormSubmittedMsg{Data: data} })
 		}
 	}
 
-    // Let the current form item handle 
-    cmds = append(cmds, form.Items[form.FocusedIndex].FormItem.Update(msg))
+	// Let the current form item handle
+	cmds = append(cmds, form.Items[form.FocusedIndex].FormItem.Update(msg))
 
-    // Return
-    return tea.Batch(cmds...)
+	// Return
+	return tea.Batch(cmds...)
 }
-
 
 // Returns the focused form item
 func (form *Form) FocusedItem() FormItem {
-    return form.Items[form.FocusedIndex].FormItem
+	return form.Items[form.FocusedIndex].FormItem
 }
 
 // Runs the post init hook
 func (form *Form) PostInit() {
-    // Let us focus the first item
-    form.Items[0].FormItem.Focus()
+	// Let us focus the first item
+	form.Items[0].FormItem.Focus()
 }
 
 // Disables a form item
 func (form *Form) Disable(id string) {
-    // Find the index
-    index := slices.IndexFunc(form.Items, func(item FormItemWrapped) bool { return item.ID == id })
+	// Find the index
+	index := slices.IndexFunc(form.Items, func(item FormItemWrapped) bool { return item.ID == id })
 
-    // Disable it
-    form.Items[index].Enabled = false
+	// Disable it
+	form.Items[index].Enabled = false
 }
 
 // Enables a form item
 func (form *Form) Enable(id string) {
-    // Find the index
-    index := slices.IndexFunc(form.Items, func(item FormItemWrapped) bool { return item.ID == id })
+	// Find the index
+	index := slices.IndexFunc(form.Items, func(item FormItemWrapped) bool { return item.ID == id })
 
-    // Enable it
-    form.Items[index].Enabled = true
+	// Enable it
+	form.Items[index].Enabled = true
 }
