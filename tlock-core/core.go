@@ -91,6 +91,14 @@ func (core *TLockCore) RenameUser(old, new string) error {
 
 	// Find
 	if index := core.Find(old); index != -1 {
+        // Original vault of the user
+        original_vault := path.Dir(core.Users[index].Vault())
+
+        // Rename vault folder
+        if err := os.Rename(original_vault, path.Join(path.Dir(original_vault), new)); err != nil {
+            return err
+        }
+
 		// Rename if the user is found
 		core.Users[index] = User(new)
 

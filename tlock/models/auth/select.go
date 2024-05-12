@@ -190,6 +190,10 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
                 cmds = append(cmds, manager.PushScreen(dashboard.InitializeDashboardScreen(focused.S(), vault, screen.context)))
             }
 		}
+
+    case modelmanager.ScreenRefocusedMsg:
+        // Update items
+        screen.listview.SetItems(utils.Map(screen.context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user) }))
 	}
 
 	// Update listview
@@ -202,9 +206,6 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 // View
 func (screen SelectUserScreen) View() string {
-	// Update items
-	screen.listview.SetItems(utils.Map(screen.context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user) }))
-
     // Set height
     screen.listview.SetHeight(min(12, len(screen.context.Core.Users)*3))
 
