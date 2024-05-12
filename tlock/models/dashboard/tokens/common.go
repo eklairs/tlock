@@ -19,41 +19,41 @@ import (
 
 // Adds a validator to input to only accept int
 func onlyInt(textinput textinput.Model) textinput.Model {
-    return utils.ValidatorInteger(textinput)
+	return utils.ValidatorInteger(textinput)
 }
 
 // Validator for period
 func periodValidator(_ *tlockvault.Vault, period string) error {
-    if num, err := strconv.ParseInt(period, 10, 64); err == nil {
-        if num < 1 {
-            return errors.New("Period cannot be < 1")
-        }
-    }
+	if num, err := strconv.ParseInt(period, 10, 64); err == nil {
+		if num < 1 {
+			return errors.New("Period cannot be < 1")
+		}
+	}
 
-    return nil
+	return nil
 }
 
 // Validator for digits
 func digitValidator(_ *tlockvault.Vault, digits string) error {
-    if num, err := strconv.ParseInt(digits, 10, 64); err == nil {
-        if num < 1 {
-            return errors.New("Digits cannot be < 1")
-        }
+	if num, err := strconv.ParseInt(digits, 10, 64); err == nil {
+		if num < 1 {
+			return errors.New("Digits cannot be < 1")
+		}
 
-        if num > 10 {
-            return errors.New("Digits cannot be > 10")
-        }
-    }
+		if num > 10 {
+			return errors.New("Digits cannot be > 10")
+		}
+	}
 
-    return nil
+	return nil
 }
 
 // Secret validator
 func secretValidator(vault *tlockvault.Vault, secret string) error {
-    // Validate
-    _, err := vault.ValidateToken(secret)
+	// Validate
+	_, err := vault.ValidateToken(secret)
 
-    // Return
+	// Return
 	return err
 }
 
@@ -62,33 +62,33 @@ func BuildForm(values map[string]string) tlockform.Form {
 	// Initialize form
 	form := tlockform.New()
 
-    // Sets the value of the input box
-    v := func (input textinput.Model, key string) textinput.Model {
-        if value, ok := values[key]; ok {
-            input.SetValue(value)
-        }
+	// Sets the value of the input box
+	v := func(input textinput.Model, key string) textinput.Model {
+		if value, ok := values[key]; ok {
+			input.SetValue(value)
+		}
 
-        return input
-    }
+		return input
+	}
 
 	// Add items
 	form.AddInput("account", "Account Name", "Name of the account, like John Doe", v(components.InitializeInputBox("Account name goes here..."), "account"), []tlockform.Validator{})
 	form.AddInput("issuer", "Issuer", "Name of the issuer, like GitHub", v(components.InitializeInputBox("Issuer name goes here..."), "issuer"), []tlockform.Validator{})
-	form.AddInput("secret", "Secret", "The secret provided by the issuer", v(components.InitializeInputBox("The secret goes here..."), "secret"), []tlockform.Validator{ secretValidator })
+	form.AddInput("secret", "Secret", "The secret provided by the issuer", v(components.InitializeInputBox("The secret goes here..."), "secret"), []tlockform.Validator{secretValidator})
 	form.AddOption("type", "Type", "Type of the token", []string{"TOTP", "HOTP"})
 	form.AddOption("hash", "Hash", "Hashing algorithm for the token", []string{"SHA1", "SHA256", "SHA512"})
-	form.AddInput("period", "Period", "Time to refresh the token", v(onlyInt(components.InitializeInputBoxCustomWidth("Time in seconds...", 24)), "period"), []tlockform.Validator{ periodValidator })
+	form.AddInput("period", "Period", "Time to refresh the token", v(onlyInt(components.InitializeInputBoxCustomWidth("Time in seconds...", 24)), "period"), []tlockform.Validator{periodValidator})
 	form.AddInput("counter", "Initial counter", "Initial counter for HOTP token", v(onlyInt(components.InitializeInputBoxCustomWidth("Initial counter...", 24)), "counter"), []tlockform.Validator{})
-	form.AddInput("digits", "Digits", "Number of digits", v(onlyInt(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24)), "digits"), []tlockform.Validator{ digitValidator })
+	form.AddInput("digits", "Digits", "Number of digits", v(onlyInt(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24)), "digits"), []tlockform.Validator{digitValidator})
 
-    // Set default values
-    form.Default = map[string]string {
-        "account": "",
-        "issuer": "",
-        "period": "30",
-        "counter": "0",
-        "digits": "6",
-    }
+	// Set default values
+	form.Default = map[string]string{
+		"account": "",
+		"issuer":  "",
+		"period":  "30",
+		"counter": "0",
+		"digits":  "6",
+	}
 
 	// Disable the counter box
 	form.Disable("counter")
@@ -147,7 +147,7 @@ func IntoViewport(ascii, description string, form tlockform.Form) viewport.Model
 	content := RenderForm(ascii, description, form)
 
 	// Initialize
-	viewport := viewport.New(85, min(height, lipgloss.Height(content)))
+	viewport := utils.DisableViewportKeys(viewport.New(85, min(height, lipgloss.Height(content))))
 	viewport.SetContent(content)
 
 	// Return
@@ -183,35 +183,35 @@ func DisableBasedOnType(form *tlockform.Form) {
 
 // Converts string to token type
 func toTokenType(tokentype string) tlockvault.TokenType {
-    if tokentype == "HOTP" {
-        return tlockvault.TokenTypeHOTP
-    }
+	if tokentype == "HOTP" {
+		return tlockvault.TokenTypeHOTP
+	}
 
-    return tlockvault.TokenTypeTOTP
+	return tlockvault.TokenTypeTOTP
 }
 
 // Converts string to opt algorithm
 func toOtpAlgorithm(algo string) otp.Algorithm {
-    switch algo {
-    case "SHA256":
-        return otp.AlgorithmSHA256
-    case "SHA512":
-        return otp.AlgorithmSHA512
-    default:
-        return otp.AlgorithmSHA1
-    }
+	switch algo {
+	case "SHA256":
+		return otp.AlgorithmSHA256
+	case "SHA512":
+		return otp.AlgorithmSHA512
+	default:
+		return otp.AlgorithmSHA1
+	}
 }
 
 // Create a token from form data
 func TokenFromFormData(data map[string]string) tlockvault.Token {
-    return tlockvault.Token{
-        Issuer: data["issuer"],
-        Account: data["account"],
-        Secret: data["secret"],
-        Type: toTokenType(data["type"]),
-        InitialCounter: utils.ToInt(data["counter"]),
-        Period: utils.ToInt(data["period"]),
-        Digits: utils.ToInt(data["digits"]),
-        HashingAlgorithm: toOtpAlgorithm(data["hash"]),
-    }
+	return tlockvault.Token{
+		Issuer:           data["issuer"],
+		Account:          data["account"],
+		Secret:           data["secret"],
+		Type:             toTokenType(data["type"]),
+		InitialCounter:   utils.ToInt(data["counter"]),
+		Period:           utils.ToInt(data["period"]),
+		Digits:           utils.ToInt(data["digits"]),
+		HashingAlgorithm: toOtpAlgorithm(data["hash"]),
+	}
 }

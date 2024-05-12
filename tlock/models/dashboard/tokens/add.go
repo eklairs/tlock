@@ -79,16 +79,16 @@ type AddTokenScreen struct {
 
 // Initializes a new screen of AddTokenScreen
 func InitializeAddTokenScreen(folder tlockvault.Folder, vault *tlockvault.Vault) AddTokenScreen {
-    // Initialize form
-    form := BuildForm(map[string]string{})
+	// Initialize form
+	form := BuildForm(map[string]string{})
 
 	// Return
 	return AddTokenScreen{
-        form: form,
-        vault: vault,
-        folder: folder,
-        viewport: IntoViewport(addTokenAscii, addTokenDesc, form),
-    }
+		form:     form,
+		vault:    vault,
+		folder:   folder,
+		viewport: IntoViewport(addTokenAscii, addTokenDesc, form),
+	}
 }
 
 // Init
@@ -98,51 +98,54 @@ func (screen AddTokenScreen) Init() tea.Cmd {
 
 // Update
 func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelManager) (modelmanager.Screen, tea.Cmd) {
-    // Commands
-    cmds := make([]tea.Cmd, 0)
+	// Commands
+	cmds := make([]tea.Cmd, 0)
 
-    // Match
-    switch msgType := msg.(type) {
-    case tea.KeyMsg:
-        switch {
-        case key.Matches(msgType, addTokenKeys.GoBack):
-            manager.PopScreen()
-        }
+	// Match
+	switch msgType := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msgType, addTokenKeys.GoBack):
+			manager.PopScreen()
+		}
 
-    case form.FormSubmittedMsg:
-        // Get token
-        token := TokenFromFormData(msgType.Data)
+	case form.FormSubmittedMsg:
+		// Get token
+		token := TokenFromFormData(msgType.Data)
 
-        // Make statusbar message
-        statusBarMessage := fmt.Sprintf("Successfully added token for %s", token.Account)
+		// Make statusbar message
+		statusBarMessage := fmt.Sprintf("Successfully added token for %s", token.Account)
 
-        if token.Account == "" {
-            statusBarMessage = fmt.Sprintf("Successfully added token (no account name)")
-        }
+		if token.Account == "" {
+			statusBarMessage = fmt.Sprintf("Successfully added token (no account name)")
+		}
 
-        // Require refresh of folders and tokens list
-        cmds = append(
-            cmds,
-            func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
-            func() tea.Msg { return tlockmessages.RefreshTokensMsg{} },
-            func() tea.Msg { return components.StatusBarMsg{Message: statusBarMessage} },
-        )
+		// Require refresh of folders and tokens list
+		cmds = append(
+			cmds,
+			func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
+			func() tea.Msg { return tlockmessages.RefreshTokensMsg{} },
+			func() tea.Msg { return components.StatusBarMsg{Message: statusBarMessage} },
+		)
 
-        // Add
-        screen.vault.AddTokenFromToken(screen.folder.Name, token)
+		// Add
+		screen.vault.AddTokenFromToken(screen.folder.Name, token)
 
-        // Break
-        manager.PopScreen()
-    }
+		// Break
+		manager.PopScreen()
+	}
 
-    // Let the form handle its update
-    cmds = append(cmds, screen.form.Update(msg, screen.vault))
+	// Let the form handle its update
+	cmds = append(cmds, screen.form.Update(msg, screen.vault))
 
-    // Update the viewport
-    DisableBasedOnType(&screen.form)
-    UpdateViewport(addTokenAscii, addTokenDesc, &screen.viewport, screen.form)
+	// Update the viewport
+	DisableBasedOnType(&screen.form)
+	UpdateViewport(addTokenAscii, addTokenDesc, &screen.viewport, screen.form)
 
-    // Return
+	// Send the update message to the viewport
+	screen.viewport, _ = screen.viewport.Update(msg)
+
+	// Return
 	return screen, tea.Batch(cmds...)
 }
 
@@ -150,4 +153,3 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
 func (screen AddTokenScreen) View() string {
 	return screen.viewport.View()
 }
-
