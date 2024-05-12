@@ -1,37 +1,32 @@
 name: Release TLock
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - '*'
 
 permissions:
-    contents: write
-    packages: write
+  contents: write
 
 jobs:
-  releases-matrix:
-    name: Release TLock
+  goreleaser:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        goos: [linux, windows, darwin]
-        goarch: ["386", amd64, arm64]
-        exclude:
-          - goarch: "386"
-            goos: darwin
-          - goarch: arm64
-            goos: windows
     steps:
-    - uses: actions/checkout@v4
-      with:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
           submodules: true
-    - uses: wangyoucao577/go-release-action@v1
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        goos: ${{ matrix.goos }}
-        goarch: ${{ matrix.goarch }}
-        project_path: "./tlock"
-        binary_name: "tlock"
-        ldflags: "-X github.com/eklairs/tlock/tlock-internal/constants.VERSION=${{ github.ref_name }} -w -s"
-        md5sum: false
-        sha256sum: true
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          distribution: goreleaser
+          version: '~> v1'
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
