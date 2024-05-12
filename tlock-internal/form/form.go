@@ -39,8 +39,8 @@ type Form struct {
 	// Focused index
 	FocusedIndex int
 
-    // Default values
-    Default map[string]string
+	// Default values
+	Default map[string]string
 }
 
 // Initializes a new form item
@@ -123,20 +123,20 @@ func (form *Form) Update(msg tea.Msg, vault *tlockvault.Vault) tea.Cmd {
 
 			// Validate them all!
 			for _, item := range form.Items {
-                // Get the value
-                value := strings.TrimSpace(item.FormItem.Value())
+				// Get the value
+				value := strings.TrimSpace(item.FormItem.Value())
 
-                // If it is empty, lets replace with default value
-                if defaultValue, ok := form.Default[item.ID]; ok && value == "" {
-                    value = defaultValue
-                }
+				// If it is empty, lets replace with default value
+				if defaultValue, ok := form.Default[item.ID]; ok && value == "" {
+					value = defaultValue
+				}
 
-                // Remove current error
-                item.FormItem.SetError(nil)
+				// Remove current error
+				item.FormItem.SetError(nil)
 
 				// Run validators
 				for _, validator := range item.Validators {
-                    // Validate
+					// Validate
 					if err := validator(vault, value); err != nil {
 						// Set erro
 						item.FormItem.SetError(&err)

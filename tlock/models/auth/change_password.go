@@ -1,10 +1,10 @@
 package auth
 
 import (
-	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/constants"
@@ -114,7 +114,7 @@ func (screen ChangePasswordScreen) Update(msg tea.Msg, manager *modelmanager.Mod
 
 // View
 func (screen ChangePasswordScreen) View() string {
-    // Items
+	// Items
 	items := []string{
 		tlockstyles.Title(changePasswordAsciiArt), "",
 		tlockstyles.Dimmed("Change your password"), "",

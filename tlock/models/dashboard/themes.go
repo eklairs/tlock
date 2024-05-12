@@ -143,8 +143,8 @@ func (screen ThemesScreen) Update(msg tea.Msg, manager *modelmanager.ModelManage
 			// Get original theme
 			originalTheme := screen.context.GetCurrentTheme()
 
-            // Set original theme
-            cmds = append(cmds, screen.SetTheme(originalTheme))
+			// Set original theme
+			cmds = append(cmds, screen.SetTheme(originalTheme))
 
 			// Pop screen
 			manager.PopScreen()
@@ -172,8 +172,8 @@ func (screen ThemesScreen) Update(msg tea.Msg, manager *modelmanager.ModelManage
 		// Get new theme
 		newTheme := screen.listview.SelectedItem().(themeItem)
 
-        // Append cmd
-        cmds = append(cmds, screen.SetTheme(tlockcontext.Theme(newTheme)))
+		// Append cmd
+		cmds = append(cmds, screen.SetTheme(tlockcontext.Theme(newTheme)))
 	}
 
 	// Return
@@ -194,11 +194,11 @@ func (screen ThemesScreen) View() string {
 
 // Sets the theme
 func (screen ThemesScreen) SetTheme(theme tlockcontext.Theme) tea.Cmd {
-    // Reinitialize styles
-    tlockstyles.InitializeStyles(theme)
+	// Reinitialize styles
+	tlockstyles.InitializeStyles(theme)
 
-    // Change background color
-    return func() tea.Msg {
-        return tea.SetBackgroundColor(termenv.RGBColor(theme.Background))
-    }
+	// Change background color
+	return func() tea.Msg {
+		return tea.SetBackgroundColor(termenv.RGBColor(theme.Background))
+	}
 }

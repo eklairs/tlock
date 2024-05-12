@@ -30,9 +30,9 @@ func GetTLockConfig() TLockConfig {
 	default_config := DefaultTLockConfig()
 
 	// Read raw
-    if config_raw, err := os.ReadFile(paths.TLOCK_CONFIG); err == nil {
-        binary.Unmarshal(config_raw, &default_config)
-    }
+	if config_raw, err := os.ReadFile(paths.TLOCK_CONFIG); err == nil {
+		binary.Unmarshal(config_raw, &default_config)
+	}
 
 	// Return
 	return default_config
@@ -40,11 +40,11 @@ func GetTLockConfig() TLockConfig {
 
 // Writes the config
 func (config TLockConfig) Write() {
-    // Marshal
+	// Marshal
 	data, _ := binary.Marshal(config)
 
-    // Create file
-    if file, err := utils.EnsureExists(paths.TLOCK_CONFIG); err == nil {
-        file.Write(data)
-    }
+	// Create file
+	if file, err := utils.EnsureExists(paths.TLOCK_CONFIG); err == nil {
+		file.Write(data)
+	}
 }

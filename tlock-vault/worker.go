@@ -18,9 +18,9 @@ func (vault *Vault) startFileWriterWorker(recv chan []Folder) {
 			encrypted, _ := Encrypt(vault.password, serialized)
 
 			// Create parent dir
-            if file, err := utils.EnsureExists(vault.path); err == nil {
-                file.Write(encrypted)
-            }
+			if file, err := utils.EnsureExists(vault.path); err == nil {
+				file.Write(encrypted)
+			}
 		}
 
 		// Sleep for 1 second

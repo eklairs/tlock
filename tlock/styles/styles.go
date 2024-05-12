@@ -119,15 +119,15 @@ func with(style lipgloss.Style) lipgloss.Style {
 
 // Renders the text with `Title` style
 func Title(text string) string {
-    return Styles.Title.Render(text)
+	return Styles.Title.Render(text)
 }
 
 // Renders the text with `SubText` style
 func Dimmed(text string) string {
-    return Styles.SubText.Render(text)
+	return Styles.SubText.Render(text)
 }
 
 // Renders the help menu
 func HelpView(help help.KeyMap) string {
-    return Help.View(help)
+	return Help.View(help)
 }

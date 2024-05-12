@@ -3,9 +3,9 @@ package tlockmodels
 import (
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/eklairs/tlock/tlock/models/auth"
 	"github.com/eklairs/tlock/tlock-internal/context"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	"github.com/eklairs/tlock/tlock/models/auth"
 
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 )
@@ -19,7 +19,7 @@ type RootModel struct {
 func InitializeRootModel(context *context.Context) RootModel {
 	var screen modelmanager.Screen
 
-    // If no user exists, we would like to move the user to the create user screen
+	// If no user exists, we would like to move the user to the create user screen
 	if len(context.Core.Users) == 0 {
 		screen = auth.InitializeCreateUserScreen(context)
 	} else {

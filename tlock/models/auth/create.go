@@ -5,8 +5,8 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
-	"github.com/charmbracelet/lipgloss"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 
 	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/constants"
@@ -149,7 +149,7 @@ func (screen CreateUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 			// Add new user
 			vault, err := screen.context.Core.AddNewUser(username, screen.passwordInput.Value())
 
-            // Handle errors
+			// Handle errors
 			if err != nil {
 				screen.usernameError = &err
 			} else {

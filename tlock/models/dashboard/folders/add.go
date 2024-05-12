@@ -96,17 +96,17 @@ func (screen AddFolderScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			// Add the folder
 			if err := screen.vault.AddFolder(screen.name.Value()); err != nil {
 				screen.errorMessage = &err
-                break
-            }
+				break
+			}
 
-            // Request folders refresh
-            cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })
-            cmds = append(cmds, func() tea.Msg {
-                return components.StatusBarMsg{Message: fmt.Sprintf("Successfully created folder named %s", screen.name.Value())}
-            })
+			// Request folders refresh
+			cmds = append(cmds, func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} })
+			cmds = append(cmds, func() tea.Msg {
+				return components.StatusBarMsg{Message: fmt.Sprintf("Successfully created folder named %s", screen.name.Value())}
+			})
 
-            // Pop
-            manager.PopScreen()
+			// Pop
+			manager.PopScreen()
 		default:
 			// Send the value to input box
 			screen.name, _ = screen.name.Update(msg)

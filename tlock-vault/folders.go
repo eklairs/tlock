@@ -19,7 +19,7 @@ func (vault *Vault) AddFolder(name string) error {
 		vault.write()
 	}
 
-    // Return
+	// Return
 	return err
 }
 

@@ -9,14 +9,14 @@ import (
 
 // Keybinding for moving the choosen item to right
 var KEY_RIGHT = key.NewBinding(
-    key.WithKeys("right"),
-    key.WithHelp("→", "right"),
+	key.WithKeys("right"),
+	key.WithHelp("→", "right"),
 )
 
 // Keybinding for moving the choosen item to right
 var KEY_LEFT = key.NewBinding(
-    key.WithKeys("left"),
-    key.WithHelp("←", "left"),
+	key.WithKeys("left"),
+	key.WithHelp("←", "left"),
 )
 
 // Form item for option box
@@ -102,4 +102,3 @@ func (item FormItemOptionBox) View() string {
 
 	return lipgloss.NewStyle().Width(31).Render(ui)
 }
-

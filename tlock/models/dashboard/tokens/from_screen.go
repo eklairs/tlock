@@ -21,33 +21,33 @@ import (
 )
 
 var MeterV2 = spinner.Spinner{
-    Frames: []string{
-        "▱▱▱▱",
-        "▰▱▱▱",
-        "▰▰▱▱",
-        "▰▰▰▱",
-        "▰▰▰▰",
-        "▱▰▰▰",
-        "▱▱▰▰",
-        "▱▱▱▰",
-    },
-    FPS: time.Second / 8, //nolint:gomnd
+	Frames: []string{
+		"▱▱▱▱",
+		"▰▱▱▱",
+		"▰▰▱▱",
+		"▰▰▰▱",
+		"▰▰▰▰",
+		"▱▰▰▰",
+		"▱▱▰▰",
+		"▱▱▱▰",
+	},
+	FPS: time.Second / 8, //nolint:gomnd
 }
 
 // Channel to send the token read from the screen
 var dataFromScreenChan = make(chan *dataFromScreen)
 
 type dataFromScreen struct {
-    // The otp
-    Uri *string
+	// The otp
+	Uri *string
 
-    // Any error from validators
-    Err error
+	// Any error from validators
+	Err error
 }
 
 // Message stating that a data has been recved
 type dataRecievedMsg struct {
-    data *dataFromScreen
+	data *dataFromScreen
 }
 
 var fromScreenAsciiArt = `
@@ -56,7 +56,7 @@ var fromScreenAsciiArt = `
 
 const (
 	stateTake = iota
-    stateGathering
+	stateGathering
 	stateConfirm
 )
 
@@ -80,11 +80,11 @@ func (k fromScreenKeyMap) FullHelp() [][]key.Binding {
 }
 
 func pollDataFetched() tea.Cmd {
-    return func() tea.Msg {
-        return dataRecievedMsg{
-            data: <-dataFromScreenChan,
-        }
-    }
+	return func() tea.Msg {
+		return dataRecievedMsg{
+			data: <-dataFromScreenChan,
+		}
+	}
 }
 
 // Keys
@@ -139,8 +139,8 @@ type TokenFromScreen struct {
 	// Vault
 	vault *tlockvault.Vault
 
-    // Spinner
-    spinner  spinner.Model
+	// Spinner
+	spinner spinner.Model
 
 	// Token read from string
 	token *dataFromScreen
@@ -154,23 +154,23 @@ type TokenFromScreen struct {
 
 // Initializes a new instance of fromScreen from screen
 func InitializeTokenFromScreen(vault *tlockvault.Vault, folder tlockvault.Folder) TokenFromScreen {
-    // Initialize spinner
-    s := spinner.New()
-    s.Spinner = MeterV2
-    s.Style = tlockstyles.Styles.Title
+	// Initialize spinner
+	s := spinner.New()
+	s.Spinner = MeterV2
+	s.Style = tlockstyles.Styles.Title
 
-    // Return
+	// Return
 	return TokenFromScreen{
-		state:  stateTake,
-		vault:  vault,
-        spinner: s,
-		folder: folder,
+		state:   stateTake,
+		vault:   vault,
+		spinner: s,
+		folder:  folder,
 	}
 }
 
 // Init
 func (screen TokenFromScreen) Init() tea.Cmd {
-    return pollDataFetched()
+	return pollDataFetched()
 }
 
 // Update
@@ -184,51 +184,51 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			manager.PopScreen()
 
 		case key.Matches(msgType, fromScreenKeys.Start) && screen.state == stateTake:
-            screen.state = stateGathering
+			screen.state = stateGathering
 
-            // Start spinner
-            cmds = append(cmds, screen.spinner.Tick)
+			// Start spinner
+			cmds = append(cmds, screen.spinner.Tick)
 
-            go func() {
-                if image, err := screenshot.CaptureRect(screenshot.GetDisplayBounds(0)); err == nil {
-                    if bmp, err := gozxing.NewBinaryBitmapFromImage(image); err == nil {
-                        qrReader := qrcode.NewQRCodeReader()
+			go func() {
+				if image, err := screenshot.CaptureRect(screenshot.GetDisplayBounds(0)); err == nil {
+					if bmp, err := gozxing.NewBinaryBitmapFromImage(image); err == nil {
+						qrReader := qrcode.NewQRCodeReader()
 
-                        if result, err := qrReader.Decode(bmp, nil); err == nil {
-                            uri := result.String()
+						if result, err := qrReader.Decode(bmp, nil); err == nil {
+							uri := result.String()
 
-                            // Try to parse
-                            if key, err := otp.NewKeyFromURL(uri); err == nil {
-                                // Run validator
-                                _, err := screen.vault.ValidateToken(key.Secret())
+							// Try to parse
+							if key, err := otp.NewKeyFromURL(uri); err == nil {
+								// Run validator
+								_, err := screen.vault.ValidateToken(key.Secret())
 
-                                // Send
-                                dataFromScreenChan <- &dataFromScreen{
-                                    Uri: &uri,
-                                    Err: err,
-                                }
-                            }
-                        }
-                    }
-                }
+								// Send
+								dataFromScreenChan <- &dataFromScreen{
+									Uri: &uri,
+									Err: err,
+								}
+							}
+						}
+					}
+				}
 
-                dataFromScreenChan <- nil
-            }()
+				dataFromScreenChan <- nil
+			}()
 
-        case key.Matches(msgType, confirmScreenKeys.Retake):
+		case key.Matches(msgType, confirmScreenKeys.Retake):
 			if screen.state == stateConfirm {
-                // Set state
+				// Set state
 				screen.state = stateTake
 
-                // Restart poll
-                cmds = append(cmds, pollDataFetched())
+				// Restart poll
+				cmds = append(cmds, pollDataFetched())
 			}
 
 		case key.Matches(msgType, confirmScreenKeys.Continue) && screen.state == stateConfirm:
 			// Add the token
 			if screen.token != nil && screen.token.Err == nil {
 				// Add token
-                screen.vault.AddToken(screen.folder.Name, *screen.token.Uri)
+				screen.vault.AddToken(screen.folder.Name, *screen.token.Uri)
 
 				// Require refresh of folders and tokens list
 				cmds = append(
@@ -242,16 +242,16 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			manager.PopScreen()
 		}
 
-    case dataRecievedMsg:
-        screen.token = msgType.data
-        screen.state = stateConfirm
+	case dataRecievedMsg:
+		screen.token = msgType.data
+		screen.state = stateConfirm
 	}
 
-    if screen.state == stateGathering {
-        var cmd tea.Cmd
-        screen.spinner, cmd = screen.spinner.Update(msg)
-        cmds = append(cmds, cmd)
-    }
+	if screen.state == stateGathering {
+		var cmd tea.Cmd
+		screen.spinner, cmd = screen.spinner.Update(msg)
+		cmds = append(cmds, cmd)
+	}
 
 	return screen, tea.Batch(cmds...)
 }
@@ -272,8 +272,8 @@ func (screen TokenFromScreen) View() string {
 			tlockstyles.Help.View(fromScreenKeys),
 		)
 
-    case stateGathering:
-        return screen.spinner.View()
+	case stateGathering:
+		return screen.spinner.View()
 
 	case stateConfirm:
 		items := []string{
@@ -286,36 +286,36 @@ func (screen TokenFromScreen) View() string {
 			items = append(items, tlockstyles.Styles.Error.Render("Did not find any token!"))
 		} else {
 			// Try to parse the otp value
-            if screen.token.Err == nil {
-                key, err := otp.NewKeyFromURL(*screen.token.Uri)
+			if screen.token.Err == nil {
+				key, err := otp.NewKeyFromURL(*screen.token.Uri)
 
-                // If there was error while finding
-                if err != nil {
-                    // Show the error
-                    items = append(items, tlockstyles.Styles.Error.Render("Did not find any token!"))
+				// If there was error while finding
+				if err != nil {
+					// Show the error
+					items = append(items, tlockstyles.Styles.Error.Render("Did not find any token!"))
 
-                    // Reset token screen before its not what we were looking for
-                    screen.token = nil
-                } else {
-                    // Find the account name
-                    accountName := key.AccountName()
-                    screen.statusBarMessage = fmt.Sprintf("Successfully added token for %s from screen", accountName)
+					// Reset token screen before its not what we were looking for
+					screen.token = nil
+				} else {
+					// Find the account name
+					accountName := key.AccountName()
+					screen.statusBarMessage = fmt.Sprintf("Successfully added token for %s from screen", accountName)
 
-                    if accountName == "" {
-                        accountName = "<no account name>"
-                        screen.statusBarMessage = fmt.Sprintf("Successfully added token from screen (no account name)")
-                    }
+					if accountName == "" {
+						accountName = "<no account name>"
+						screen.statusBarMessage = fmt.Sprintf("Successfully added token from screen (no account name)")
+					}
 
-                    // Show to user
-                    items = append(items, fmt.Sprintf("%s %s", tlockstyles.Styles.SubText.Render("Found a token for"), tlockstyles.Styles.Title.Render(accountName)))
-                }
-            } else {
-                items = append(items, lipgloss.JoinHorizontal(
-                    lipgloss.Center,
-                    tlockstyles.Styles.Base.Render("Found a token from screen, but "),
-                    tlockstyles.Styles.Error.Render(strings.ToLower(screen.token.Err.Error())),
-                ))
-            }
+					// Show to user
+					items = append(items, fmt.Sprintf("%s %s", tlockstyles.Styles.SubText.Render("Found a token for"), tlockstyles.Styles.Title.Render(accountName)))
+				}
+			} else {
+				items = append(items, lipgloss.JoinHorizontal(
+					lipgloss.Center,
+					tlockstyles.Styles.Base.Render("Found a token from screen, but "),
+					tlockstyles.Styles.Error.Render(strings.ToLower(screen.token.Err.Error())),
+				))
+			}
 		}
 
 		// Add help

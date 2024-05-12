@@ -20,7 +20,7 @@ type FormItem interface {
 	// Returns the value
 	Value() string
 
-    // Sets the error message
-    // Nil means to remove the error
-    SetError(err *error)
+	// Sets the error message
+	// Nil means to remove the error
+	SetError(err *error)
 }

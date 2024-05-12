@@ -162,38 +162,38 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 		case key.Matches(msgType, selectUserKeys.New):
 			cmds = append(cmds, manager.PushScreen(InitializeCreateUserScreen(screen.context)))
 
-        // User options
+			// User options
 		case key.Matches(msgType, selectUserKeys.Options):
-            // Try to unlock vault
-            focused, vault := screen.tryUnlock();
+			// Try to unlock vault
+			focused, vault := screen.tryUnlock()
 
-            // If the vault is protected, ask for password
-            if vault == nil {
-                // Screen to go to
-                next := InitializeEnterPassScreenCustomOpts(screen.context, tlockcore.User(focused), InitializeUserOptionsScreen, sudoAscii, "Enter password for %s to see user options")
+			// If the vault is protected, ask for password
+			if vault == nil {
+				// Screen to go to
+				next := InitializeEnterPassScreenCustomOpts(screen.context, tlockcore.User(focused), InitializeUserOptionsScreen, sudoAscii, "Enter password for %s to see user options")
 
-                // Push
-                cmds = append(cmds, manager.PushScreen(next))
-            } else {
-                cmds = append(cmds, manager.PushScreen(InitializeUserOptionsScreen(focused.S(), vault, screen.context)))
+				// Push
+				cmds = append(cmds, manager.PushScreen(next))
+			} else {
+				cmds = append(cmds, manager.PushScreen(InitializeUserOptionsScreen(focused.S(), vault, screen.context)))
 			}
 
 		case key.Matches(msgType, selectUserKeys.Enter):
-            // Try to unlock vault
-            focused, vault := screen.tryUnlock();
+			// Try to unlock vault
+			focused, vault := screen.tryUnlock()
 
-            if vault == nil {
-                // It is encrypted with a password, require password
-                cmds = append(cmds, manager.PushScreen(InitializeEnterPassScreen(screen.context, focused, dashboard.InitializeDashboardScreen)))
-            } else {
-                // YAY!
-                cmds = append(cmds, manager.PushScreen(dashboard.InitializeDashboardScreen(focused.S(), vault, screen.context)))
-            }
+			if vault == nil {
+				// It is encrypted with a password, require password
+				cmds = append(cmds, manager.PushScreen(InitializeEnterPassScreen(screen.context, focused, dashboard.InitializeDashboardScreen)))
+			} else {
+				// YAY!
+				cmds = append(cmds, manager.PushScreen(dashboard.InitializeDashboardScreen(focused.S(), vault, screen.context)))
+			}
 		}
 
-    case modelmanager.ScreenRefocusedMsg:
-        // Update items
-        screen.listview.SetItems(utils.Map(screen.context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user) }))
+	case modelmanager.ScreenRefocusedMsg:
+		// Update items
+		screen.listview.SetItems(utils.Map(screen.context.Core.Users, func(user tlockcore.User) list.Item { return selectUserListItem(user) }))
 	}
 
 	// Update listview
@@ -206,8 +206,8 @@ func (screen SelectUserScreen) Update(msg tea.Msg, manager *modelmanager.ModelMa
 
 // View
 func (screen SelectUserScreen) View() string {
-    // Set height
-    screen.listview.SetHeight(min(12, len(screen.context.Core.Users)*3))
+	// Set height
+	screen.listview.SetHeight(min(12, len(screen.context.Core.Users)*3))
 
 	// List of items to render
 	items := []string{
@@ -233,12 +233,12 @@ func (screen SelectUserScreen) View() string {
 
 // Tries to unlock the vault for the focused user
 func (screen SelectUserScreen) tryUnlock() (tlockcore.User, *tlockvault.Vault) {
-    // Get focused
-    focused := tlockcore.User(screen.listview.SelectedItem().(selectUserListItem))
+	// Get focused
+	focused := tlockcore.User(screen.listview.SelectedItem().(selectUserListItem))
 
-    // Try to decrypt user with empty password
-    vault, _ := tlockvault.Load(focused.Vault(), "")
+	// Try to decrypt user with empty password
+	vault, _ := tlockvault.Load(focused.Vault(), "")
 
-    // Return
-    return focused, vault
+	// Return
+	return focused, vault
 }

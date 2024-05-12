@@ -28,8 +28,8 @@ func Initialize(at, password string) (*Vault, error) {
 		dataChan: make(chan []Folder, 1),
 	}
 
-    // Run post init hook
-    vault.PostInit()
+	// Run post init hook
+	vault.PostInit()
 
 	// Write empty data
 	vault.write()
@@ -74,8 +74,8 @@ func Load(path, password string) (*Vault, error) {
 		dataChan: make(chan []Folder, 1),
 	}
 
-    // Run post init hook
-    vault.PostInit()
+	// Run post init hook
+	vault.PostInit()
 
 	// Return
 	return vault, nil

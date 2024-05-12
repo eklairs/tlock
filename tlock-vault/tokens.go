@@ -76,8 +76,8 @@ func (vault *Vault) ReplaceToken(fromFolder string, token, newToken Token) error
 			// Write
 			vault.write()
 
-            // Ok!
-            return nil
+			// Ok!
+			return nil
 		}
 	}
 

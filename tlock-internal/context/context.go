@@ -73,8 +73,8 @@ func InitializeContext() Context {
 
 	json.Unmarshal(tlockvendor.IconsJSON, &icons)
 
-    // Initialize core
-    core, _ := tlockcore.New()
+	// Initialize core
+	core, _ := tlockcore.New()
 
 	// Return
 	return Context{

@@ -7,7 +7,7 @@ import (
 
 // Kanged from totp module
 func ValidateSecret(secret string) bool {
-    // Add pads
+	// Add pads
 	secret = strings.TrimSpace(secret)
 	if n := len(secret) % 8; n != 0 {
 		secret = secret + strings.Repeat("=", 8-n)
@@ -17,9 +17,9 @@ func ValidateSecret(secret string) bool {
 	// but the StdEncoding (and the RFC), expect a dictionary of only upper case letters.
 	secret = strings.ToUpper(secret)
 
-    // Check
+	// Check
 	_, err := base32.StdEncoding.DecodeString(secret)
 
-    // Return
-    return err == nil
+	// Return
+	return err == nil
 }

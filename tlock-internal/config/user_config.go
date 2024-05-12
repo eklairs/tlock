@@ -162,9 +162,9 @@ func LoadUserConfig(user string) UserConfiguration {
 	// Parse the file if it is read
 	if raw, err := os.ReadFile(paths.UserConfigFor(user)); err == nil {
 		yaml.Unmarshal(raw, &default_config)
-    } else {
-        WriteDefault(user)
-    }
+	} else {
+		WriteDefault(user)
+	}
 
 	// Return
 	return default_config

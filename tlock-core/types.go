@@ -18,4 +18,3 @@ func (user User) S() string {
 func (user User) Vault() string {
 	return path.Join(paths.VAULT_DIR, user.S(), "vault.bin")
 }
-

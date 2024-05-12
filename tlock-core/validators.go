@@ -30,4 +30,3 @@ func (core TLockCore) validateUsername(username string) (string, error) {
 	// No errors
 	return username, nil
 }
-

@@ -26,10 +26,10 @@ type FormItemInputBox struct {
 func (item *FormItemInputBox) Update(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 
-    // Let the input box handle its logic
+	// Let the input box handle its logic
 	item.Input, cmd = item.Input.Update(msg)
 
-    // Return
+	// Return
 	return cmd
 }
 
@@ -50,11 +50,10 @@ func (item FormItemInputBox) View() string {
 
 // SetError
 func (item *FormItemInputBox) SetError(err *error) {
-    item.ErrorMessage = err
+	item.ErrorMessage = err
 }
 
 // Value
 func (item FormItemInputBox) Value() string {
 	return item.Input.Value()
 }
-
