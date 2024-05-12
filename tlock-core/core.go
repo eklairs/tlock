@@ -91,13 +91,13 @@ func (core *TLockCore) RenameUser(old, new string) error {
 
 	// Find
 	if index := core.Find(old); index != -1 {
-        // Original vault of the user
-        original_vault := path.Dir(core.Users[index].Vault())
+		// Original vault of the user
+		original_vault := path.Dir(core.Users[index].Vault())
 
-        // Rename vault folder
-        if err := os.Rename(original_vault, path.Join(path.Dir(original_vault), new)); err != nil {
-            return err
-        }
+		// Rename vault folder
+		if err := os.Rename(original_vault, path.Join(path.Dir(original_vault), new)); err != nil {
+			return err
+		}
 
 		// Rename if the user is found
 		core.Users[index] = User(new)
@@ -116,6 +116,9 @@ func (core *TLockCore) DeleteUser(username string) {
 		// Remove its vault
 		os.RemoveAll(path.Dir(User(username).Vault()))
 
+		// Remove its config
+		os.RemoveAll(path.Dir(paths.UserConfigFor(username)))
+
 		// Remove user
 		core.Users = utils.Remove(core.Users, index)
 
@@ -133,4 +136,3 @@ func (core TLockCore) Exists(username string) bool {
 func (core TLockCore) Find(username string) int {
 	return slices.Index(core.Users, User(username))
 }
-
