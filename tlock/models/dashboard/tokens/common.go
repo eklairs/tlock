@@ -1,59 +1,113 @@
 package tokens
 
 import (
+	"errors"
 	"os"
+	"strconv"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/eklairs/tlock/tlock-internal/components"
-	"github.com/eklairs/tlock/tlock-internal/form"
+	tlockform "github.com/eklairs/tlock/tlock-internal/form"
+	"github.com/eklairs/tlock/tlock-internal/utils"
+	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	tlockstyles "github.com/eklairs/tlock/tlock/styles"
+	"github.com/pquerna/otp"
 	"golang.org/x/term"
 )
 
-// Returns the form
-func BuildForm() form.Form {
-    // Initialize form
-    form := form.New();
+// Adds a validator to input to only accept int
+func onlyInt(textinput textinput.Model) textinput.Model {
+    return utils.ValidatorInteger(textinput)
+}
 
-    // Add items
-    form.AddInput("account", "Account Name", "Name of the account, like John Doe", components.InitializeInputBox("Account name goes here..."), []textinput.ValidateFunc{})
-    form.AddInput("issuer", "Issuer", "Name of the issuer, like GitHub", components.InitializeInputBox("Issuer name goes here..."), []textinput.ValidateFunc{})
-    form.AddInput("secret", "Secret", "The secret provided by the issuer", components.InitializeInputBox("The secret goes here..."), []textinput.ValidateFunc{})
-    form.AddOption("type", "Type", "Type of the token", []string{"TOTP", "HOTP"})
-    form.AddOption("hash", "Hash", "Hashing algorithm for the token", []string{"SHA1", "SHA256", "SHA512"})
-    form.AddInput("period", "Period", "Time to refresh the token", components.InitializeInputBoxCustomWidth("Time in seconds...", 24), []textinput.ValidateFunc{})
-    form.AddInput("counter", "Initial counter", "Initial counter for HOTP token", components.InitializeInputBoxCustomWidth("Initial counter...", 24), []textinput.ValidateFunc{})
-    form.AddInput("digits", "Digits", "Number of digits", components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24), []textinput.ValidateFunc{})
+// Validator for period
+func periodValidator(_ *tlockvault.Vault, period string) error {
+    if num, err := strconv.ParseInt(period, 10, 64); err == nil {
+        if num < 1 {
+            return errors.New("Period cannot be < 1")
+        }
+    }
 
-    // Disable the counter box
-    form.Disable("counter")
+    return nil
+}
 
-    // Run post init hook
-    form.PostInit()
+// Validator for digits
+func digitValidator(_ *tlockvault.Vault, digits string) error {
+    if num, err := strconv.ParseInt(digits, 10, 64); err == nil {
+        if num < 1 {
+            return errors.New("Digits cannot be < 1")
+        }
+
+        if num > 10 {
+            return errors.New("Digits cannot be > 10")
+        }
+    }
+
+    return nil
+}
+
+// Secret validator
+func secretValidator(vault *tlockvault.Vault, secret string) error {
+    // Validate
+    _, err := vault.ValidateToken(secret)
 
     // Return
-    return form
+	return err
+}
+
+// Returns the form
+func BuildForm() tlockform.Form {
+	// Initialize form
+	form := tlockform.New()
+
+	// Add items
+	form.AddInput("account", "Account Name", "Name of the account, like John Doe", components.InitializeInputBox("Account name goes here..."), []tlockform.Validator{})
+	form.AddInput("issuer", "Issuer", "Name of the issuer, like GitHub", components.InitializeInputBox("Issuer name goes here..."), []tlockform.Validator{})
+	form.AddInput("secret", "Secret", "The secret provided by the issuer", components.InitializeInputBox("The secret goes here..."), []tlockform.Validator{ secretValidator })
+	form.AddOption("type", "Type", "Type of the token", []string{"TOTP", "HOTP"})
+	form.AddOption("hash", "Hash", "Hashing algorithm for the token", []string{"SHA1", "SHA256", "SHA512"})
+	form.AddInput("period", "Period", "Time to refresh the token", onlyInt(components.InitializeInputBoxCustomWidth("Time in seconds...", 24)), []tlockform.Validator{ periodValidator })
+	form.AddInput("counter", "Initial counter", "Initial counter for HOTP token", onlyInt(components.InitializeInputBoxCustomWidth("Initial counter...", 24)), []tlockform.Validator{})
+	form.AddInput("digits", "Digits", "Number of digits", onlyInt(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24)), []tlockform.Validator{ digitValidator })
+
+    // Set default values
+    form.Default = map[string]string {
+        "account": "",
+        "issuer": "",
+        "period": "30",
+        "counter": "0",
+        "digits": "6",
+    }
+
+	// Disable the counter box
+	form.Disable("counter")
+
+	// Run post init hook
+	form.PostInit()
+
+	// Return
+	return form
 }
 
 // Renders the form
-func RenderForm(ascii, description string, form form.Form) string {
-    // Items
+func RenderForm(ascii, description string, form tlockform.Form) string {
+	// Items
 	items := []string{
 		tlockstyles.Styles.Title.Render(ascii), "",
 		tlockstyles.Styles.SubText.Render("Add a new token [secret is required, rest are optional]"), "",
 		form.Items[0].FormItem.View(), // Account name input
-		form.Items[1].FormItem.View(), // Account name input
-		form.Items[2].FormItem.View(), // Account name input
-        lipgloss.JoinHorizontal(
+		form.Items[1].FormItem.View(), // Issuer name input
+		form.Items[2].FormItem.View(), // Secret name input
+		lipgloss.JoinHorizontal(
 			lipgloss.Left,
 			form.Items[3].FormItem.View(), "   ",
 			form.Items[4].FormItem.View(),
 		), "",
 	}
 
-    // Render the input boxes based on choosen type
+	// Render the input boxes based on choosen type
 	inputGroup := lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		form.Items[5].FormItem.View(), "   ",
@@ -69,51 +123,86 @@ func RenderForm(ascii, description string, form form.Form) string {
 	}
 
 	// Add the help menu
-    items = append(items, inputGroup, "", tlockstyles.Help.View(addTokenKeys))
+	items = append(items, inputGroup, "", tlockstyles.Help.View(addTokenKeys))
 
-    // Return
-    return lipgloss.JoinVertical(lipgloss.Center, items...)
+	// Return
+	return lipgloss.JoinVertical(lipgloss.Center, items...)
 }
 
 // Creates a new viewport with the form rendered
-func IntoViewport(ascii, description string, form form.Form) viewport.Model {
-    // Get size
-    _, height, _ := term.GetSize(int(os.Stdout.Fd()))
+func IntoViewport(ascii, description string, form tlockform.Form) viewport.Model {
+	// Get size
+	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
-    // Rendered content
-    content := RenderForm(ascii, description, form)
+	// Rendered content
+	content := RenderForm(ascii, description, form)
 
-    // Initialize
-    viewport := viewport.New(85, min(height, lipgloss.Height(content)))
-    viewport.SetContent(content)
+	// Initialize
+	viewport := viewport.New(85, min(height, lipgloss.Height(content)))
+	viewport.SetContent(content)
 
-    // Return
-    return viewport
+	// Return
+	return viewport
 }
 
 // Updates the viewport with the new form content
-func UpdateViewport(ascii, description string, viewport *viewport.Model, form form.Form) {
-    // Get size
-    _, height, _ := term.GetSize(int(os.Stdout.Fd()))
+func UpdateViewport(ascii, description string, viewport *viewport.Model, form tlockform.Form) {
+	// Get size
+	_, height, _ := term.GetSize(int(os.Stdout.Fd()))
 
-    // Rendered content
-    content := RenderForm(ascii, description, form)
+	// Rendered content
+	content := RenderForm(ascii, description, form)
 
-    // Update
-    viewport.Height = min(height, lipgloss.Height(content))
-    viewport.SetContent(content)
+	// Update
+	viewport.Height = min(height, lipgloss.Height(content))
+	viewport.SetContent(content)
 }
 
 // Disables the form item based on the selected type
-func DisableBasedOnType(form *form.Form) {
-    // Enable / Disable items based on the choosen type
+func DisableBasedOnType(form *tlockform.Form) {
+	// Enable / Disable items based on the choosen type
 	if form.Items[3].FormItem.Value() == "TOTP" {
-        form.Disable("counter")
-        form.Enable("period")
+		form.Disable("counter")
+		form.Enable("period")
 	}
 
-    if form.Items[3].FormItem.Value() == "HOTP" {
-        form.Enable("counter")
-        form.Disable("period")
+	if form.Items[3].FormItem.Value() == "HOTP" {
+		form.Enable("counter")
+		form.Disable("period")
 	}
+}
+
+// Converts string to token type
+func toTokenType(tokentype string) tlockvault.TokenType {
+    if tokentype == "HOTP" {
+        return tlockvault.TokenTypeHOTP
+    }
+
+    return tlockvault.TokenTypeTOTP
+}
+
+// Converts string to opt algorithm
+func toOtpAlgorithm(algo string) otp.Algorithm {
+    switch algo {
+    case "SHA256":
+        return otp.AlgorithmSHA256
+    case "SHA512":
+        return otp.AlgorithmSHA512
+    default:
+        return otp.AlgorithmSHA1
+    }
+}
+
+// Create a token from form data
+func TokenFromFormData(data map[string]string) tlockvault.Token {
+    return tlockvault.Token{
+        Issuer: data["issuer"],
+        Account: data["account"],
+        Secret: data["secret"],
+        Type: toTokenType(data["type"]),
+        InitialCounter: utils.ToInt(data["counter"]),
+        Period: utils.ToInt(data["period"]),
+        Digits: utils.ToInt(data["digits"]),
+        HashingAlgorithm: toOtpAlgorithm(data["hash"]),
+    }
 }

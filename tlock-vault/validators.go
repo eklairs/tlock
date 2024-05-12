@@ -14,7 +14,7 @@ var ERR_FOLDER_EMPTY = errors.New("Folder name cannot be empty")
 var ERR_FOLDER_EXISTS = errors.New("Folder with that name already exists")
 
 // Error representing that the token secret is empty
-var ERR_TOKEN_EMPTY = errors.New("Secret value cannt be empty")
+var ERR_TOKEN_EMPTY = errors.New("Secret value cannot be empty")
 
 // Error representing that the secret is invalid
 var ERR_TOKEN_INVALID = errors.New("Secret is invalid, are you sure it is typed correctly?")

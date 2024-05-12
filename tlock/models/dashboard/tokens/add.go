@@ -1,22 +1,17 @@
 package tokens
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/eklairs/tlock/tlock-internal/components"
 	"github.com/eklairs/tlock/tlock-internal/form"
+	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 )
-
-// Converts the given string type tok token type
-func toTokenType(value string) tlockvault.TokenType {
-	if value == "HOTP" {
-		return tlockvault.TokenTypeHOTP
-	}
-
-	return tlockvault.TokenTypeTOTP
-}
 
 // Add token key map
 type addTokenKeyMap struct {
@@ -106,8 +101,42 @@ func (screen AddTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMana
     // Commands
     cmds := make([]tea.Cmd, 0)
 
+    // Match
+    switch msgType := msg.(type) {
+    case tea.KeyMsg:
+        switch {
+        case key.Matches(msgType, addTokenKeys.GoBack):
+            manager.PopScreen()
+        }
+
+    case form.FormSubmittedMsg:
+        // Get token
+        token := TokenFromFormData(msgType.Data)
+
+        // Make statusbar message
+        statusBarMessage := fmt.Sprintf("Successfully added token for %s", token.Account)
+
+        if token.Account == "" {
+            statusBarMessage = fmt.Sprintf("Successfully added token (no account name)")
+        }
+
+        // Require refresh of folders and tokens list
+        cmds = append(
+            cmds,
+            func() tea.Msg { return tlockmessages.RefreshFoldersMsg{} },
+            func() tea.Msg { return tlockmessages.RefreshTokensMsg{} },
+            func() tea.Msg { return components.StatusBarMsg{Message: statusBarMessage} },
+        )
+
+        // Add
+        screen.vault.AddTokenFromToken(screen.folder.Name, token)
+
+        // Break
+        manager.PopScreen()
+    }
+
     // Let the form handle its update
-    screen.form.Update(msg)
+    cmds = append(cmds, screen.form.Update(msg, screen.vault))
 
     // Update the viewport
     DisableBasedOnType(&screen.form)

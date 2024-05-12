@@ -17,7 +17,7 @@ func toType(type_ string) TokenType {
 }
 
 // Adds a new token to the given folder from token URI
-func (vault *Vault) AddToken(folderId string, uri string) error {
+func (vault *Vault) AddToken(folder string, uri string) error {
 	// Key
 	var key *otp.Key
 	var err error
@@ -38,7 +38,7 @@ func (vault *Vault) AddToken(folderId string, uri string) error {
 		}
 
 		// Add
-		return vault.AddTokenFromToken(folderId, token)
+		return vault.AddTokenFromToken(folder, token)
 	}
 
 	// Return

@@ -109,7 +109,7 @@ func (screen EditTokenScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
     cmds := make([]tea.Cmd, 0)
 
     // Let the form handle
-    screen.form.Update(msg)
+    screen.form.Update(msg, screen.vault)
 
     // Return
 	return screen, tea.Batch(cmds...)
