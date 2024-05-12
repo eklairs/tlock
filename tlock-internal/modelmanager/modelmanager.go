@@ -9,6 +9,9 @@ import (
 	"golang.org/x/term"
 )
 
+// Message represeting that the screenw as refocused after popping
+type ScreenRefocusedMsg struct{}
+
 // A tea.Model-ish interface but for model manager
 type Screen interface {
 	Init() tea.Cmd
@@ -123,6 +126,10 @@ func (manager *ModelManager) ResolveOperation() {
 		manager.stack = append(manager.stack, *manager.operation.Screen)
 	case OperationPop:
 		manager.stack = manager.stack[:screen_index]
+
+        // Send the refocused message
+        manager.stack[len(manager.stack)-1], _ = manager.stack[len(manager.stack)-1].Update(ScreenRefocusedMsg{}, manager)
+
 	case OperationReplace:
 		manager.stack[screen_index] = *manager.operation.Screen
 	}
