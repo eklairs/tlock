@@ -6,11 +6,11 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/eklairs/tlock/releases/download/v1.0.0/tlock-v1.0.0-windows-amd64.zip",
-            "hash": "8f8b0525b849c2656c41b0eaa71afe94799067a5073917c7ca495771d3892aef"
+            "hash": "7dbc7009348d8f8148bbf036b6732da80af1b243c6c5fabbde9e155c5bd19534"
         },
         "32bit": {
             "url": "https://github.com/eklairs/tlock/releases/download/v1.0.0/tlock-v1.0.0-windows-386.zip",
-            "hash": "a11205e0e6609b5466ddbb69b4844836bf57b6ca5c5a04239c24ee69e7885e7f"
+            "hash": "b96f7b5ff46a3f61773b2848a1d1e9e6f7f1ccbc3f69f74b337ab5fc68998d8f"
         }
     },
     "bin": "tlock.exe"
