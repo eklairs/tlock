@@ -218,7 +218,7 @@ func (screen SelectUserScreen) View() string {
 
 	// Add paginator
 	if screen.listview.Paginator.TotalPages > 1 {
-		items = append(items, components.Paginator(screen.listview))
+		items = append(items, components.Paginator(screen.listview), "")
 	}
 
 	// Add help
