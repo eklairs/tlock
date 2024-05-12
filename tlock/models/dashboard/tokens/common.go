@@ -58,19 +58,28 @@ func secretValidator(vault *tlockvault.Vault, secret string) error {
 }
 
 // Returns the form
-func BuildForm() tlockform.Form {
+func BuildForm(values map[string]string) tlockform.Form {
 	// Initialize form
 	form := tlockform.New()
 
+    // Sets the value of the input box
+    v := func (input textinput.Model, key string) textinput.Model {
+        if value, ok := values[key]; ok {
+            input.SetValue(value)
+        }
+
+        return input
+    }
+
 	// Add items
-	form.AddInput("account", "Account Name", "Name of the account, like John Doe", components.InitializeInputBox("Account name goes here..."), []tlockform.Validator{})
-	form.AddInput("issuer", "Issuer", "Name of the issuer, like GitHub", components.InitializeInputBox("Issuer name goes here..."), []tlockform.Validator{})
-	form.AddInput("secret", "Secret", "The secret provided by the issuer", components.InitializeInputBox("The secret goes here..."), []tlockform.Validator{ secretValidator })
+	form.AddInput("account", "Account Name", "Name of the account, like John Doe", v(components.InitializeInputBox("Account name goes here..."), "account"), []tlockform.Validator{})
+	form.AddInput("issuer", "Issuer", "Name of the issuer, like GitHub", v(components.InitializeInputBox("Issuer name goes here..."), "issuer"), []tlockform.Validator{})
+	form.AddInput("secret", "Secret", "The secret provided by the issuer", v(components.InitializeInputBox("The secret goes here..."), "secret"), []tlockform.Validator{ secretValidator })
 	form.AddOption("type", "Type", "Type of the token", []string{"TOTP", "HOTP"})
 	form.AddOption("hash", "Hash", "Hashing algorithm for the token", []string{"SHA1", "SHA256", "SHA512"})
-	form.AddInput("period", "Period", "Time to refresh the token", onlyInt(components.InitializeInputBoxCustomWidth("Time in seconds...", 24)), []tlockform.Validator{ periodValidator })
-	form.AddInput("counter", "Initial counter", "Initial counter for HOTP token", onlyInt(components.InitializeInputBoxCustomWidth("Initial counter...", 24)), []tlockform.Validator{})
-	form.AddInput("digits", "Digits", "Number of digits", onlyInt(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24)), []tlockform.Validator{ digitValidator })
+	form.AddInput("period", "Period", "Time to refresh the token", v(onlyInt(components.InitializeInputBoxCustomWidth("Time in seconds...", 24)), "period"), []tlockform.Validator{ periodValidator })
+	form.AddInput("counter", "Initial counter", "Initial counter for HOTP token", v(onlyInt(components.InitializeInputBoxCustomWidth("Initial counter...", 24)), "counter"), []tlockform.Validator{})
+	form.AddInput("digits", "Digits", "Number of digits", v(onlyInt(components.InitializeInputBoxCustomWidth("Number of digits goes here...", 24)), "digits"), []tlockform.Validator{ digitValidator })
 
     // Set default values
     form.Default = map[string]string {

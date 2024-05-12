@@ -80,7 +80,7 @@ type AddTokenScreen struct {
 // Initializes a new screen of AddTokenScreen
 func InitializeAddTokenScreen(folder tlockvault.Folder, vault *tlockvault.Vault) AddTokenScreen {
     // Initialize form
-    form := BuildForm()
+    form := BuildForm(map[string]string{})
 
 	// Return
 	return AddTokenScreen{
