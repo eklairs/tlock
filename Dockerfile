@@ -17,7 +17,7 @@ COPY . /app
 RUN go mod tidy
 
 # Build
-RUN CGO_ENABLED=1 go build -o /usr/bin/tlock tlock/main.go 
+RUN go build -ldflags "-X github.com/eklairs/tlock/tlock-internal/constants.VERSION=docker -w -s" -o /usr/bin/tlock tlock/main.go
 
 # Set entry point to the binary
 ENTRYPOINT ["/usr/bin/tlock"]
