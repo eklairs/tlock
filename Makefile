@@ -2,9 +2,9 @@
 install-git-hooks:
 	cp hooks/* .git/hooks/
 
-# Generates vendor
-generate-vendor:
-	go run genvendor.go
+# Generates icons
+generate-icons:
+	go run scripts/genicons.go
 
 # Builds git version of the tlock
 # Basically sets the version to the latest commit
