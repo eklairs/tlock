@@ -33,7 +33,7 @@ TLock is an open-source tool to store and manage your authentication tokens secu
   {
     inputs = {
       nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-      tlock.url = "github:eklairs/tlock";
+      tlock.url = "git+https://github.com/eklairs/tlock?submodules=1";
       tlock.inputs.nixpkgs.follows = "nixpkgs";
     };
 
