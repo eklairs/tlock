@@ -28,6 +28,13 @@ TLock is an open-source tool to store and manage your authentication tokens secu
   ```
 
 - **NixOS** (with Flakes)
+
+  Try out before installing ✨
+  ```fish
+  nix run "git+https://github.com/eklairs/tlock?submodules=1"
+  ```
+
+  Minimal configuration:
   ```nix
   # flake.nix
   {
