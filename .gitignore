@@ -24,3 +24,9 @@ go.work
 build/
 
 dist/
+
+# Direnv
+.direnv/
+
+# Nix build symlink
+result
