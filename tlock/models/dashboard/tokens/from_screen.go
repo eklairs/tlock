@@ -190,13 +190,27 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 				// Read data from the screen
 				data, err := utils.ReadTokenFromScreen()
 
-				// Create data
+				// Prepare data
 				dataScreen := dataFromScreen{
 					Uri: data,
 					Err: err,
 				}
 
-				dataFromScreenChan <- &dataScreen
+				// Try to parse
+				if data != nil {
+					if key, err := otp.NewKeyFromURL(*data); err == nil {
+						// Run validator
+						_, err := screen.vault.ValidateToken(key.Secret())
+
+						// Update error message
+						if dataScreen.Err == nil {
+							dataScreen.Err = err
+						}
+					}
+
+					// Send
+					dataFromScreenChan <- &dataScreen
+				}
 			}()
 
 		case key.Matches(msgType, confirmScreenKeys.Retake):
@@ -212,6 +226,7 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			// Add the token
 			if screen.token != nil && screen.token.Err == nil {
 				// Add token
+				// We can ignore validations because we have already pre-checked it
 				screen.vault.AddToken(screen.folder.Name, *screen.token.Uri)
 
 				// Require refresh of folders and tokens list
