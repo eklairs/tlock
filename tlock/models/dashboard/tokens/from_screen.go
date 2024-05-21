@@ -12,11 +12,9 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/components"
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	tlockstyles "github.com/eklairs/tlock/tlock/styles"
-	"github.com/kbinani/screenshot"
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/qrcode"
 	"github.com/pquerna/otp"
 )
 
@@ -190,29 +188,16 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			cmds = append(cmds, screen.spinner.Tick)
 
 			go func() {
-				if image, err := screenshot.CaptureRect(screenshot.GetDisplayBounds(0)); err == nil {
-					if bmp, err := gozxing.NewBinaryBitmapFromImage(image); err == nil {
-						qrReader := qrcode.NewQRCodeReader()
+				// Read data from the screen
+				data, err := utils.ReadTokenFromScreen()
 
-						if result, err := qrReader.Decode(bmp, nil); err == nil {
-							uri := result.String()
-
-							// Try to parse
-							if key, err := otp.NewKeyFromURL(uri); err == nil {
-								// Run validator
-								_, err := screen.vault.ValidateToken(key.Secret())
-
-								// Send
-								dataFromScreenChan <- &dataFromScreen{
-									Uri: &uri,
-									Err: err,
-								}
-							}
-						}
-					}
+				// Create data
+				dataScreen := dataFromScreen{
+					Uri: data,
+					Err: err,
 				}
 
-				dataFromScreenChan <- nil
+				dataFromScreenChan <- &dataScreen
 			}()
 
 		case key.Matches(msgType, confirmScreenKeys.Retake):
