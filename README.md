@@ -19,6 +19,9 @@ TLock is an open-source tool to store and manage your authentication tokens secu
 >[!NOTE]
 >For showing the provider's icon, you must have Nerd Fonts installed
 
+>[!NOTE]
+>To make screenshot feature work on wayland, you need to install grim
+
 ## ⬇️ Installation
 
 - **Arch Linux** (with AUR helper, like yay)

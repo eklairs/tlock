@@ -2,7 +2,6 @@ package tokens
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -12,11 +11,9 @@ import (
 	"github.com/eklairs/tlock/tlock-internal/components"
 	tlockmessages "github.com/eklairs/tlock/tlock-internal/messages"
 	"github.com/eklairs/tlock/tlock-internal/modelmanager"
+	"github.com/eklairs/tlock/tlock-internal/utils"
 	tlockvault "github.com/eklairs/tlock/tlock-vault"
 	tlockstyles "github.com/eklairs/tlock/tlock/styles"
-	"github.com/kbinani/screenshot"
-	"github.com/makiuchi-d/gozxing"
-	"github.com/makiuchi-d/gozxing/qrcode"
 	"github.com/pquerna/otp"
 )
 
@@ -190,29 +187,30 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			cmds = append(cmds, screen.spinner.Tick)
 
 			go func() {
-				if image, err := screenshot.CaptureRect(screenshot.GetDisplayBounds(0)); err == nil {
-					if bmp, err := gozxing.NewBinaryBitmapFromImage(image); err == nil {
-						qrReader := qrcode.NewQRCodeReader()
+				// Read data from the screen
+				data, err := utils.ReadTokenFromScreen()
 
-						if result, err := qrReader.Decode(bmp, nil); err == nil {
-							uri := result.String()
+				// Prepare data
+				dataScreen := dataFromScreen{
+					Uri: data,
+					Err: err,
+				}
 
-							// Try to parse
-							if key, err := otp.NewKeyFromURL(uri); err == nil {
-								// Run validator
-								_, err := screen.vault.ValidateToken(key.Secret())
+				// Try to parse
+				if data != nil {
+					if key, err := otp.NewKeyFromURL(*data); err == nil {
+						// Run validator
+						_, err := screen.vault.ValidateToken(key.Secret())
 
-								// Send
-								dataFromScreenChan <- &dataFromScreen{
-									Uri: &uri,
-									Err: err,
-								}
-							}
+						// Update error message
+						if dataScreen.Err == nil {
+							dataScreen.Err = err
 						}
 					}
 				}
 
-				dataFromScreenChan <- nil
+				// Send
+				dataFromScreenChan <- &dataScreen
 			}()
 
 		case key.Matches(msgType, confirmScreenKeys.Retake):
@@ -228,6 +226,7 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 			// Add the token
 			if screen.token != nil && screen.token.Err == nil {
 				// Add token
+				// We can ignore validations because we have already pre-checked it
 				screen.vault.AddToken(screen.folder.Name, *screen.token.Uri)
 
 				// Require refresh of folders and tokens list
@@ -282,9 +281,7 @@ func (screen TokenFromScreen) View() string {
 		}
 
 		// If the token is null, show the message
-		if screen.token == nil {
-			items = append(items, tlockstyles.Styles.Error.Render("Did not find any token!"))
-		} else {
+		if screen.token != nil {
 			// Try to parse the otp value
 			if screen.token.Err == nil {
 				key, err := otp.NewKeyFromURL(*screen.token.Uri)
@@ -312,8 +309,7 @@ func (screen TokenFromScreen) View() string {
 			} else {
 				items = append(items, lipgloss.JoinHorizontal(
 					lipgloss.Center,
-					tlockstyles.Styles.Base.Render("Found a token from screen, but "),
-					tlockstyles.Styles.Error.Render(strings.ToLower(screen.token.Err.Error())),
+					tlockstyles.Styles.Error.Render(screen.token.Err.Error()),
 				))
 			}
 		}
