@@ -59,7 +59,7 @@ func ReadTokenFromScreenWaylandOnly() (*string, error) {
 		return nil, errors.New(fmt.Sprintf("Cannot run grim command: %s", err))
 	}
 
-	return nil, nil
+	return nil, TOKEN_NOT_FOUND_ERR
 }
 
 // Reads QRCode from screen based on the session type

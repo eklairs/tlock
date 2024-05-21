@@ -2,7 +2,6 @@ package tokens
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -267,9 +266,7 @@ func (screen TokenFromScreen) View() string {
 		}
 
 		// If the token is null, show the message
-		if screen.token == nil {
-			items = append(items, tlockstyles.Styles.Error.Render("Did not find any token!"))
-		} else {
+		if screen.token != nil {
 			// Try to parse the otp value
 			if screen.token.Err == nil {
 				key, err := otp.NewKeyFromURL(*screen.token.Uri)
@@ -297,8 +294,7 @@ func (screen TokenFromScreen) View() string {
 			} else {
 				items = append(items, lipgloss.JoinHorizontal(
 					lipgloss.Center,
-					tlockstyles.Styles.Base.Render("Found a token from screen, but "),
-					tlockstyles.Styles.Error.Render(strings.ToLower(screen.token.Err.Error())),
+					tlockstyles.Styles.Error.Render(screen.token.Err.Error()),
 				))
 			}
 		}
