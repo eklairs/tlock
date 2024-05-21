@@ -207,10 +207,10 @@ func (screen TokenFromScreen) Update(msg tea.Msg, manager *modelmanager.ModelMan
 							dataScreen.Err = err
 						}
 					}
-
-					// Send
-					dataFromScreenChan <- &dataScreen
 				}
+
+				// Send
+				dataFromScreenChan <- &dataScreen
 			}()
 
 		case key.Matches(msgType, confirmScreenKeys.Retake):
