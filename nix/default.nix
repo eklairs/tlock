@@ -1,8 +1,7 @@
-{ pkgs, lib, buildGoModule, git_version, ... }: let
-  manifest = builtins.fromJSON (builtins.readFile (../. + "/tlock.json"));
-in buildGoModule rec {
+{ pkgs, lib, buildGoModule, git_version, ... }:
+buildGoModule rec {
   pname = "tlock";
-  version = manifest.version;
+  version = "1.0.0";
 
   src = lib.cleanSource ../.;
   vendorHash = "sha256-G402CigSvloF/SI9Wbcts/So1impMUH5kroxDD/KKew=";
