@@ -30,6 +30,44 @@ TLock is an open-source tool to store and manage your authentication tokens secu
   yay -S tlock
   ```
 
+- **NixOS** (with Flakes)
+
+  Try out before installing ✨
+  ```fish
+  nix run "git+https://github.com/eklairs/tlock?submodules=1"
+  ```
+
+  Minimal configuration:
+  ```nix
+  # flake.nix
+  {
+    inputs = {
+      nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+      tlock.url = "git+https://github.com/eklairs/tlock?submodules=1";
+      tlock.inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    outputs = inputs @ { self, nixpkgs, tlock, ... }:
+    {
+      # Change hostname etc. as needed
+      nixosConfigurations.hostname = let
+        system = "x86_64-linux";
+        lib = nixpkgs.lib;
+      in lib.nixosSystem {
+        inherit system;
+        modules = [
+          {
+            environment.systemPackages = [
+              tlock.packages.${system}.default
+            ];
+          }
+          ./configuration.nix
+        ];
+      };
+    };
+  }
+  ```
+
 - **Windows** (with scoop)
 
   ```fish
